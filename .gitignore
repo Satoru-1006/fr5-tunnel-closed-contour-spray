@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# ROS / colcon build products
+build/
+install/
+log/
+
+# Local/vendor mirrors
+external/
+
+# Generated outputs: keep lightweight demo artifacts only
+outputs/*
+!outputs/*.png
+!outputs/*.gif
+!outputs/*.json
+!outputs/tcp_poses.csv
+!outputs/tcp_poses_base_link.csv
+!outputs/quality_report.csv
+!outputs/ik_waypoints.csv
+!outputs/final_quality_report.csv
+
+# Nested output snapshots stay local
+outputs/timing_check/
+
+# Local generated report draft with broken encoding in this workspace
+PROJECT_REPORT_README.md
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Large generated data
+*.bag
+*.db3
+*.mcap
+*.log

@@ -1,0 +1,31 @@
+{
+  "overall_status": "pass",
+  "strict_runtime": true,
+  "items": [
+    {
+      "requirement": "Real TCP speed and stand-off are recomputed from FK(q(t))",
+      "status": "pass",
+      "evidence": "example FK profile uses tcp_speed_from_positions; final strict validation uses MoveIt2 FK reports for TCP speed, normal, and stand-off gates"
+    },
+    {
+      "requirement": "MoveIt2 uses wall-normal TCP pose goals",
+      "status": "pass",
+      "evidence": "tcp_poses pose_count=720, quaternion-vs-normal max error=8.53774e-07 deg; MoveIt goal link is spray_tcp_link"
+    },
+    {
+      "requirement": "IK includes nozzle wall-normal orientation constraints",
+      "status": "pass",
+      "evidence": "IK residual includes tool-Z axis error; current FK normal_angle_error_max_deg=7.380547673360324"
+    },
+    {
+      "requirement": "Ruckig smoothing runs after MoveIt2 trajectory planning/time-parameterization",
+      "status": "pass",
+      "evidence": "bridge builds the MoveIt trajectory, applies configured time-parameterization, then native RobotTrajectory.apply_ruckig_smoothing; execution refuses use_ruckig_smoothing:=false"
+    },
+    {
+      "requirement": "ROS2/MoveIt2 runtime execution-chain evidence",
+      "status": "pass",
+      "evidence": "MoveIt FK quality report passed, FK trace rows=720, joint dynamics ratios are within limits; max_jerk_ratio=0.1868, collision states=145, environment objects=60"
+    }
+  ]
+}

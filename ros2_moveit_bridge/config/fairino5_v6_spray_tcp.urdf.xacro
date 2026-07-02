@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fairino5_v6_spray_tcp">
+  <xacro:arg name="initial_positions_file" default="$(find fairino5_v6_moveit2_config)/config/initial_positions.yaml" />
+  <xacro:arg name="tool_tcp_xyz" default="0 0 0" />
+  <xacro:arg name="tool_tcp_rpy" default="0 0 0" />
+
+  <xacro:include filename="$(find fairino_description)/urdf/fairino5_v6.urdf" />
+  <xacro:include filename="$(find fairino5_v6_moveit2_config)/config/fairino5_v6_robot.ros2_control.xacro" />
+  <xacro:fairino5_v6_robot_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)" />
+
+  <!-- Replace tool_tcp_xyz/rpy with the measured flange-to-nozzle calibration. -->
+  <link name="spray_tcp_link" />
+  <joint name="spray_tcp_fixed_joint" type="fixed">
+    <parent link="wrist3_link" />
+    <child link="spray_tcp_link" />
+    <origin xyz="$(arg tool_tcp_xyz)" rpy="$(arg tool_tcp_rpy)" />
+  </joint>
+</robot>

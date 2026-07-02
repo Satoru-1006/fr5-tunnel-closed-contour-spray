@@ -1,0 +1,71 @@
+{
+  "overall_status": "pass",
+  "result_source": "moveit2_strict_runtime",
+  "reports": {
+    "quality": "C:\\Users\\86198\\Desktop\\robotfucker\\outputs\\moveit_quality_report.csv",
+    "dynamics": "C:\\Users\\86198\\Desktop\\robotfucker\\outputs\\moveit_joint_dynamics_report.csv",
+    "collision": "C:\\Users\\86198\\Desktop\\robotfucker\\outputs\\moveit_collision_report.csv",
+    "strict_audit": "C:\\Users\\86198\\Desktop\\robotfucker\\outputs\\audit_goal_requirements_strict.json"
+  },
+  "metrics": {
+    "result_source": "moveit2_strict_runtime",
+    "status": "pass",
+    "runtime_log_source": "C:\\Users\\86198\\Desktop\\robotfucker\\outputs\\moveit_runtime.log",
+    "ruckig_known_warning_count_raw_log": 0,
+    "strict_audit_status": "pass",
+    "quality_report_source": "C:\\Users\\86198\\Desktop\\robotfucker\\outputs\\moveit_quality_report.csv",
+    "dynamics_report_source": "C:\\Users\\86198\\Desktop\\robotfucker\\outputs\\moveit_joint_dynamics_report.csv",
+    "collision_report_source": "C:\\Users\\86198\\Desktop\\robotfucker\\outputs\\moveit_collision_report.csv",
+    "fk_normal_error_mean_deg": "0.4637331751588082",
+    "fk_normal_error_max_deg": "2.4871678782286684",
+    "fk_standoff_error_max_abs_mm": "1.2820582750966703",
+    "fk_path_deviation_p95_mm": "0.08128501567048063",
+    "fk_path_deviation_max_mm": "1.851782906667074",
+    "fk_tcp_speed_mean_m_s": "0.002995909417811119",
+    "fk_tcp_speed_p05_m_s": "0.0029999999995450276",
+    "fk_tcp_speed_p95_m_s": "0.0030000000006289275",
+    "fk_tcp_speed_p05_p95_fluctuation": "3.6179328068995417e-10",
+    "moveit_ruckig_smoothing_used": "true",
+    "moveit_time_parameterization": "tcp_arclength",
+    "moveit_ee_link": "spray_tcp_link",
+    "max_velocity_ratio": 0.16823842356025193,
+    "max_acceleration_ratio": 0.5938644984471205,
+    "max_jerk_ratio": 0.18680515377540977,
+    "worst_jerk_joint": "j4",
+    "collision_environment_object_count": "60.0",
+    "collision_checked_state_count": "145.0",
+    "collision_count": "0.0",
+    "collision_status": "pass"
+  },
+  "audit": {
+    "overall_status": "pass",
+    "strict_runtime": true,
+    "items": [
+      {
+        "requirement": "Real TCP speed and stand-off are recomputed from FK(q(t))",
+        "status": "pass",
+        "evidence": "example FK profile uses tcp_speed_from_positions; final strict validation uses MoveIt2 FK reports for TCP speed, normal, and stand-off gates"
+      },
+      {
+        "requirement": "MoveIt2 uses wall-normal TCP pose goals",
+        "status": "pass",
+        "evidence": "tcp_poses pose_count=720, quaternion-vs-normal max error=8.53774e-07 deg; MoveIt goal link is spray_tcp_link"
+      },
+      {
+        "requirement": "IK includes nozzle wall-normal orientation constraints",
+        "status": "pass",
+        "evidence": "IK residual includes tool-Z axis error; current FK normal_angle_error_max_deg=7.380547673360324"
+      },
+      {
+        "requirement": "Ruckig smoothing runs after MoveIt2 trajectory planning/time-parameterization",
+        "status": "pass",
+        "evidence": "bridge builds the MoveIt trajectory, applies configured time-parameterization, then native RobotTrajectory.apply_ruckig_smoothing; execution refuses use_ruckig_smoothing:=false"
+      },
+      {
+        "requirement": "ROS2/MoveIt2 runtime execution-chain evidence",
+        "status": "pass",
+        "evidence": "MoveIt FK quality report passed, FK trace rows=720, joint dynamics ratios are within limits; max_jerk_ratio=0.1868, collision states=145, environment objects=60"
+      }
+    ]
+  }
+}
