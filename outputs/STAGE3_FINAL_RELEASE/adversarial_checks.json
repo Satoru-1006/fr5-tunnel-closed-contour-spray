@@ -1,0 +1,8 @@
+{
+  "canonical_identity_unchanged": "PASS",
+  "corrupted_checkpoint_rejection": "PASS",
+  "input_shape_and_finiteness": "PASS",
+  "invalid_tensor_shape_rejection": "PASS",
+  "nan_inf_policy": "PASS",
+  "shadow_nonpromotion": "PASS"
+}

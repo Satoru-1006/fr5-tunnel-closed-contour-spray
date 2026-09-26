@@ -1,0 +1,150 @@
+{
+  "benchmark_id": "STAGE4_SYSTEM_BENCHMARK_V1",
+  "checkpoint_reload": {
+    "checkpoint": "outputs/stage3_h13_d35_permanent_champion/checkpoints/committed_update_480.pt",
+    "sha256": "37645eea5aef8ce2fe7084c83f35429a7a13fbe3e9612eb84417ccce6cba9742",
+    "status": "PASS"
+  },
+  "clean_restart": {
+    "evidence": {
+      "D45_replay_sandbox": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/stage3_replay_auth",
+      "H1": 7.089328839013259e-05,
+      "H32": 0.01849100619381173,
+      "status": "PASS"
+    },
+    "status": "PASS_D45_AUTHENTICATED_STAGE3_REPLAY"
+  },
+  "determinism_claim": "exact benchmark task identity and frozen regression CSV identity are proven; cross-platform bitwise replay is not claimed",
+  "first_divergence": null,
+  "fixed_seed_randomized_benchmark_replay": {
+    "case_count": 1000,
+    "case_identity_frozen": true,
+    "seed": 460046,
+    "status": "PASS"
+  },
+  "fresh_process_replay": {
+    "cases_compared": [
+      {
+        "case_id": "normal_0000",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "normal_0100",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "boundary_0000",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "boundary_0100",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "collision_sensitive_0000",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "collision_sensitive_0051",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "adversarial_0100",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "adversarial_0101",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "perturbation_0000",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "perturbation_0100",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "regression_0000",
+        "mismatches": [],
+        "status": "PASS"
+      },
+      {
+        "case_id": "regression_0001",
+        "mismatches": [],
+        "status": "PASS"
+      }
+    ],
+    "native_process": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/native_replay_2",
+    "process_scope": "12 frozen acceptance cases",
+    "status": "PASS"
+  },
+  "mismatches": [],
+  "report_id": "STAGE4_REPRODUCIBILITY_REPORT_V1",
+  "same_process_replay": {
+    "cases": [
+      {
+        "case_id": "regression_0000",
+        "finite": true,
+        "result_present": true,
+        "state_sha256": "800f8cc1fa00dbc547af4f5d85159b80d08750e55054bb012a938babbbea8230",
+        "state_shape": [
+          181,
+          6
+        ]
+      },
+      {
+        "case_id": "regression_0002",
+        "finite": true,
+        "result_present": true,
+        "state_sha256": "800f8cc1fa00dbc547af4f5d85159b80d08750e55054bb012a938babbbea8230",
+        "state_shape": [
+          181,
+          6
+        ]
+      },
+      {
+        "case_id": "regression_0003",
+        "finite": true,
+        "result_present": true,
+        "state_sha256": "800f8cc1fa00dbc547af4f5d85159b80d08750e55054bb012a938babbbea8230",
+        "state_shape": [
+          181,
+          6
+        ]
+      },
+      {
+        "case_id": "regression_0004",
+        "finite": true,
+        "result_present": true,
+        "state_sha256": "800f8cc1fa00dbc547af4f5d85159b80d08750e55054bb012a938babbbea8230",
+        "state_shape": [
+          181,
+          6
+        ]
+      },
+      {
+        "case_id": "regression_0005",
+        "finite": true,
+        "result_present": true,
+        "state_sha256": "800f8cc1fa00dbc547af4f5d85159b80d08750e55054bb012a938babbbea8230",
+        "state_shape": [
+          181,
+          6
+        ]
+      }
+    ],
+    "status": "PASS"
+  },
+  "schema_version": "stage4-reproducibility-report-v1"
+}

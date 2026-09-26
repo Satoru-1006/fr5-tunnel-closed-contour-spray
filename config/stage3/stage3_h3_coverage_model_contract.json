@@ -1,0 +1,53 @@
+{
+  "schema_version": "stage3-h3-coverage-model-contract-v1",
+  "status": "FROZEN_FOR_H3",
+  "model_id": "geometric_cone_projection_v1",
+  "model_classification": "GEOMETRIC_FOOTPRINT_ONLY",
+  "physical_deposition_model": "NOT_AVAILABLE",
+  "parameters": {
+    "cone_half_angle_deg": 15.0,
+    "effective_radius_formula": "nominal_standoff_m * tan(cone_half_angle_deg)",
+    "nominal_standoff_source": "stage3_h3_target_pose_contract.json",
+    "clipping_rule": "finite tangent-plane disk; distance <= effective_radius_m; no extrapolation beyond declared disk",
+    "incidence_angle_semantics": "acos(clamp(dot(surface_normal_unit, -spray_direction_unit), -1, 1))",
+    "maximum_incidence_angle_deg": 90.0,
+    "surface_intersection": "Euclidean point distance against evaluation surface sample, with incidence gate; local tangent-plane interpretation",
+    "calibration": "not_available"
+  },
+  "metrics": {
+    "surface_coverage_ratio": {
+      "classification": "CALCULATED",
+      "formula": "sum(weight_i * 1[count_i > 0]) / sum(weight_i)",
+      "threshold": "UNRESOLVED"
+    },
+    "uncovered_ratio": {
+      "classification": "CALCULATED",
+      "formula": "1 - surface_coverage_ratio",
+      "threshold": "UNRESOLVED"
+    },
+    "coverage_overlap_redundancy": {
+      "classification": "CALCULATED",
+      "formula": "sum(weight_i * max(count_i - 1, 0)) / sum(weight_i)",
+      "threshold": "UNRESOLVED"
+    },
+    "effective_spray_coverage": {
+      "classification": "DIAGNOSTIC",
+      "formula": "weighted mean of min(1, sum(max(cos(incidence_j), 0))) over covered evaluation samples",
+      "threshold": "UNRESOLVED"
+    },
+    "coverage_uniformity": {
+      "classification": "DIAGNOSTIC",
+      "formula": "1 / (1 + weighted_std(count_i) / weighted_mean(count_i)) when mean > 0, else 0",
+      "threshold": "UNRESOLVED"
+    }
+  },
+  "invalid_geometry_policy": {
+    "nonfinite": "FAIL_CLOSED",
+    "degenerate_faces": "REPORT_AND_EXCLUDE_FROM_H2_SAMPLING",
+    "open_boundaries_and_holes": "REPORT_ONLY_NO_REPAIR",
+    "disconnected_components": "REPORT_ONLY_NO_REPAIR",
+    "isolated_point_regions": "REPORT_ONLY_NO_REPAIR",
+    "invalid_normals": "FAIL_CLOSED",
+    "orientation_ambiguity": "FAIL_CLOSED_UNLESS_H2_POLICY_IS_EXPLICIT"
+  }
+}

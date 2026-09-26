@@ -1,0 +1,11 @@
+schema_version: stage5a-explicit-tcp-v1
+tcp:
+  parent_link: wrist3_link
+  child_link: spray_tcp_link
+  xyz_m: [0.0, 0.0, 0.15]
+  rpy_rad: [0.0, 0.0, 0.0]
+  units: SI_m_rad
+  source: assumed_150mm_placeholder
+  calibration_status: not_claimed
+  physical_hardware_validated: false
+  note: D65 model-scope transform only; replace with measured TCP before production use.

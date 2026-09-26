@@ -1,0 +1,4 @@
+interface:
+  display_name: "Trajectory Dynamics Ruckig"
+  short_description: "Validate Ruckig timing and motion limits"
+  default_prompt: "Use trajectory-dynamics-ruckig after continuity closure for q/v/a/jerk limits, Ruckig parameterization, and post-checks."

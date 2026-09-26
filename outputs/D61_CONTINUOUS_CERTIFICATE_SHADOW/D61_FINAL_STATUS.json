@@ -1,0 +1,53 @@
+{
+  "schema_version": "d61-final-status-v1",
+  "claim_scope": "shadow-only explicit FK(q(t)) interval evidence; not exact external articulated continuous self-CCD",
+  "supersession": {
+    "historical_predecessor": "D59/D60 scoped conservative-model observations",
+    "current_boundary": "D61 real windows are coverage-incomplete and remain unresolved",
+    "promotion": "NO_PROMOTION"
+  },
+  "task_status": "PARTIALLY_EXECUTED_MEASURED_NO_PROMOTION",
+  "measurement_pipeline_status": "PASS_FOR_D61_KNOWN_ANSWERS_AND_SHADOW_DOMAINS",
+  "implementation_status": "EXPLICIT_FK_QT_INTERVAL_SEPARATING_ENCLOSURE_IMPLEMENTED",
+  "known_answer_tests": "8/8",
+  "protected_regression_tests": "20/20",
+  "real_trajectory_shadow": {
+    "d59_auto0": {
+      "certificate": "outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/auto0/D61_CERTIFICATE_final_window.json",
+      "checked_intervals": 50,
+      "requested_intervals": 7004,
+      "certified_regions": 450,
+      "unresolved_regions": 50,
+      "collision_regions": 0,
+      "status": "UNRESOLVED_COVERAGE_INCOMPLETE"
+    },
+    "d59_auto1_corrected": {
+      "certificate": "outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/auto1/D61_CERTIFICATE_final_window.json",
+      "checked_intervals": 50,
+      "requested_intervals": 7029,
+      "certified_regions": 450,
+      "unresolved_regions": 50,
+      "collision_regions": 0,
+      "status": "UNRESOLVED_COVERAGE_INCOMPLETE"
+    }
+  },
+  "route_status": {
+    "route_a_interval_fk_support": "IMPLEMENTED_EXECUTED",
+    "route_a_plus_separating_axes": "IMPLEMENTED_EXECUTED",
+    "route_b_explicit_polynomial": "AVAILABLE_ONLY_WITH_EXPLICIT_COEFFICIENT_INPUT",
+    "route_c_interval_bisection": "IMPLEMENTED_EXECUTED",
+    "route_d_external_backend": "RESEARCHED_NOT_LOCAL_AUTHORITY"
+  },
+  "comparison_boundary": {
+    "d60_inherited_endpoint_fcl_jerk_model": "HISTORICAL_SCOPED_FULL_2_FINALIST_PASS_ZERO_UNRESOLVED_UNDER_DISTINCT_MODEL",
+    "d61_mesh_support_certificate": "PARTIAL_WINDOW_UNRESOLVED",
+    "discrete_collision_label": "adaptive_discrete_interpolation",
+    "exact_external_articulated_ccd": "UNAVAILABLE_UNVERIFIED"
+  },
+  "starting_canonical": "outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3",
+  "starting_protected_floor": "c4_clearance_adversarial0101_amp005_consistent_0025",
+  "final_protected_floor": "c4_clearance_adversarial0101_amp005_consistent_0025",
+  "promotion": "NO_PROMOTION",
+  "material_regression": "NO_PROTECTED_REGRESSION",
+  "generated_at_utc": "2026-09-01T02:22:41.3403501Z"
+}

@@ -1,0 +1,276 @@
+{
+  "benchmark_id": "STAGE4_SYSTEM_BENCHMARK_V1",
+  "global_notes": [
+    "URDF position/effort fields and existing joint_limits.yaml velocity/acceleration/jerk fields were loaded directly.",
+    "The configured 8 rad/s^3 jerk values are project-defined simulation/research limits, not manufacturer certification.",
+    "No physical torque telemetry exists; model-based required torque is unavailable in this environment."
+  ],
+  "joints": [
+    {
+      "acceleration": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j1.max_acceleration",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^2",
+        "value": 0.7
+      },
+      "jerk": {
+        "provenance_status": "LIMIT_PROVENANCE_UNVERIFIED_NOT_VENDOR_CERTIFIED",
+        "source_field": "joint_limits.j1.max_jerk",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^3",
+        "value": 8.0
+      },
+      "joint": "j1",
+      "position": {
+        "provenance_status": "model_limit",
+        "source_field": "joint[j1]/limit@lower|upper",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "rad",
+        "upper_value": 3.0543,
+        "value": -3.0543
+      },
+      "torque_effort": {
+        "provenance_status": "model_limit_not_physical_telemetry",
+        "source_field": "joint[j1]/limit@effort",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "URDF effort units; treated as N*m only if model convention is accepted",
+        "value": 150.0
+      },
+      "velocity": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j1.max_velocity",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s",
+        "value": 3.15
+      }
+    },
+    {
+      "acceleration": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j2.max_acceleration",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^2",
+        "value": 0.7
+      },
+      "jerk": {
+        "provenance_status": "LIMIT_PROVENANCE_UNVERIFIED_NOT_VENDOR_CERTIFIED",
+        "source_field": "joint_limits.j2.max_jerk",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^3",
+        "value": 8.0
+      },
+      "joint": "j2",
+      "position": {
+        "provenance_status": "model_limit",
+        "source_field": "joint[j2]/limit@lower|upper",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "rad",
+        "upper_value": 1.4835,
+        "value": -4.6251
+      },
+      "torque_effort": {
+        "provenance_status": "model_limit_not_physical_telemetry",
+        "source_field": "joint[j2]/limit@effort",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "URDF effort units; treated as N*m only if model convention is accepted",
+        "value": 150.0
+      },
+      "velocity": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j2.max_velocity",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s",
+        "value": 3.15
+      }
+    },
+    {
+      "acceleration": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j3.max_acceleration",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^2",
+        "value": 0.7
+      },
+      "jerk": {
+        "provenance_status": "LIMIT_PROVENANCE_UNVERIFIED_NOT_VENDOR_CERTIFIED",
+        "source_field": "joint_limits.j3.max_jerk",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^3",
+        "value": 8.0
+      },
+      "joint": "j3",
+      "position": {
+        "provenance_status": "model_limit",
+        "source_field": "joint[j3]/limit@lower|upper",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "rad",
+        "upper_value": 2.8274,
+        "value": -2.8274
+      },
+      "torque_effort": {
+        "provenance_status": "model_limit_not_physical_telemetry",
+        "source_field": "joint[j3]/limit@effort",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "URDF effort units; treated as N*m only if model convention is accepted",
+        "value": 150.0
+      },
+      "velocity": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j3.max_velocity",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s",
+        "value": 3.15
+      }
+    },
+    {
+      "acceleration": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j4.max_acceleration",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^2",
+        "value": 0.7
+      },
+      "jerk": {
+        "provenance_status": "LIMIT_PROVENANCE_UNVERIFIED_NOT_VENDOR_CERTIFIED",
+        "source_field": "joint_limits.j4.max_jerk",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^3",
+        "value": 8.0
+      },
+      "joint": "j4",
+      "position": {
+        "provenance_status": "model_limit",
+        "source_field": "joint[j4]/limit@lower|upper",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "rad",
+        "upper_value": 1.4835,
+        "value": -4.6251
+      },
+      "torque_effort": {
+        "provenance_status": "model_limit_not_physical_telemetry",
+        "source_field": "joint[j4]/limit@effort",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "URDF effort units; treated as N*m only if model convention is accepted",
+        "value": 28.0
+      },
+      "velocity": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j4.max_velocity",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s",
+        "value": 3.2
+      }
+    },
+    {
+      "acceleration": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j5.max_acceleration",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^2",
+        "value": 0.7
+      },
+      "jerk": {
+        "provenance_status": "LIMIT_PROVENANCE_UNVERIFIED_NOT_VENDOR_CERTIFIED",
+        "source_field": "joint_limits.j5.max_jerk",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^3",
+        "value": 8.0
+      },
+      "joint": "j5",
+      "position": {
+        "provenance_status": "model_limit",
+        "source_field": "joint[j5]/limit@lower|upper",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "rad",
+        "upper_value": 3.0543,
+        "value": -3.0543
+      },
+      "torque_effort": {
+        "provenance_status": "model_limit_not_physical_telemetry",
+        "source_field": "joint[j5]/limit@effort",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "URDF effort units; treated as N*m only if model convention is accepted",
+        "value": 28.0
+      },
+      "velocity": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j5.max_velocity",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s",
+        "value": 3.2
+      }
+    },
+    {
+      "acceleration": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j6.max_acceleration",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^2",
+        "value": 0.7
+      },
+      "jerk": {
+        "provenance_status": "LIMIT_PROVENANCE_UNVERIFIED_NOT_VENDOR_CERTIFIED",
+        "source_field": "joint_limits.j6.max_jerk",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s^3",
+        "value": 8.0
+      },
+      "joint": "j6",
+      "position": {
+        "provenance_status": "model_limit",
+        "source_field": "joint[j6]/limit@lower|upper",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "rad",
+        "upper_value": 3.0543,
+        "value": -3.0543
+      },
+      "torque_effort": {
+        "provenance_status": "model_limit_not_physical_telemetry",
+        "source_field": "joint[j6]/limit@effort",
+        "source_file": "outputs/stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z/derived_robot_model.urdf",
+        "source_type": "URDF",
+        "units": "URDF effort units; treated as N*m only if model convention is accepted",
+        "value": 28.0
+      },
+      "velocity": {
+        "provenance_status": "configured_for_offline_simulation",
+        "source_field": "joint_limits.j6.max_velocity",
+        "source_file": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+        "source_type": "existing_project_configuration",
+        "units": "rad/s",
+        "value": 3.2
+      }
+    }
+  ],
+  "schema_version": "stage4-limit-provenance-v1",
+  "status": "PARTIAL_WITH_EXPLICIT_UNVERIFIED_PROVENANCE"
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": "d56-final-status-v1",
+  "task_status": "PASS",
+  "scope": "Stage 0/1 ON-state open-arch software closure",
+  "starting_champion": "stateful_local_g1_w05_0025",
+  "final_champion": "c4_clearance_adversarial0101_amp005_consistent_0025",
+  "canonical_promotion": "NO",
+  "ruckig_jerk_contract": {
+    "status": "PASS",
+    "runtime_max_jerk_rad_s3": 8.0,
+    "strict_current_target_valid_segments": 7004,
+    "calculated_success_segments": 7004,
+    "calculation_failures": 0,
+    "max_analytic_profile_jerk_rad_s3": 8.0,
+    "evidence": "contract_repaired_0025.json"
+  },
+  "ruckig_infeasibility_root_cause": "The original endpoint derivative states contained jerk-limited unreachable boundary transitions; repeated duration extension could not repair unchanged boundary derivatives. D56 repaired the boundary derivatives and the consistent timebase before native Ruckig execution.",
+  "teardown_minus11_status": {
+    "status": "PASS",
+    "accepted_path": "D56 custom MoveIt ROS planning and MoveItPy overlay with explicit teardown ordering",
+    "native_post_ruckig_case_count": 12,
+    "clean_exit": true
+  },
+  "clearance": {
+    "minimum_before_m": 3.430834805626115e-7,
+    "minimum_after_m": 2.5891847838983156e-5,
+    "worst_case_after": "adversarial_0101",
+    "worst_pair_after": "forearm_link|wrist2_link",
+    "certificate_status": "PASS_MODEL_BASED_CONSERVATIVE",
+    "certificate_cases": 12,
+    "required_pair_count": 10,
+    "unresolved_region_count": 0,
+    "physical_articulated_self_ccd": "NOT_AVAILABLE"
+  },
+  "full_suite_collision_status": {
+    "status": "PASS",
+    "case_count": 12,
+    "nominal_world_collision_cases": 0,
+    "nominal_self_collision_cases": 0,
+    "native_robot_world_continuous_segment_collisions": 0,
+    "collision_method": "adaptive_discrete_interpolation"
+  },
+  "singularity": {
+    "sigma_min_before": 1.9116869978233232e-6,
+    "sigma_min_after": 1.6707154306500308e-5,
+    "condition_number_before": 971628.7757918573,
+    "condition_number_after": 111175.072829886,
+    "full_jacobian_status": "PASS",
+    "full_jacobian_consistency_max_residual": 1.769855847224454e-15,
+    "neighborhood_tracking": "PASS",
+    "task_weighted_jacobian": "NOT_APPLIED_NO_PHYSICALLY_JUSTIFIED_TRANSLATION_ROTATION_WEIGHT"
+  },
+  "motion_and_dynamics": {
+    "peak_exported_finite_difference_jerk_rad_s3": 0.103291849182834,
+    "peak_native_profile_jerk_rad_s3": 8.0,
+    "peak_nominal_torque_Nm": 51.15675525540761,
+    "peak_plus_10pct_mass_torque_Nm": 56.27243078094836,
+    "peak_nominal_torque_slew_Nm_s": 2.7185535626085415,
+    "peak_plus_10pct_mass_torque_slew_Nm_s": 2.990408918869191,
+    "per_joint_effort_status": "PASS_MODEL_BASED",
+    "hardware_torque_certification": "NOT_AVAILABLE"
+  },
+  "task_accuracy": {
+    "status": "PASS_FINITE_NO_REGRESSION",
+    "method": "nearest_point_authoritative_task_polyline_plus_tcp_z_axis_normal_error",
+    "fixed_target_case_max_path_error_m": 0.006359292401327267,
+    "fixed_target_case_max_normal_error_rad": 0.08906416462565228,
+    "boundary_stress_cases": "Measured separately; endpoint perturbations are not treated as nominal task-accuracy failures.",
+    "full_quaternion_roll": "NOT_USED_TARGET_ROLL_NOT_AUTHORITATIVE",
+    "universal_task_threshold": "UNRESOLVED_THRESHOLD"
+  },
+  "stage3_regression_status": {
+    "status": "PASS",
+    "pytest_count": 42,
+    "protected_stage3_d45_stage4a_tests_included": true,
+    "py_compile": "PASS"
+  },
+  "system_level_net_gain": "YES_ON_MEASURED_SOFTWARE_CHANNELS",
+  "remaining_software_addressable_d56_defects": 0,
+  "external_or_unresolved_boundaries": [
+    "physical articulated self-CCD backend was not available; the accepted result is a conservative FK-aware model-based certificate",
+    "hardware-calibrated TCP clearance and encoder/compliance uncertainty are not available",
+    "hardware torque/current certification is not available",
+    "no universal task-accuracy or singularity threshold was authorized beyond the documented diagnostic observables"
+  ],
+  "evidence": {
+    "final_report": "D56_FINAL_REPORT.md",
+    "runtime_limits": "runtime_limits/D56_RUNTIME_LIMITS.json",
+    "ruckig_contract": "contract_repaired_0025.json",
+    "native_runtime": "d56_final_native_runtime/execution_form_summary.json",
+    "certificate": "c4_clearance_adversarial0101_amp005_certificate_full/D54_CONTINUOUS_SELF_COLLISION_CERTIFICATION.json",
+    "full_geometry": "c4_clearance_adversarial0101_amp005_full_geometry/native/D41_native_case_summary.jsonl",
+    "full_jacobian": "d41_full_jacobian_final/D41_native_full_jacobian.csv",
+    "accuracy": "accuracy_amp005_fixed/accuracy_final.json",
+    "dynamics": "dynamics_amp005/native/native_dynamics_report.json",
+    "per_joint_torque": "dynamics_amp005/per_joint_torque_audit.json"
+  }
+}

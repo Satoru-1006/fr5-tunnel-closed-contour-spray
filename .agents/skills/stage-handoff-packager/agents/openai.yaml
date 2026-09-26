@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stage Handoff Packager"
+  short_description: "Build verified stage handoff packages"
+  default_prompt: "Use stage-handoff-packager for concise, redacted, reproducible stage handoffs and verified <=50 MB archives."

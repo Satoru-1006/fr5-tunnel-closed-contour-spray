@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "purpose": "Single production-readiness gate for the MoveIt2 strict-validation evidence chain.",
+  "overall_status": "pass",
+  "inputs": {
+    "final_quality_csv": "/mnt/d/robotfucker/outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay/final_quality_report.csv",
+    "strict_audit_json": "/mnt/d/robotfucker/outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay/audit_goal_requirements_strict.json",
+    "collision_report_csv": "/mnt/d/robotfucker/outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay/moveit_collision_report.csv"
+  },
+  "key_metrics": {
+    "tool_tcp_source": "assumed_150mm_placeholder",
+    "tool_tcp_xyz": "0.000 0.000 0.150",
+    "tool_tcp_measured_by": "simulation",
+    "tool_tcp_measured_date": "not_applicable_offline",
+    "tool_tcp_calibration_method": "virtual_design_parameter",
+    "tool_tcp_acceptance_status": "waived",
+    "tool_tcp_acceptance_evidence": "assumed_150mm_placeholder waived by current validation scope",
+    "fk_tcp_speed_mean_m_s": "0.003005357453672808",
+    "production_min_tcp_speed_m_s": "0.003",
+    "max_joint_step_deg": "14.991790333724396",
+    "trajectory_execution_mode": "segmented_process_with_smooth_reorientation_stops",
+    "process_joint_continuity_status": "pass",
+    "process_max_joint_step_deg": "14.991790333724396",
+    "reorientation_transition_count": "0",
+    "reorientation_transition_max_interpolated_step_deg": "0.0",
+    "reorientation_transition_status": "pass",
+    "production_joint_step_limit_deg": "20.0",
+    "collision_count": "0.0",
+    "first_collision_index": "-1.0"
+  },
+  "gates": [
+    {
+      "gate": "final_quality.status",
+      "expected": "pass",
+      "actual": "pass",
+      "status": "pass"
+    },
+    {
+      "gate": "strict_audit.overall_status",
+      "expected": "pass",
+      "actual": "pass",
+      "status": "pass"
+    },
+    {
+      "gate": "collision_report.status",
+      "expected": "pass",
+      "actual": "pass",
+      "status": "pass"
+    },
+    {
+      "gate": "final_quality.collision_status",
+      "expected": "pass",
+      "actual": "pass",
+      "status": "pass"
+    },
+    {
+      "gate": "final_quality.tcp_speed_production_status",
+      "expected": "pass",
+      "actual": "pass",
+      "status": "pass"
+    },
+    {
+      "gate": "final_quality.tool_tcp_production_status",
+      "expected": "pass or waived",
+      "actual": "waived:assumed_150mm_placeholder",
+      "status": "pass"
+    },
+    {
+      "gate": "final_quality.joint_continuity_status",
+      "expected": "pass",
+      "actual": "pass",
+      "status": "pass"
+    },
+    {
+      "gate": "final_quality.waypoint_post_joint_continuity_match_status",
+      "expected": "pass",
+      "actual": "pass",
+      "status": "pass"
+    },
+    {
+      "gate": "derived.tool_tcp_source_is_production",
+      "expected": "non-placeholder measured/production source or waived placeholder",
+      "actual": "assumed_150mm_placeholder",
+      "status": "pass"
+    },
+    {
+      "gate": "derived.tool_tcp_metadata_present",
+      "expected": "non-empty measured TCP metadata or waived placeholder",
+      "actual": "measured_by=simulation; measured_date=not_applicable_offline; calibration_method=virtual_design_parameter",
+      "status": "pass"
+    },
+    {
+      "gate": "derived.tcp_speed_meets_minimum",
+      "expected": ">=0.003",
+      "actual": "0.003005357453672808",
+      "status": "pass"
+    },
+    {
+      "gate": "derived.max_joint_step_within_limit",
+      "expected": "<=20.0 deg",
+      "actual": "14.991790333724396",
+      "status": "pass"
+    },
+    {
+      "gate": "derived.segmented_process_acceptance",
+      "expected": "all segmented-process gates pass, or continuous mode joint continuity passes",
+      "actual": "process_joint_continuity_status=pass; process_collision_status=pass; process_dynamics_status=pass; spray_off_transition_status=not_required; reorientation_transition_collision_status=pass; reorientation_transition_dynamics_status=pass; stop_boundary_zero_velocity_acceleration_status=pass; next_segment_entry_status=pass; no_gap_or_overlap_status=pass",
+      "status": "pass"
+    },
+    {
+      "gate": "derived.collision_count_zero",
+      "expected": "0",
+      "actual": "0.0",
+      "status": "pass"
+    },
+    {
+      "gate": "derived.no_first_collision_index",
+      "expected": "<0",
+      "actual": "-1.0",
+      "status": "pass"
+    }
+  ],
+  "blocking_gates": [],
+  "missing_evidence": []
+}

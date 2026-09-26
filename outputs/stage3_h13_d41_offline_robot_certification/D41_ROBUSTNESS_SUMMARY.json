@@ -1,0 +1,36 @@
+{
+  "classification": "PASS",
+  "fail": 0,
+  "families": {
+    "cartesian_translation": {
+      "pass": 12,
+      "total": 12
+    },
+    "curvature_shape": {
+      "pass": 4,
+      "total": 4
+    },
+    "initial_state": {
+      "pass": 6,
+      "total": 6
+    },
+    "near_joint_limit": {
+      "pass": 3,
+      "total": 3
+    },
+    "near_singularity": {
+      "pass": 3,
+      "total": 3
+    },
+    "surface_normal": {
+      "pass": 6,
+      "total": 6
+    },
+    "waypoint_density": {
+      "pass": 3,
+      "total": 3
+    }
+  },
+  "pass": 37,
+  "total": 37
+}

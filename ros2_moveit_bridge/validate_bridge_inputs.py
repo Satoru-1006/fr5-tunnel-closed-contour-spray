@@ -54,6 +54,7 @@ def validate_tcp_pose_csv(
     samples_per_loop: int,
     max_normal_error_deg: float = 0.1,
     max_station_std: float = 1e-9,
+    open_path: bool = False,
 ) -> dict[str, float | str]:
     points, quaternions, normals = _load_pose_csv(path)
     tool_z = _tool_z_from_quaternion(quaternions)
@@ -67,7 +68,7 @@ def validate_tcp_pose_csv(
         "normal_angle_error_max_deg": float(np.max(normal_error)),
         "normal_angle_error_mean_deg": float(np.mean(normal_error)),
         "station_y_std": float(np.std(points[:, 1])),
-        "close_position_error": _closure_error(points, samples_per_loop),
+        "close_position_error": "not_applicable_open_path" if open_path else _closure_error(points, samples_per_loop),
     }
     failures: list[str] = []
     if float(metrics["normal_angle_error_max_deg"]) > max_normal_error_deg:
@@ -76,7 +77,7 @@ def validate_tcp_pose_csv(
         failures.append("quaternion normalization")
     if float(metrics["station_y_std"]) > max_station_std:
         failures.append("fixed station y")
-    if samples_per_loop > 0 and float(metrics["close_position_error"]) > 1e-6:
+    if not open_path and samples_per_loop > 0 and float(metrics["close_position_error"]) > 1e-6:
         failures.append("closed contour repeat")
     metrics["status"] = "pass" if not failures else "fail:" + ",".join(failures)
     return metrics
@@ -87,9 +88,10 @@ def main() -> None:
     parser.add_argument("--tcp-path-csv", type=Path, default=Path("outputs/tcp_poses.csv"))
     parser.add_argument("--samples-per-loop", type=int, default=240)
     parser.add_argument("--report-csv", type=Path, default=Path("outputs/bridge_input_validation.csv"))
+    parser.add_argument("--open-path", action="store_true", help="Validate an open contour without requiring closure.")
     args = parser.parse_args()
 
-    metrics = validate_tcp_pose_csv(args.tcp_path_csv, args.samples_per_loop)
+    metrics = validate_tcp_pose_csv(args.tcp_path_csv, args.samples_per_loop, open_path=args.open_path)
     args.report_csv.parent.mkdir(parents=True, exist_ok=True)
     with args.report_csv.open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)

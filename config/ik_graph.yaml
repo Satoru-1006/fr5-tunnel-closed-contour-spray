@@ -1,0 +1,47 @@
+stage: "stage_0_1"
+path:
+  tcp_pose_csv: "outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv"
+  seed_joint_csv: "outputs/internal_wiper_moveit_inputs/open_arch_seed_joints.csv"
+  expected_waypoint_count: 181
+  open_path: true
+  spray_state: "ON"
+moveit:
+  group_name: "fairino5_v6_group"
+  ee_link: "spray_tcp_link"
+  base_frame: "base_link"
+  tool_tcp_xyz: "0.000 0.000 0.150"
+  tool_tcp_rpy: "0 0 0"
+  stand_off_m: 0.260
+  tcp_points_to_wall: true
+  wall_thickness_m: 0.040
+  tunnel_y_thickness_m: 1.10
+  include_tunnel_floor_collision: true
+  tunnel_floor_z_m: -0.20
+  include_bottom_closure_collision: false
+ik:
+  timeout_s: 0.05
+  max_position_error_m: 0.006
+  max_standoff_error_fraction: 0.05
+  max_normal_error_deg: 10.0
+  max_joint_step_deg: 20.0
+  roll_sample_count: 36
+  max_candidates_per_waypoint: 8
+  candidate_seed_limit: 8
+  dedup_max_circular_delta_rad: 0.00001
+collision:
+  check_type: "adaptive_discrete_interpolation"
+  max_interpolation_joint_step_deg: 0.5
+  ccd_status: "not_available"
+  clearance_status: "not_available"
+output:
+  directory: "outputs/ik_graph"
+  nodes_parquet: "nodes.parquet"
+  edges_parquet: "edges.parquet"
+  summary_json: "graph_summary.json"
+  rejected_json: "rejected_candidates.json"
+ruckig:
+  enabled_if_complete_path: true
+  velocity_scaling: 0.15
+  acceleration_scaling: 0.15
+  target_tcp_speed_m_s: 0.003
+  zero_boundary_state: true

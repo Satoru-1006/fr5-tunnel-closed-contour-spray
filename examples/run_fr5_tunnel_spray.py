@@ -24,6 +24,7 @@ from src.path_planner import (
     generate_closed_horseshoe_contour_path,
     generate_closed_horseshoe_path,
     generate_helical_path,
+    generate_internal_wiper_path,
     generate_serpentine_path,
 )
 from src.robot_model import FR5Robot, make_tool_frame
@@ -49,11 +50,17 @@ def nearest_wall_and_normals(points: np.ndarray, wall_points: np.ndarray, wall_n
     return projected, projected_normals
 
 
-def fk_tcp_profile(robot: FR5Robot, profile: TimeProfile) -> tuple[TimeProfile, np.ndarray]:
+def fk_tcp_profile(
+    robot: FR5Robot,
+    profile: TimeProfile,
+    tool_transform: np.ndarray | None = None,
+) -> tuple[TimeProfile, np.ndarray]:
     actual_positions = []
     actual_z = []
     for qi in profile.q:
         T = robot.fk(qi)
+        if tool_transform is not None:
+            T = T @ tool_transform
         actual_positions.append(T[:3, 3])
         actual_z.append(T[:3, 2])
     actual_positions = np.asarray(actual_positions)
@@ -130,14 +137,20 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="FR5 horseshoe tunnel spray/contact simulation.")
     parser.add_argument("--tool", choices=["spray", "contact"], default="spray")
     parser.add_argument("--robot-model", choices=["official", "placeholder"], default="official")
-    parser.add_argument("--path-mode", choices=["closed_horseshoe", "helical", "serpentine"], default="closed_horseshoe")
+    parser.add_argument(
+        "--path-mode",
+        choices=["internal_wiper", "closed_horseshoe", "helical", "serpentine"],
+        default="internal_wiper",
+    )
     parser.add_argument("--station-y", type=float, default=None)
-    parser.add_argument("--loops", type=int, default=3)
+    parser.add_argument("--loops", type=int, default=1)
     parser.add_argument("--samples-per-loop", type=int, default=240)
+    parser.add_argument("--wiper-samples", type=int, default=181)
+    parser.add_argument("--base-y", type=float, default=0.45)
     parser.add_argument("--fillet-radius", type=float, default=0.20)
     parser.add_argument("--width", type=float, default=1.20)
     parser.add_argument("--height", type=float, default=1.10)
-    parser.add_argument("--length", type=float, default=0.60)
+    parser.add_argument("--length", type=float, default=0.90)
     parser.add_argument("--speed", type=float, default=0.08)
     parser.add_argument("--overlap", type=float, default=0.50)
     parser.add_argument("--spray-distance", type=float, default=0.18)
@@ -165,7 +178,7 @@ def main() -> None:
     if args.robot_model == "official":
         try:
             robot, assets = load_official_fr5_robot(ROOT)
-            robot = robot.with_base([0.0, 0.0, 0.20], yaw=np.pi)
+            robot = robot.with_base([0.0, args.base_y, 0.20], yaw=np.pi)
             robot_source = f"official:{assets.urdf}"
         except Exception as exc:
             raise RuntimeError(
@@ -173,7 +186,7 @@ def main() -> None:
                 "repair external/frcobot_ros2 or explicitly pass --robot-model placeholder for demo-only use."
             ) from exc
     else:
-        robot = FR5Robot.placeholder().with_base([0.0, 0.0, 0.20], yaw=np.pi)
+        robot = FR5Robot.placeholder().with_base([0.0, args.base_y, 0.20], yaw=np.pi)
 
     warning = tunnel.warn_if_real_tunnel_exceeds_fr5()
     if warning:
@@ -229,13 +242,22 @@ def main() -> None:
             fillet_radius=args.fillet_radius,
         )
         path_smoothness = 0.0
+    elif args.path_mode == "internal_wiper":
+        y0 = tunnel.length * 0.5 if args.station_y is None else args.station_y
+        raw_path = generate_internal_wiper_path(
+            tunnel,
+            tool,
+            station_y=y0,
+            samples=args.wiper_samples,
+        )
+        path_smoothness = 0.0
     elif args.path_mode == "helical":
         raw_path = generate_helical_path(tunnel, tool, pass_overlap=selected_overlap)
         path_smoothness = 0.0002
     else:
         raw_path = generate_serpentine_path(tunnel, tool, pass_overlap=selected_overlap)
         path_smoothness = 0.0
-    if args.path_mode == "closed_horseshoe":
+    if args.path_mode in {"closed_horseshoe", "internal_wiper"}:
         smooth_tcp = raw_path.tcp_points
         normals = raw_path.normals
     elif args.path_mode == "helical":
@@ -249,6 +271,11 @@ def main() -> None:
     stand_off = tool.spray_distance if isinstance(tool, SprayTool) else tool.stand_off
     smooth_surface = smooth_tcp - stand_off * normals
     poses = [make_tool_frame(p, n) for p, n in zip(smooth_tcp, normals)]
+    tool_transform = None
+    if args.path_mode == "internal_wiper":
+        tool_transform = np.eye(4)
+        tool_transform[:3, 3] = [0.0, 0.0, 0.150]
+    ik_poses = [pose @ np.linalg.inv(tool_transform) for pose in poses] if tool_transform is not None else poses
 
     pose_rows = []
     base_pose_rows = []
@@ -292,7 +319,7 @@ def main() -> None:
     pd.DataFrame(base_pose_rows).to_csv(args.out / "tcp_poses_base_link.csv", index=False)
 
     q, ik_errors, ik_success = robot.solve_trajectory_ik(
-        poses,
+        ik_poses,
         max_step_deg=args.max_ik_step_deg,
         orientation_weight=args.orientation_weight,
         continuity_weight=args.continuity_weight,
@@ -306,14 +333,18 @@ def main() -> None:
             robot.limits,
             target_tcp_speed=args.speed,
             closed_loop=args.path_mode == "closed_horseshoe",
-            fk_position=lambda qi: robot.fk(qi)[:3, 3],
+            fk_position=lambda qi: (
+                (robot.fk(qi) @ tool_transform)[:3, 3]
+                if tool_transform is not None
+                else robot.fk(qi)[:3, 3]
+            ),
             joint_smoothness=args.joint_smoothness,
         )
     except Exception as exc:
         time_profile_note = f"Ruckig failed, fallback used: {exc}"
         print(f"WARNING: {time_profile_note}")
         profile = make_jerk_limited_time_profile(smooth_tcp, q, robot.limits, target_tcp_speed=args.speed)
-    actual_profile, actual_tool_z = fk_tcp_profile(robot, profile)
+    actual_profile, actual_tool_z = fk_tcp_profile(robot, profile, tool_transform=tool_transform)
     normal_angle_error_deg, standoff_error = tool_quality(
         actual_profile.path_points,
         actual_tool_z,
@@ -329,7 +360,7 @@ def main() -> None:
     tcp_self_intersects = contour_self_intersects(one_loop_tcp) if args.path_mode == "closed_horseshoe" else False
     tcp_inside = (
         tcp_inside_standard_horseshoe(one_loop_tcp, args.width / 2.0, args.height - args.width / 2.0)
-        if args.path_mode == "closed_horseshoe"
+        if args.path_mode in {"closed_horseshoe", "internal_wiper"}
         else True
     )
     report = build_quality_report(

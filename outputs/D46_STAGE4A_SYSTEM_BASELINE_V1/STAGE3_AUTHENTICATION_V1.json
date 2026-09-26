@@ -1,0 +1,42 @@
+{
+  "authoritative_inputs": {
+    "legacy_720_point_outputs_in_scope": false,
+    "point_count": 181,
+    "poses": {
+      "path": "outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv",
+      "sha256": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7"
+    },
+    "scope": "Stage 0/1 ON-state open-arch only",
+    "seed_joints": {
+      "path": "outputs/internal_wiper_moveit_inputs/open_arch_seed_joints.csv",
+      "sha256": "c568a6f49d6bfe170049774283b03b6576b950646dd79c449fb2e61c83034cba"
+    },
+    "spray_off_or_reorientation_in_scope": false
+  },
+  "canonical_checkpoint": "outputs/stage3_h13_d35_permanent_champion/checkpoints/committed_update_480.pt",
+  "canonical_checkpoint_sha256": "37645eea5aef8ce2fe7084c83f35429a7a13fbe3e9612eb84417ccce6cba9742",
+  "canonical_metrics": {
+    "H1": 7.089328839013259e-05,
+    "H32": 0.01849100619381173
+  },
+  "canonical_update": 480,
+  "release": "outputs/STAGE3_FINAL_RELEASE",
+  "release_manifest_sha256": "83f8a659df86f57165955bba4b962569e624a70bc903990a8d712e1a2eb276fe",
+  "release_status": "FROZEN_AND_CLOSED",
+  "replay_authentication": {
+    "D45_replay_sandbox": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/stage3_replay_auth",
+    "H1": 7.089328839013259e-05,
+    "H32": 0.01849100619381173,
+    "status": "PASS"
+  },
+  "retained_stage3_robot": {
+    "D41_run_directory": "outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z",
+    "D41_summary": "outputs/stage3_h13_d41_offline_robot_certification/D41_SUMMARY.json",
+    "final_acceptance_status": "pass",
+    "post_ruckig_trajectory": "outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay/moveit_smoothed_joint_trajectory.csv",
+    "pre_ruckig_waypoint_trajectory": "outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay/moveit_waypoint_joint_trajectory.csv",
+    "strict_replay": "outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay"
+  },
+  "schema_version": "stage4a-stage3-authentication-v1",
+  "scientific_mutation": "none"
+}

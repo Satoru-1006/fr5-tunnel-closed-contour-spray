@@ -1,0 +1,295 @@
+{
+  "acceptance_set_id": "STAGE4_ACCEPTANCE_SET_V1",
+  "benchmark_id": "STAGE4_SYSTEM_BENCHMARK_V1",
+  "case_definitions": [
+    {
+      "actual_post_ruckig": true,
+      "audit_only_perturbation": false,
+      "case_id": "regression_0000",
+      "family": "REGRESSION",
+      "generation": "actual_frozen_stage3_post_ruckig_replay",
+      "hard_invalid_input_by_design": false,
+      "index": 0,
+      "seed": 150000,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 1.0,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/regression_0000.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\regression_0000.csv",
+      "trajectory_sha256": "800f8cc1fa00dbc547af4f5d85159b80d08750e55054bb012a938babbbea8230"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "regression_0001",
+      "family": "REGRESSION",
+      "generation": "frozen_pre_ruckig_waypoint_replay",
+      "hard_invalid_input_by_design": false,
+      "index": 1,
+      "seed": 150001,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 1.0,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/regression_0001.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\regression_0001.csv",
+      "trajectory_sha256": "800f8cc1fa00dbc547af4f5d85159b80d08750e55054bb012a938babbbea8230"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "normal_0000",
+      "family": "NORMAL",
+      "generation": "smooth_bounded_nominal_variation",
+      "hard_invalid_input_by_design": false,
+      "index": 0,
+      "seed": 100000,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 0.95,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/normal_0000.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\normal_0000.csv",
+      "trajectory_sha256": "f8066379c6cef941e6f10f69498d87758c1ddd0b1198345e5efee5c9324907b5"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "normal_0100",
+      "family": "NORMAL",
+      "generation": "smooth_bounded_nominal_variation",
+      "hard_invalid_input_by_design": false,
+      "index": 100,
+      "seed": 100100,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 0.96,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/normal_0100.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\normal_0100.csv",
+      "trajectory_sha256": "59c7b53953f53da27583d95e8877f227790f29c67417357a09645ab9866018b8"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "boundary_0000",
+      "family": "BOUNDARY",
+      "generation": "bounded_urdf_position_boundary_push",
+      "hard_invalid_input_by_design": false,
+      "index": 0,
+      "seed": 110000,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 0.45,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/boundary_0000.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\boundary_0000.csv",
+      "trajectory_sha256": "8911e83c9709885d7a1b15cb31c6ebee26eaace17c29b777f20f0bc1a7796050"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "boundary_0100",
+      "family": "BOUNDARY",
+      "generation": "bounded_urdf_position_boundary_push",
+      "hard_invalid_input_by_design": false,
+      "index": 100,
+      "seed": 110100,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 0.45,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/boundary_0100.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\boundary_0100.csv",
+      "trajectory_sha256": "31ce4e4a4fb82edda17cb999b5d24bec7026002fe242cac4e4197d06f2a83395"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "collision_sensitive_0000",
+      "family": "COLLISION_SENSITIVE",
+      "generation": "smooth_excursion_to_known_self_collision_state",
+      "hard_invalid_input_by_design": false,
+      "index": 0,
+      "seed": 120000,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 0.8,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/collision_sensitive_0000.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\collision_sensitive_0000.csv",
+      "trajectory_sha256": "0c4e26207c3cfb8cd7b6da78adccf8cb073191b4b1a245c9dfba04439673d239"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "collision_sensitive_0051",
+      "family": "COLLISION_SENSITIVE",
+      "generation": "smooth_excursion_to_known_self_collision_state",
+      "hard_invalid_input_by_design": false,
+      "index": 51,
+      "seed": 120051,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 0.92,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/collision_sensitive_0051.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\collision_sensitive_0051.csv",
+      "trajectory_sha256": "0c4e26207c3cfb8cd7b6da78adccf8cb073191b4b1a245c9dfba04439673d239"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "adversarial_0100",
+      "family": "ADVERSARIAL",
+      "generation": "high_curvature_short_horizon_stress",
+      "hard_invalid_input_by_design": false,
+      "index": 100,
+      "seed": 130100,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 0.19999999999999998,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/adversarial_0100.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\adversarial_0100.csv",
+      "trajectory_sha256": "75c2f083158f360927b71c4b9e9ec5eb09f57512cf550b1b72198b05a2625f80"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "adversarial_0101",
+      "family": "ADVERSARIAL",
+      "generation": "high_curvature_short_horizon_stress",
+      "hard_invalid_input_by_design": false,
+      "index": 101,
+      "seed": 130101,
+      "target_shift_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "time_scale": 0.22,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/adversarial_0101.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\adversarial_0101.csv",
+      "trajectory_sha256": "ec0211ba2c3c3aaaf0f646d4777df49536da42c78a80f970f420100b43f90a19"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "perturbation_0000",
+      "family": "PERTURBATION",
+      "generation": "fixed_seed_joint_and_target_pose_perturbation",
+      "hard_invalid_input_by_design": false,
+      "index": 0,
+      "seed": 140000,
+      "target_shift_m": [
+        0.00016325311857749917,
+        0.00019171774715133607,
+        -2.365969533108349e-05
+      ],
+      "time_scale": 0.8,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/perturbation_0000.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\perturbation_0000.csv",
+      "trajectory_sha256": "f0a2e24ce89cc141d05434953adbff2686687f6231809b05d16ce7d9b21274ec"
+    },
+    {
+      "actual_post_ruckig": false,
+      "audit_only_perturbation": true,
+      "case_id": "perturbation_0100",
+      "family": "PERTURBATION",
+      "generation": "fixed_seed_joint_and_target_pose_perturbation",
+      "hard_invalid_input_by_design": false,
+      "index": 100,
+      "seed": 140100,
+      "target_shift_m": [
+        -5.819272454156621e-05,
+        -0.00017378353389589464,
+        1.3170607191962861e-05
+      ],
+      "time_scale": 0.98,
+      "trajectory_csv": "outputs/D46_STAGE4A_SYSTEM_BASELINE_V1/cases/perturbation_0100.csv",
+      "trajectory_path": "D:\\robotfucker\\outputs\\D46_STAGE4A_SYSTEM_BASELINE_V1\\cases\\perturbation_0100.csv",
+      "trajectory_sha256": "cca7b31c7844af90c5c5b714ee4998ebd91e5c3ea0068fa6c1e18d1e17b126f7"
+    }
+  ],
+  "case_ids": [
+    "regression_0000",
+    "regression_0001",
+    "normal_0000",
+    "normal_0100",
+    "boundary_0000",
+    "boundary_0100",
+    "collision_sensitive_0000",
+    "collision_sensitive_0051",
+    "adversarial_0100",
+    "adversarial_0101",
+    "perturbation_0000",
+    "perturbation_0100"
+  ],
+  "frozen_before_execution": true,
+  "hard_gates": {
+    "acceleration_limit": {
+      "max_failures": 0
+    },
+    "deterministic_replay": {
+      "max_mismatches": 0,
+      "tolerance": "exact CSV identity for frozen replay controls"
+    },
+    "environment_collision": {
+      "max_failures": 0,
+      "measurement": "adaptive_discrete_interpolation"
+    },
+    "jerk_limit": {
+      "max_failures": 0,
+      "provenance_note": "project-configured jerk values are not vendor-certified"
+    },
+    "joint_position_limit": {
+      "max_failures": 0
+    },
+    "non_finite_values": {
+      "max_failures": 0
+    },
+    "ruckig_validity": {
+      "applicable_cases": "actual D41 post-Ruckig replay controls only",
+      "max_failures": 0
+    },
+    "self_collision": {
+      "max_failures": 0,
+      "measurement": "adaptive_discrete_interpolation"
+    },
+    "stage3_frozen_correctness_regression": {
+      "max_failures": 0
+    },
+    "velocity_limit": {
+      "max_failures": 0
+    }
+  },
+  "removal_policy": "difficult cases remain frozen even when they fail; no outcome-dependent case removal",
+  "schema_version": "stage4-acceptance-set-v1",
+  "unsupported_thresholds": {
+    "environment_clearance": "UNRESOLVED_THRESHOLD",
+    "model_based_torque": "UNAVAILABLE",
+    "self_clearance": "UNRESOLVED_THRESHOLD",
+    "singularity_physical_threshold": "UNRESOLVED_THRESHOLD",
+    "tcp_calibration_uncertainty": "UNAVAILABLE"
+  }
+}

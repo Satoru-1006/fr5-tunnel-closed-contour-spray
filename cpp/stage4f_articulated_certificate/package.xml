@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>stage4f_articulated_certificate</name>
+  <version>0.1.0</version>
+  <description>D54 FK-aware articulated continuous self-collision and clearance certificate.</description>
+  <maintainer email="codex@example.com">D54 shadow tooling</maintainer>
+  <license>BSD-3-Clause</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>moveit_core</depend>
+  <depend>rclcpp</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

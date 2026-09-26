@@ -134,6 +134,67 @@ def generate_closed_horseshoe_path(
     return CoveragePath(surf_arr, tcp_arr, normals_arr, poses, tool.footprint_width)
 
 
+def generate_internal_wiper_path(
+    tunnel: HorseshoeTunnel,
+    tool: ToolModel,
+    station_y: float | None = None,
+    samples: int = 181,
+) -> CoveragePath:
+    """Generate a one-way, inside-tunnel wiper sweep over the open arch.
+
+    The bottom closure is intentionally omitted.  The TCP starts near the
+    left spring line, follows the two side walls and upper semicircle, and
+    finishes near the right spring line.  This keeps the process path open so
+    the robot does not need to reverse through the invert or spin a wrist at
+    the closure point.
+    """
+
+    if samples < 32:
+        raise ValueError("samples must be at least 32 for an internal wiper path.")
+    stand_off = tool.spray_distance if isinstance(tool, SprayTool) else tool.stand_off
+    radius = tunnel.width / 2.0
+    spring_z = tunnel.height - radius
+    fillet = min(tunnel.fillet_radius, radius * 0.35, spring_z * 0.45 if spring_z > 0.0 else 0.0)
+    if stand_off <= 0.0 or stand_off >= radius:
+        raise ValueError("The wiper stand-off must be positive and smaller than the arch radius.")
+
+    lengths = np.asarray(
+        [max(spring_z - fillet, 0.0), np.pi * radius, max(spring_z - fillet, 0.0)],
+        dtype=float,
+    )
+    raw_counts = samples * lengths / max(float(np.sum(lengths)), 1e-12)
+    counts = np.maximum(4, np.floor(raw_counts).astype(int))
+    difference = int(samples - np.sum(counts))
+    order = np.argsort(raw_counts - np.floor(raw_counts))[::-1]
+    for index in range(abs(difference)):
+        target = order[index % len(order)]
+        if difference > 0:
+            counts[target] += 1
+        elif counts[target] > 4:
+            counts[target] -= 1
+
+    left_z = np.linspace(fillet, spring_z, counts[0], endpoint=False)
+    arch_theta = np.linspace(np.pi, 0.0, counts[1], endpoint=False)
+    right_z = np.linspace(spring_z, fillet, counts[2], endpoint=False)
+    left = np.column_stack([np.full(len(left_z), -radius), left_z])
+    arch = np.column_stack([radius * np.cos(arch_theta), spring_z + radius * np.sin(arch_theta)])
+    right = np.column_stack([np.full(len(right_z), radius), right_z])
+    section = np.vstack([left, arch, right])
+    normals_2d = np.vstack(
+        [
+            np.tile(np.array([1.0, 0.0]), (len(left), 1)),
+            np.column_stack([-np.cos(arch_theta), -np.sin(arch_theta)]),
+            np.tile(np.array([-1.0, 0.0]), (len(right), 1)),
+        ]
+    )
+    station = tunnel.length * 0.5 if station_y is None else float(station_y)
+    surface = np.column_stack([section[:, 0], np.full(len(section), station), section[:, 1]])
+    normals = np.column_stack([normals_2d[:, 0], np.zeros(len(normals_2d)), normals_2d[:, 1]])
+    tcp = surface + stand_off * normals
+    poses = [make_tool_frame(point, normal) for point, normal in zip(tcp, normals)]
+    return CoveragePath(surface, tcp, normals, poses, tool.footprint_width)
+
+
 def generate_closed_horseshoe_contour_path(
     R: float,
     H: float,

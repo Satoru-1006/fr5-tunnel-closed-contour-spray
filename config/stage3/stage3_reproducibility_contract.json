@@ -1,0 +1,27 @@
+{
+  "schema_version": "stage3-reproducibility-contract-v1",
+  "contract_id": "stage3-reproducibility-20260808",
+  "status": "FROZEN_FOR_H2",
+  "deterministic_algorithms": {
+    "definition": "Same input hashes, same software/environment identity, same configuration, same declared seed state, and same output or tolerance-equivalent output.",
+    "required_record": ["input_hashes", "software_identity", "environment_identity", "config_hash", "seed_state", "output_hashes", "comparison_policy"],
+    "comparison_policy": {"exact": ["identities", "split_manifest", "candidate IDs", "collision booleans", "contract classifications"], "tolerance_equivalent": ["floating-point metric arrays only when tolerance is declared before comparison"]},
+    "nondeterminism": "Must be attributed to a source (parallel scheduling, backend, hardware, unseeded library, numerical reduction, or other observed cause); a bare nondeterminism flag is insufficient.",
+    "repeat_policy": {"deterministic_replay_runs": 3, "must_match": ["semantic output hash", "selected sequence", "gate decisions"], "failure": "BLOCKED"}
+  },
+  "stochastic_ml_and_optimization": {
+    "status": "FROZEN_POLICY_ONLY",
+    "required_record": ["random_seed", "python_seed", "numpy_seed", "pytorch_seed", "cuda_determinism_settings", "dataset_split_identity", "model_configuration", "optimizer_configuration", "run_id", "software_versions", "hardware_information"],
+    "repeat_policy": {"minimum_runs": null, "status": "UNRESOLVED", "reason": "No Stage 3 dataset/model or statistical power analysis exists in H1."},
+    "statistics_policy": {"mean": "required when repeated runs exist", "standard_deviation": "required when repeated runs exist", "confidence_interval_or_distribution": "required and selected before experiment", "single_run_formal_conclusion": "forbidden"},
+    "h1_authorization": "No stochastic ML/optimization experiment is started in H1."
+  },
+  "seed_defaults": {
+    "python": 0,
+    "numpy": 0,
+    "pytorch": 0,
+    "cuda_deterministic": "must be explicitly recorded; no assumption",
+    "note": "Defaults are contract test fixtures, not evidence that a future model is deterministic."
+  },
+  "provenance": ["attached Stage 3 H1 request: deterministic and stochastic reproducibility requirements", "config/stage3/stage3_geometry_dataset_split_contract.json"]
+}

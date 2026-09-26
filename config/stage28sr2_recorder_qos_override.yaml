@@ -1,0 +1,23 @@
+# Stage 2.8S-R2 zero-goal diagnosis override.
+# This config changes only recorder subscriber history depth; runtime
+# publishers and machine command semantics remain untouched.
+/joint_states:
+  reliability: reliable
+  history: keep_all
+  depth: 1000
+  durability: volatile
+/fairino5_controller/controller_state:
+  reliability: reliable
+  history: keep_all
+  depth: 1000
+  durability: volatile
+/tf:
+  reliability: reliable
+  history: keep_all
+  depth: 1000
+  durability: volatile
+/tf_static:
+  reliability: reliable
+  history: keep_all
+  depth: 1000
+  durability: transient_local

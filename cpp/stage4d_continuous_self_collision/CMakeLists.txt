@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.22)
+project(stage4d_continuous_self_collision)
+
+find_package(ament_cmake REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(moveit_core REQUIRED)
+find_package(rclcpp REQUIRED)
+
+add_executable(stage4d_continuous_self_collision stage4d_continuous_self_collision.cpp)
+add_executable(stage4d_fcl_known_answer stage4d_fcl_known_answer.cpp)
+target_compile_features(stage4d_continuous_self_collision PRIVATE cxx_std_17)
+target_compile_features(stage4d_fcl_known_answer PRIVATE cxx_std_17)
+target_link_libraries(stage4d_continuous_self_collision Eigen3::Eigen fcl)
+target_link_libraries(stage4d_fcl_known_answer Eigen3::Eigen fcl)
+ament_target_dependencies(stage4d_continuous_self_collision moveit_core rclcpp)
+target_link_libraries(stage4d_continuous_self_collision moveit_core::moveit_collision_detection_fcl)
+
+install(TARGETS stage4d_continuous_self_collision DESTINATION lib/${PROJECT_NAME})
+install(TARGETS stage4d_fcl_known_answer DESTINATION lib/${PROJECT_NAME})
+ament_package()

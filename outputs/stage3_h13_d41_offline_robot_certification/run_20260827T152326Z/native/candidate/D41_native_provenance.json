@@ -1,0 +1,13 @@
+{
+  "schema_version":"d41-native-provenance-v1",
+  "backend":"MoveIt2 native CollisionEnvBullet plus CollisionEnvFCL distance",
+  "collision_detector":"Bullet",
+  "continuous_robot_world_api":"CollisionEnv::checkRobotCollision(req,result,state1,state2,acm)",
+  "distance_robot_api":"CollisionEnvFCL::distanceRobot",
+  "distance_self_api":"CollisionEnvFCL::distanceSelf",
+  "self_continuous_api":"not_available_in_MoveIt_Bullet_wrapper; adaptive_discrete_refinement_used",
+  "moveit_collision_detector_name":"Bullet",
+  "world_object_count":181,
+  "pose_count":181,
+  "source_scope":"181-point ON-state open-arch only"
+}

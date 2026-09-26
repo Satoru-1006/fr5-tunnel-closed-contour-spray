@@ -1,0 +1,81 @@
+{
+  "schema_version": "stage3-h6-1-spray-process-tolerance-contract-v1",
+  "contract_id": "Stage 3 H6.1 Spray Process Tolerance Contract",
+  "status": "FROZEN_FOR_STAGE_3_H6_1",
+  "classification": {
+    "scope": "simulation/research acceptance constraints for surface-constrained spray trajectory planning",
+    "contract_type": "project-defined research acceptance contract",
+    "not_manufacturer_parameter": true,
+    "not_coating_supplier_parameter": true,
+    "not_industrial_production_quality_assurance_value": true,
+    "not_ik_fk_floating_point_tolerance": true,
+    "not_moveit_solver_tolerance": true,
+    "not_fcl_collision_interpolation_tolerance": true,
+    "not_joint_trajectory_controller_tolerance": true
+  },
+  "geometry": {
+    "nominal_standoff_m": 0.26,
+    "standoff_abs_tolerance_m": 0.01,
+    "standoff_min_m": 0.25,
+    "standoff_max_m": 0.27,
+    "normal_angle_tolerance_deg": 5.0
+  },
+  "tcp_reproduction": {
+    "tcp_position_tolerance_m": 0.001,
+    "tcp_orientation_tolerance_deg": 1.0
+  },
+  "semantic_definitions": {
+    "standoff": "Euclidean distance from the FK TCP position to the declared surface point in the declared reference frame; signed error is actual_standoff_m - nominal_standoff_m and absolute error is its absolute value.",
+    "surface_normal_angular_deviation": "The angle between the actual spray direction and the expected surface-normal-aligned spray direction at the same dense Spray-ON waypoint.",
+    "actual_spray_direction": "The normalized TCP local +Z axis expressed in the declared reference frame by the FK TCP orientation.",
+    "expected_spray_direction": "The frozen H6 spray_direction_unit, defined as the unit vector from TCP/nozzle toward the surface.",
+    "tcp_position_error": "Euclidean distance between the frozen commanded TCP position and the FK TCP position.",
+    "tcp_orientation_error": "Shortest rotation angle between the frozen commanded TCP orientation and the FK TCP orientation, expressed in degrees.",
+    "spray_off": "Spray-OFF transfer waypoints are excluded from Spray-ON process tolerance acceptance but remain subject to native IK, joint-limit, FK, collision-free, and adaptive discrete interpolation checks."
+  },
+  "units": {
+    "length": "m",
+    "angle": "deg",
+    "quaternion_order": "xyzw"
+  },
+  "frames": {
+    "reference_frame": "base_link",
+    "surface_point_frame": "base_link",
+    "surface_normal_frame": "base_link",
+    "tcp_pose_frame": "base_link",
+    "tcp_position_error_frame": "base_link"
+  },
+  "tcp_link": "spray_tcp_link",
+  "spray_tcp_link": "spray_tcp_link",
+  "surface_normal_convention": {
+    "source": "frozen H6 surface waypoint surface_normal_unit",
+    "orientation": "H2-oriented normal carried through the frozen H4.5 fixture transform",
+    "unit_vector": true
+  },
+  "spray_direction_convention": {
+    "definition": "unit(-surface_normal_unit)",
+    "direction_of_travel": "from TCP/nozzle toward surface",
+    "actual_axis": "TCP local +Z expressed in base_link by FK",
+    "expected_axis": "frozen H6 spray_direction_unit"
+  },
+  "acceptance_rules": {
+    "standoff": "abs(actual_standoff_m - nominal_standoff_m) <= standoff_abs_tolerance_m",
+    "normal_angle": "normal_angle_deviation_deg <= normal_angle_tolerance_deg",
+    "tcp_position": "tcp_position_error_m <= tcp_position_tolerance_m",
+    "tcp_orientation": "tcp_orientation_error_deg <= tcp_orientation_tolerance_deg",
+    "scope": "all dense Spray-ON waypoints; no endpoint-only substitution"
+  },
+  "provenance": {
+    "authority": "Stage 3 H6.1 project-defined research/simulation acceptance contract",
+    "nominal_standoff_source": "config/stage3/stage3_h3_target_pose_contract.json:stand_off.value_m carried into frozen H4.5/H5/H6 inputs",
+    "values_source": "Stage 3 H6.1 task specification; conservative values are declared before recertification and are not inferred from H6 maximum errors",
+    "historical_contract_status": "No prior H6-authoritative formal spray-process tolerance was found in the read-only audit",
+    "post_hoc_threshold_tuning": "FORBIDDEN",
+    "trajectory_mutation_authorized": false
+  },
+  "hashing": {
+    "algorithm": "SHA-256",
+    "canonicalization": "UTF-8 JSON, recursively sorted object keys, compact separators, ensure_ascii=true, with top-level contract_sha256 set to null"
+  },
+  "contract_sha256": "9ad4ef2e78b59881c5fe612216474f77f7cfa0ea7d76706be9741b98f2040487"
+}

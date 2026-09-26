@@ -1,0 +1,53 @@
+{
+  "model_class": "ResidualCausalGRUTrajectoryPredictor",
+  "module": "src.stage3_h11_model plus inherited Stage 3 branch loader",
+  "optimizer": {
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "class": "AdamW",
+    "eps": 1e-08,
+    "learning_rate": 3.90625e-07,
+    "weight_decay": 1e-05
+  },
+  "parameter_names": [
+    "gru.weight_ih_l0",
+    "gru.weight_hh_l0",
+    "gru.bias_ih_l0",
+    "gru.bias_hh_l0",
+    "gru.weight_ih_l1",
+    "gru.weight_hh_l1",
+    "gru.bias_ih_l1",
+    "gru.bias_hh_l1",
+    "head.0.weight",
+    "head.0.bias",
+    "head.2.weight",
+    "head.2.bias"
+  ],
+  "preprocessing": {
+    "dataset_windows": 25991,
+    "feature_channel_count": 19,
+    "normalization_source": "authenticated H11/H10 TRAIN statistics"
+  },
+  "runtime": {
+    "captured_at_utc": "2026-08-27T16:04:15.904675Z",
+    "cuda_available": false,
+    "cudnn_benchmark": false,
+    "cudnn_deterministic": true,
+    "dataloader_workers": 0,
+    "deterministic_algorithms": true,
+    "device": "cpu",
+    "dtype": "float32",
+    "native_runtime": "Windows CPU; direct tensor batches; no DataLoader worker processes",
+    "numpy_version": "2.1.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.1",
+    "pytorch_version": "2.13.0+cpu",
+    "residual_nondeterminism": "cross_platform_bitwise_recreation_not_claimed",
+    "source_revision": "a6dff2b6887cc3f7598ab95549c2dd21c0efe763",
+    "source_revision_match": true
+  },
+  "schema_version": "stage3_authoritative_model_definition_v1",
+  "trainable_parameter_count": 179376
+}

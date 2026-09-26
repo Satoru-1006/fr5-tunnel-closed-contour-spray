@@ -1,0 +1,91 @@
+schema_version: "1.0"
+
+stage:
+  stage_id: "stage_1_9_3_completion"
+  scene_id: "open_arch_181_stage_completion"
+  formal_constraints_locked: true
+
+inputs:
+  tcp_pose_csv: "outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv"
+  seed_joint_csv: "outputs/internal_wiper_moveit_inputs/open_arch_seed_joints.csv"
+  stage17_config: "config/stage17_pose_repair.yaml"
+
+robot:
+  model_name: "FAIRINO_FR5_V6"
+  group_name: "fairino5_v6_group"
+  ee_link: "spray_tcp_link"
+  tool_tcp_offset_m: 0.150
+  tool_tcp_source: "assumed_150mm_placeholder"
+
+deterministic_ik:
+  enabled: true
+  solver: "deterministic_numeric_urdf_scipy_least_squares"
+  solver_version: "scipy-least_squares-fixed-v1"
+  expanded_runtime_urdf: "outputs/ik_graph_stage193/expanded_runtime_urdf.urdf"
+  joint_limits_path: "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml"
+  position_tolerance_m: 0.006
+  tool_z_tolerance_deg: 10.0
+  orientation_weight: 3.0
+  continuity_weight: 0.001
+  max_nfev: 160
+  call_mode: "deterministic_single_seed"
+  requested_timeout_s: 0.0
+  require_actual_attempt_count: 1
+  forbid_internal_random_restart: true
+  seed_templates:
+    include_nominal_seed: true
+    include_previous_waypoint_seeds: true
+    include_fixed_shoulder_templates: false
+    include_fixed_elbow_templates: false
+    include_fixed_wrist_templates: false
+    include_fixed_combination_templates: false
+  seed_offsets_rad:
+    fixed_shoulder: [-3.141592653589793, 3.141592653589793]
+    fixed_elbow: [-3.141592653589793, 3.141592653589793]
+    fixed_wrist: [-3.141592653589793, 3.141592653589793]
+    fixed_combination:
+      - joint_indices: [0, 2, 4]
+        offset_rad: 3.141592653589793
+  seed_order: "explicit_config_order"
+  allow_parallel_execution: false
+
+numeric:
+  ik_dedup_tolerance_rad: 1.0e-5
+  joint_hash_quantization_rad: 1.0e-7
+  task_pose_hash_quantization_mm: 1.0e-4
+  task_pose_hash_quantization_deg: 1.0e-6
+  edge_cost_hash_quantization: 1.0e-9
+  cost_comparison_tolerance: 1.0e-9
+
+deterministic_sort:
+  task_pose_candidates: true
+  ik_candidates: true
+  transition_edges: true
+  dp_states: true
+  dp_predecessors: true
+
+dp_tie_break:
+  - total_cost
+  - max_joint_step
+  - total_joint_motion
+  - modified_waypoint_count
+  - total_tcp_offset
+  - total_roll_and_standoff_change
+  - task_pose_candidate_id_sequence
+  - ik_candidate_id_sequence
+
+collision:
+  method: "adaptive_discrete_interpolation"
+  interpolation_step_deg: 0.5
+  ccd_status: "not_available"
+  clearance_status: "not_available"
+
+reproduction:
+  run_count: 3
+  random_seed: 0
+  python_hash_seed: 0
+  require_exact_semantic_hash_match: true
+  require_exact_selected_sequence_match: true
+
+outputs:
+  directory: "outputs/ik_graph_stage_completion"

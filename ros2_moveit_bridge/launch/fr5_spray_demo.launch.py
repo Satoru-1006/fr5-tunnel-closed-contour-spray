@@ -44,6 +44,8 @@ def generate_launch_description():
     quality_report_csv = LaunchConfiguration("quality_report_csv")
     fk_trace_csv = LaunchConfiguration("fk_trace_csv")
     trajectory_csv = LaunchConfiguration("trajectory_csv")
+    segmented_execution = LaunchConfiguration("segmented_execution")
+    segmented_trajectory_csv = LaunchConfiguration("segmented_trajectory_csv")
     dynamics_report_csv = LaunchConfiguration("dynamics_report_csv")
 
     moveit_config = (
@@ -74,6 +76,8 @@ def generate_launch_description():
     launch_description.add_action(DeclareLaunchArgument("quality_report_csv", default_value="outputs/moveit_quality_report.csv"))
     launch_description.add_action(DeclareLaunchArgument("fk_trace_csv", default_value="outputs/moveit_fk_tcp_trace.csv"))
     launch_description.add_action(DeclareLaunchArgument("trajectory_csv", default_value="outputs/moveit_smoothed_joint_trajectory.csv"))
+    launch_description.add_action(DeclareLaunchArgument("segmented_execution", default_value="true"))
+    launch_description.add_action(DeclareLaunchArgument("segmented_trajectory_csv", default_value="outputs/moveit_executed_segmented_joint_trajectory.csv"))
     launch_description.add_action(DeclareLaunchArgument("dynamics_report_csv", default_value="outputs/moveit_joint_dynamics_report.csv"))
     for action in generate_demo_launch(moveit_config).entities:
         launch_description.add_action(action)
@@ -101,6 +105,8 @@ def generate_launch_description():
                     "quality_report_csv": quality_report_csv,
                     "fk_trace_csv": fk_trace_csv,
                     "trajectory_csv": trajectory_csv,
+                    "segmented_execution": segmented_execution,
+                    "segmented_trajectory_csv": segmented_trajectory_csv,
                     "dynamics_report_csv": dynamics_report_csv,
                     "execute_trajectory": execute_trajectory,
                     "validate_post_ruckig_fk": True,

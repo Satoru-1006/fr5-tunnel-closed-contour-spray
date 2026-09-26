@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot name="fairino5_v6_robot">
+<robot name="fairino5_v6_spray_tcp">
     <group name="fairino5_v6_group">
         <joint name="j1"/>
         <joint name="j2"/>

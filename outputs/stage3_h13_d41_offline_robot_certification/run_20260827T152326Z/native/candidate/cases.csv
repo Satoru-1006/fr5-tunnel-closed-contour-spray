@@ -1,0 +1,2 @@
+case_id,trajectory_csv,family
+nominal_d41_limit_aware,/mnt/d/robotfucker/outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay/moveit_waypoint_joint_trajectory.csv,d41_limit_aware_nominal

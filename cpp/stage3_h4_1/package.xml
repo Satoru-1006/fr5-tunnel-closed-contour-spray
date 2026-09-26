@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>stage3_h4_1_bridge</name>
+  <version>0.1.0</version>
+  <description>Stage 3 H4.1 direct KinematicsBase single-attempt IK bridge.</description>
+  <maintainer email="stage3@example.com">stage3</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>geometry_msgs</depend>
+  <depend>moveit_core</depend>
+  <depend>moveit_kinematics</depend>
+  <depend>moveit_msgs</depend>
+  <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
+  <depend>srdfdom</depend>
+  <depend>urdf</depend>
+</package>

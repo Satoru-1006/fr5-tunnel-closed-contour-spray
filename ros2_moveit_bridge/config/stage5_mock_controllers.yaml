@@ -1,0 +1,22 @@
+# Stage 5A isolated mock controller contract.  This file contains no
+# FAIRINO hardware plugin and no trajectory data.
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    fairino5_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+fairino5_controller:
+  ros__parameters:
+    joints: [j1, j2, j3, j4, j5, j6]
+    command_interfaces: [position]
+    state_interfaces: [position]
+    interpolation_method: splines
+    # D65 is replayed byte-for-byte. Its measured terminal dq contains tiny
+    # residuals, so rejecting the goal here would be a harness defect.
+    allow_nonzero_velocity_at_trajectory_end: true
+    constraints:
+      stopped_velocity_tolerance: 0.05
+      goal_time: 0.0

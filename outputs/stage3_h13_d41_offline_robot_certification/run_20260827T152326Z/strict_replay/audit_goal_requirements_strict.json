@@ -1,0 +1,41 @@
+{
+  "overall_status": "pass",
+  "strict_runtime": true,
+  "items": [
+    {
+      "requirement": "Real TCP speed and stand-off are recomputed from FK(q(t))",
+      "status": "pass",
+      "evidence": "example FK profile uses tcp_speed_from_positions; final strict validation uses MoveIt2 FK reports for TCP speed, normal, and stand-off gates"
+    },
+    {
+      "requirement": "MoveIt2 uses wall-normal TCP pose goals",
+      "status": "pass",
+      "evidence": "tcp_poses path=/mnt/d/robotfucker/outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv, pose_count=181, quaternion-vs-normal max error=8.53774e-07 deg; MoveIt goal link is spray_tcp_link"
+    },
+    {
+      "requirement": "IK includes nozzle wall-normal orientation constraints",
+      "status": "pass",
+      "evidence": "IK residual includes tool-Z axis error; current FK normal_angle_error_max_deg=2.024380697964421"
+    },
+    {
+      "requirement": "Ruckig smoothing runs after MoveIt2 trajectory planning/time-parameterization",
+      "status": "pass",
+      "evidence": "bridge builds the MoveIt trajectory, applies configured time-parameterization, then native RobotTrajectory.apply_ruckig_smoothing; execution refuses use_ruckig_smoothing:=false"
+    },
+    {
+      "requirement": "Controller execution is blocked unless strict quality gates pass",
+      "status": "pass",
+      "evidence": "execute_trajectory path refuses non-pass FK quality reports before moveit.execute, including joint-continuity failures"
+    },
+    {
+      "requirement": "Strict validation records and guards the assumed spray TCP",
+      "status": "pass",
+      "evidence": "strict script defaults to a 150 mm assumed TCP, can load measured TCP calibration YAML, refuses zero TCP unless explicitly allowed, blocks seed-joint replay with non-zero TCP, and the MoveIt quality report records the TCP assumption"
+    },
+    {
+      "requirement": "ROS2/MoveIt2 runtime execution-chain evidence",
+      "status": "pass",
+      "evidence": "MoveIt FK quality report passed, FK trace rows=181, joint dynamics ratios are within limits; max_jerk_ratio=0.0002304, collision states=993, environment objects=181; tool_tcp_source=assumed_150mm_placeholder accepted by current validation scope"
+    }
+  ]
+}

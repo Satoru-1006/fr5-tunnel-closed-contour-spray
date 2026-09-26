@@ -1,0 +1,100 @@
+schema_version: "1.0"
+
+scene:
+  scene_id: "open_arch_181_stage17"
+  waypoint_count_expected: 181
+  open_path: true
+  frame_id: "base_link"
+
+inputs:
+  tcp_pose_csv: "outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv"
+  seed_joint_csv: "outputs/internal_wiper_moveit_inputs/open_arch_seed_joints.csv"
+  nominal_nodes_parquet: "outputs/ik_graph/nodes.parquet"
+  nominal_edges_parquet: "outputs/ik_graph/edges.parquet"
+  stage16_report: "outputs/ik_feasibility_ablation_stage1_6/stage1_6_report.md"
+  stage16_matrix: "outputs/ik_feasibility_ablation_stage1_6/ablation_matrix.csv"
+
+robot:
+  model_name: "FAIRINO_FR5_V6"
+  group_name: "fairino5_v6_group"
+  ee_link: "spray_tcp_link"
+  joint_count: 6
+  joint_unit: "rad"
+  tool_tcp_offset_m: 0.150
+  tool_tcp_source: "assumed_150mm_placeholder"
+
+process:
+  nominal_standoff_m: 0.260
+  # Existing bridge input convention: normal points from TCP to the wall.
+  tcp_points_to_wall: true
+  max_joint_step_deg: 20.0
+
+formal_study_constraints:
+  tangential_longitudinal_offset_norm_max_mm: 5.0
+  standoff_offset_max_mm: 5.0
+  roll_offset_max_deg: 15.0
+  normal_error_max_deg: 10.0
+  fk_position_error_max_m: 0.006
+
+diagnostic_limits:
+  tangential_longitudinal_offset_norm_max_mm: 10.0
+  standoff_offset_max_mm: 20.0
+  roll_offset_max_deg: 30.0
+  normal_error_max_deg: 30.0
+
+repair_windows:
+  - window_id: "branch_bridge_45_75"
+    start_waypoint: 45
+    end_waypoint: 75
+    primary_problem: "global_ik_branch_cut"
+  - window_id: "pose_feasibility_80_100"
+    start_waypoint: 80
+    end_waypoint: 100
+    primary_problem: "task_pose_parameterization_limited"
+
+candidate_generation:
+  mode: "hierarchical"
+  always_include_nominal_pose: true
+  max_task_pose_candidates_per_waypoint: 64
+  max_ik_candidates_per_task_pose: 16
+  ik_dedup_tolerance_rad: 1.0e-5
+  tangential_offsets_mm: [-5.0, -2.5, 0.0, 2.5, 5.0]
+  longitudinal_offsets_mm: [-5.0, -2.5, 0.0, 2.5, 5.0]
+  standoff_offsets_mm: [-5.0, -2.5, 0.0, 2.5, 5.0]
+  roll_offsets_deg: [-15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0]
+  allow_full_cartesian_product: false
+  expand_combinations_only_when_needed: true
+
+collision:
+  backend: "moveit_planning_scene"
+  validation_method: "adaptive_discrete_interpolation"
+  interpolation_step_deg: 0.5
+  ccd_status: "not_available"
+  clearance_status: "not_available"
+
+search:
+  solver: "second_order_dynamic_programming"
+  fail_on_unreachable_layer: true
+  preserve_nominal_nodes_outside_repair_windows: true
+  beam_width: null
+
+cost_weights:
+  task_position_offset: 1.0
+  standoff_offset: 1.0
+  roll_offset: 0.5
+  normal_error: 1.0
+  joint_motion: 1.0
+  joint_max_step: 2.0
+  repair_first_difference: 2.0
+  repair_second_difference: 4.0
+  roll_first_difference: 1.0
+  standoff_first_difference: 1.0
+  nominal_anchor: 2.0
+
+ruckig:
+  execute_only_if_complete_path_exists: true
+  post_validation_required: true
+  sample_period_s: 0.01
+
+outputs:
+  directory: "outputs/ik_graph_stage17"

@@ -55,21 +55,108 @@ def detect_jerk_spikes(
     ratio_threshold: float = 6.0,
     min_abs_jerk: float = 0.25,
     jerk_limits: np.ndarray | None = None,
+    limit_warning_fraction: float = 0.30,
+    local_ratio_threshold: float = 3.0,
+    local_baseline_radius: int = 5,
 ) -> tuple[np.ndarray, list[dict[str, float | int | str]]]:
-    mag = np.abs(jerk)
+    """Find candidate jerk peaks for diagnostics.
+
+    This is a diagnostic heuristic, not a continuous-jerk certificate or a
+    substitute for the configured limit audit.  The global p95 outlier rule
+    is intentionally supplemented by a local-baseline rule: a short,
+    localized excursion can be well below ``limit_warning_fraction`` of a
+    generous configured limit while still being a meaningful discontinuity
+    relative to the surrounding trajectory.
+    """
+
+    jerk_values = np.asarray(jerk, dtype=float)
+    if jerk_values.ndim == 1:
+        jerk_values = jerk_values[:, None]
+    elif jerk_values.ndim != 2:
+        raise ValueError("jerk must be a one- or two-dimensional finite array")
+    if jerk_values.shape[1] == 0:
+        raise ValueError("jerk must contain at least one joint")
+    if not np.all(np.isfinite(jerk_values)):
+        raise ValueError("jerk must contain only finite values")
+
+    threshold_values = {
+        "ratio_threshold": ratio_threshold,
+        "min_abs_jerk": min_abs_jerk,
+        "limit_warning_fraction": limit_warning_fraction,
+        "local_ratio_threshold": local_ratio_threshold,
+    }
+    for name, value in threshold_values.items():
+        numeric_value = float(value)
+        if not np.isfinite(numeric_value) or numeric_value < 0.0:
+            raise ValueError(f"{name} must be a finite non-negative number")
+        threshold_values[name] = numeric_value
+    ratio_threshold = threshold_values["ratio_threshold"]
+    min_abs_jerk = threshold_values["min_abs_jerk"]
+    limit_warning_fraction = threshold_values["limit_warning_fraction"]
+    local_ratio_threshold = threshold_values["local_ratio_threshold"]
+
+    sample_count, joint_count = jerk_values.shape
+    if t is not None:
+        time_values = np.asarray(t, dtype=float)
+        if time_values.ndim != 1 or len(time_values) != sample_count:
+            raise ValueError("t must be a one-dimensional array matching jerk samples")
+        if not np.all(np.isfinite(time_values)):
+            raise ValueError("t must contain only finite values")
+    else:
+        time_values = None
+
+    if sample_count == 0:
+        return np.empty(0, dtype=int), []
+
+    mag = np.abs(jerk_values)
     p95 = np.percentile(mag, 95, axis=0) + 1e-12
-    ratio_mask = (mag > ratio_threshold * p95) & (mag > min_abs_jerk)
+    global_ratio_mask = (mag > ratio_threshold * p95) & (mag > min_abs_jerk)
     if jerk_limits is not None:
         limits = np.asarray(jerk_limits, dtype=float)
+        if limits.ndim == 0:
+            limits = np.repeat(limits, joint_count)
+        if limits.ndim != 1 or len(limits) != joint_count:
+            raise ValueError("jerk_limits must be a one-dimensional array matching jerk joints")
+        if not np.all(np.isfinite(limits)) or np.any(limits < 0.0):
+            raise ValueError("jerk_limits must contain finite non-negative values")
+        warning_band = np.maximum(limits[None, :] * limit_warning_fraction, min_abs_jerk)
+        global_ratio_mask = global_ratio_mask & (mag > warning_band)
         limit_mask = mag > limits[None, :] * 1.02
-        mask = ratio_mask | limit_mask
     else:
         limit_mask = np.zeros_like(mag, dtype=bool)
-        mask = ratio_mask
+
+    # Estimate the local baseline from neighboring samples while excluding
+    # the candidate itself.  Keeping this independent of the global warning
+    # band is what preserves localized low-amplitude diagnostics.
+    radius = int(local_baseline_radius)
+    if radius < 1:
+        raise ValueError("local_baseline_radius must be at least one sample")
+    local_baseline = np.empty_like(mag)
+    for row in range(mag.shape[0]):
+        start = max(0, row - radius)
+        stop = min(mag.shape[0], row + radius + 1)
+        neighborhood = mag[start:stop]
+        if neighborhood.shape[0] > 1:
+            without_candidate = np.delete(neighborhood, row - start, axis=0)
+            local_baseline[row] = np.median(without_candidate, axis=0)
+        else:  # pragma: no cover - guarded for completeness on one-sample input
+            local_baseline[row] = neighborhood[0]
+    local_ratio = mag / np.maximum(local_baseline, 1e-12)
+    local_ratio_mask = (local_ratio > local_ratio_threshold) & (mag > min_abs_jerk)
+    mask = global_ratio_mask | local_ratio_mask | limit_mask
     peak_pairs: list[tuple[int, int]] = []
     for joint in range(mag.shape[1]):
         peaks, _ = find_peaks(mag[:, joint], height=0.0, distance=5)
-        for row in peaks:
+        # scipy's interior-only peak finder omits an excursion at either
+        # boundary.  Include a boundary only when it is strictly larger than
+        # its sole neighbor, keeping flat signals out of the diagnostic list.
+        boundary_peaks: list[int] = []
+        if sample_count > 1:
+            if mag[0, joint] > 0.0 and mag[0, joint] > mag[1, joint]:
+                boundary_peaks.append(0)
+            if mag[-1, joint] > 0.0 and mag[-1, joint] > mag[-2, joint]:
+                boundary_peaks.append(sample_count - 1)
+        for row in np.unique(np.concatenate((peaks, np.asarray(boundary_peaks, dtype=int)))):
             if mask[row, joint]:
                 peak_pairs.append((int(row), joint))
     peak_pairs.sort()
@@ -77,15 +164,22 @@ def detect_jerk_spikes(
     for row, joint in peak_pairs[:50]:
         details.append(
             {
-                "time": float(t[row]) if t is not None else float(row),
+                "time": float(time_values[row]) if time_values is not None else float(row),
                 "path_index": int(row),
                 "joint": int(joint + 1),
-                "jerk": float(jerk[row, joint]),
+                "jerk": float(jerk_values[row, joint]),
                 "p95_joint_jerk": float(p95[joint]),
+                "local_baseline_jerk": float(local_baseline[row, joint]),
+                "local_baseline_ratio": float(local_ratio[row, joint]),
+                "measurement_scope": "diagnostic_heuristic_only",
                 "reason": (
                     "joint-space jerk exceeds configured limit"
                     if limit_mask[row, joint]
-                    else "joint-space jerk is a max/p95 outlier; inspect local path curvature and IK continuity"
+                    else (
+                        "joint-space jerk is a max/p95 outlier; inspect local path curvature and IK continuity"
+                        if global_ratio_mask[row, joint]
+                        else "joint-space jerk is a local baseline diagnostic outlier; inspect local path curvature and IK continuity"
+                    )
                 ),
             }
         )

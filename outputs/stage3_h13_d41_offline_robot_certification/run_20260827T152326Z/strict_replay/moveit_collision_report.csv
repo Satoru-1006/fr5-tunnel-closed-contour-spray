@@ -1,0 +1,15 @@
+metric,value
+collision_environment_object_count,181.0
+trajectory_waypoint_count,181.0
+collision_checked_state_count,993.0
+collision_interpolation_step_deg,0.5
+collision_count,0.0
+first_collision_index,-1.0
+first_collision_trajectory_segment,-1.0
+first_collision_contact_count,0.0
+first_collision_summary,none
+include_bottom_closure_collision,not_applicable_open_path
+include_tunnel_floor_collision,true
+tunnel_floor_z,-0.2
+open_path,true
+status,pass

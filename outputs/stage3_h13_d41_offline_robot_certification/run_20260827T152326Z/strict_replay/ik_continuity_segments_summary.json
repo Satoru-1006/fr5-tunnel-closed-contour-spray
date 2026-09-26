@@ -1,0 +1,13 @@
+{
+  "source": "/mnt/d/robotfucker/outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay/moveit_joint_step_report.csv",
+  "tcp_pose_source": "/mnt/d/robotfucker/outputs/tcp_poses_base_link.csv",
+  "production_joint_step_limit_deg": 0.0,
+  "exceeding_joint_step_count": 0,
+  "exceeding_transition_count": 0,
+  "exceeding_joints": [],
+  "geometry_zones": [],
+  "loop_size": 240,
+  "segments": [],
+  "phase_clusters": [],
+  "interpretation": "Each segment is an adjacent trajectory transition where at least one joint exceeds the 20 deg production continuity gate. step_deg uses the shortest circular joint delta; raw_step_deg is preserved in the CSV to expose representation wraps. loop_index and phase_index help compare repeated contour loops."
+}

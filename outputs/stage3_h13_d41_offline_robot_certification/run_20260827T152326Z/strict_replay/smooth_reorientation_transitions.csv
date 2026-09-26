@@ -1,0 +1,1 @@
+transition_id,sample_index,from_index,to_index,loop_index,phase_index,spray_enabled,normalized_time,duration_s,t,j1_q,j2_q,j3_q,j4_q,j5_q,j6_q,j1_dq,j2_dq,j3_dq,j4_dq,j5_dq,j6_dq,j1_ddq,j2_ddq,j3_ddq,j4_ddq,j5_ddq,j6_ddq,j1_jerk,j2_jerk,j3_jerk,j4_jerk,j5_jerk,j6_jerk

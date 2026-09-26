@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from src.path_planner import generate_closed_horseshoe_contour_path
+from src.path_planner import generate_closed_horseshoe_contour_path, generate_internal_wiper_path
 from src.metrics import detect_jerk_spikes, polyline_distance, project_points_to_polyline, tcp_speed_from_positions
 from src.robot_model import FR5Robot
 from src.robot_model import JointLimits
@@ -74,10 +74,63 @@ def test_periodic_ruckig_profile_is_continuous_and_limit_compliant() -> None:
     assert np.min(profile.tcp_speed) > 0.0
 
 
-def test_jerk_outlier_is_not_hidden_by_a_high_absolute_limit() -> None:
+def test_internal_wiper_omits_bottom_closure_and_keeps_tcp_inside_arch() -> None:
+    from src.tool_models import SprayTool
+    from src.tunnel_geometry import HorseshoeTunnel, TunnelConfig
+
+    tunnel = HorseshoeTunnel(TunnelConfig(width=1.20, height=1.10, length=0.60, fillet_radius=0.20))
+    path = generate_internal_wiper_path(tunnel, SprayTool(spray_distance=0.18), station_y=0.30, samples=181)
+
+    assert len(path.tcp_points) == 181
+    assert np.allclose(path.tcp_points[:, 1], 0.30)
+    assert np.allclose(np.linalg.norm(path.tcp_points - path.surface_points, axis=1), 0.18, atol=1e-10)
+    assert path.surface_points[0, 0] < -0.55
+    assert path.surface_points[-1, 0] > 0.55
+    assert float(np.min(path.surface_points[:, 2])) > 0.15
+    assert float(np.max(path.surface_points[:, 2])) > 1.0
+
+
+def test_jerk_outlier_below_global_warning_band_is_reported() -> None:
     jerk = np.zeros((200, 6))
     jerk[:, 3] = 0.01
     jerk[100, 3] = 2.0
+    indices, details = detect_jerk_spikes(jerk, jerk_limits=np.full(6, 8.0))
+
+    assert 100 in indices
+    assert details[0]["joint"] == 4
+    assert details[0]["local_baseline_jerk"] == 0.01
+    assert details[0]["local_baseline_ratio"] == 200.0
+    assert "diagnostic" in str(details[0]["reason"])
+
+
+def test_jerk_outlier_below_warning_band_is_not_a_dynamic_spike() -> None:
+    jerk = np.zeros((200, 6))
+    jerk[:, 3] = 1.0
+    jerk[100, 3] = 2.0
+    indices, details = detect_jerk_spikes(jerk, jerk_limits=np.full(6, 8.0))
+
+    assert len(indices) == 0
+    assert details == []
+
+
+def test_local_jerk_outlier_below_global_warning_band_is_reported() -> None:
+    jerk = np.zeros((200, 6))
+    jerk[:, 3] = 0.50
+    jerk[100, 3] = 2.0
+    indices, details = detect_jerk_spikes(jerk, jerk_limits=np.full(6, 8.0))
+
+    assert 100 in indices
+    assert details[0]["joint"] == 4
+    assert details[0]["jerk"] == 2.0
+    assert details[0]["local_baseline_jerk"] == 0.5
+    assert details[0]["local_baseline_ratio"] == 4.0
+    assert "diagnostic" in str(details[0]["reason"])
+
+
+def test_jerk_outlier_near_limit_is_reported_as_dynamic_spike() -> None:
+    jerk = np.zeros((200, 6))
+    jerk[:, 3] = 0.01
+    jerk[100, 3] = 3.0
     indices, details = detect_jerk_spikes(jerk, jerk_limits=np.full(6, 8.0))
 
     assert 100 in indices

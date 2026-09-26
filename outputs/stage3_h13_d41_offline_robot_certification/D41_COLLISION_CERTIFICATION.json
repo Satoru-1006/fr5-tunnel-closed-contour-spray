@@ -1,0 +1,133 @@
+{
+  "ccd_scope": "robot-world only; self continuous CCD unavailable in installed MoveIt wrapper",
+  "controls": [
+    {
+      "control": "endpoint_free_mid_segment_collision",
+      "discrete_mid_collision": true,
+      "link": "forearm_link",
+      "native_continuous_collision": true,
+      "obstacle_center": [
+        -0.425,
+        0,
+        0.152
+      ],
+      "obstacle_side_m": 0.04,
+      "q0": [
+        -1,
+        -0.7,
+        0.8,
+        0,
+        0,
+        0
+      ],
+      "q1": [
+        1,
+        0.7,
+        -0.8,
+        0,
+        0,
+        0
+      ],
+      "status": "PASS",
+      "trials": 1
+    },
+    {
+      "control": "free_space_negative_control",
+      "detail": "far obstacle remains free for endpoints and native sweep",
+      "status": "PASS"
+    },
+    {
+      "control": "self_collision_negative_control",
+      "detail": "deliberate feasible joint state produces native self collision",
+      "status": "PASS"
+    },
+    {
+      "control": "self_collision_negative_control_detail",
+      "pairs": [
+        "upperarm_link|wrist2_link"
+      ],
+      "q": [
+        -1.538838809312652,
+        0.08956028673572458,
+        -2.6759293795387253,
+        -3.0521654331547774,
+        -2.0899656685260903,
+        -2.8783824178455135
+      ]
+    },
+    {
+      "control": "near_miss_positive_clearance",
+      "detail": "native distance is positive and below 10 mm",
+      "status": "PASS"
+    },
+    {
+      "control": "near_miss_detail",
+      "distance_m": 0.001984452949892061,
+      "obstacle_center": [
+        -0.375,
+        0,
+        0.152
+      ]
+    },
+    {
+      "control": "comfortable_clearance",
+      "detail": "native distance exceeds 50 mm",
+      "status": "PASS"
+    },
+    {
+      "control": "comfortable_clearance_detail",
+      "distance_m": 0.06706880325227428,
+      "obstacle_center": [
+        -0.305,
+        0,
+        0.152
+      ]
+    }
+  ],
+  "d41_limit_aware_candidate": {
+    "case_id": "nominal_d41_limit_aware",
+    "family": "d41_limit_aware_nominal",
+    "maximum_jacobian_condition_number": 11822852191.641027,
+    "minimum_jacobian_sigma": 1.5720330432378874e-10,
+    "minimum_robot_world_distance_m": 0.08857717027025891,
+    "minimum_robot_world_pair": "upperarm_link|horseshoe_wall_25",
+    "minimum_robot_world_waypoint": 85,
+    "minimum_self_distance_m": 0.016622079721570728,
+    "minimum_self_pair": "wrist2_link|forearm_link",
+    "minimum_self_waypoint": 88,
+    "native_continuous_robot_world": true,
+    "native_continuous_segment_collision_count": 0,
+    "nominal_waypoint_self_collision_count": 0,
+    "nominal_waypoint_world_collision_count": 0,
+    "self_adaptive_sample_count": 1172,
+    "self_adaptive_step_rad": 0.008726646259971648,
+    "state_count": 181,
+    "status": "PASS"
+  },
+  "distance_method": "native MoveIt2 distanceRobot/distanceSelf at accepted states and refined samples",
+  "native_provenance": "D:\\robotfucker\\outputs\\stage3_h13_d41_offline_robot_certification\\run_20260827T152326Z\\native\\nominal\\D41_native_provenance.json",
+  "nominal": {
+    "case_id": "nominal_d40",
+    "family": "canonical_nominal",
+    "maximum_jacobian_condition_number": 11045688933.319517,
+    "minimum_jacobian_sigma": 1.6824977210418674e-10,
+    "minimum_robot_world_distance_m": 0.08857717027025891,
+    "minimum_robot_world_pair": "upperarm_link|horseshoe_wall_25",
+    "minimum_robot_world_waypoint": 85,
+    "minimum_self_distance_m": 0.016622079721666533,
+    "minimum_self_pair": "wrist2_link|forearm_link",
+    "minimum_self_waypoint": 88,
+    "native_continuous_robot_world": true,
+    "native_continuous_segment_collision_count": 0,
+    "nominal_waypoint_self_collision_count": 0,
+    "nominal_waypoint_world_collision_count": 0,
+    "self_adaptive_sample_count": 1172,
+    "self_adaptive_step_rad": 0.008726646259971648,
+    "state_count": 181,
+    "status": "PASS"
+  },
+  "robot_world_collision_method": "native MoveIt2 CollisionEnvBullet two-state continuous API",
+  "schema_version": "d41-collision-certification-v1",
+  "self_collision_method": "native discrete self-collision plus adaptive 0.5-degree joint-space refinement",
+  "status": "PASS"
+}

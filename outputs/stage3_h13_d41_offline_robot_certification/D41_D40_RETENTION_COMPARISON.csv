@@ -1,0 +1,8 @@
+metric,D40_locked,D41_replay_or_locked,regression_status
+fk_path_deviation_p95_mm,0.028219554641211297,0.028219554641211297,PASS
+fk_path_deviation_max_mm,0.14126918172561212,0.14126918172561212,PASS
+fk_standoff_error_max_abs_mm,0.10550011330623388,0.10550011330623388,PASS
+fk_normal_error_max_deg,1.0068129181254613,1.0068129181254613,PASS
+max_joint_step_deg,14.991790333724396,14.991790333724396,PASS
+future_joint_reads,0,0,PASS
+native_Ruckig_acceptance,pass,pass,PASS

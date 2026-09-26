@@ -1,0 +1,41 @@
+schema_version: '1.9.2c'
+stage:
+  stage_id: stage_1_9_2c
+  input_scope: 181-point open-arch ON-state diagnostics only
+  frozen_call_id: call:00000182
+  difficult_waypoints: [67, 68, 87, 94]
+robot:
+  group_name: fairino5_v6_group
+  base_frame: base_link
+  tip_link: spray_tcp_link
+  joint_order: [j1, j2, j3, j4, j5, j6]
+solver:
+  epsilon: 1.0e-5
+  max_solver_iterations: 500
+  search_discretization: 0.005
+  position_only_ik: false
+  orientation_vs_position: 1.0
+  error_scaling_order: frozen_stage192b
+  joint_limit_clipping_order: frozen_stage192b
+policies:
+  P0_disabled: {wiggle: none}
+  P1_exact_replay: {source: captured_internal_state, generic_candidate_solver: false}
+  P2_fixed_prng: {generator: explicit_splitmix64, seed: '0x6a09e667f3bcc909'}
+  P3_axis_basis: {directions: 12 fixed signed axes}
+  P4_multi_joint_templates: {ordering: fixed}
+  P5_jacobian_svd: {directions: [smallest_right_singular_vector, second_smallest_right_singular_vector]}
+  P6_hybrid: {sequence: [P5_jacobian_svd, P3_axis_basis, P4_multi_joint_templates, P2_fixed_prng]}
+repetition:
+  same_instance: 100
+  new_instance: 50
+  independent_process: 20
+scope_controls:
+  collision_method: adaptive_discrete_interpolation
+  ccd_status: not_available
+  clearance_status: not_available
+  off_states: false
+  reorientation_edges: false
+  gnn: false
+  stage2_input: false
+outputs:
+  directory: outputs/ik_graph_stage192c

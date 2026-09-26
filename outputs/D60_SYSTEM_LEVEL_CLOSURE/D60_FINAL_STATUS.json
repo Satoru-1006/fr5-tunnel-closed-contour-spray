@@ -1,0 +1,74 @@
+{
+  "ADVERSARIAL_VALIDATION": {
+    "d59_full_chain_robustness": "12/12",
+    "fcl_rigid_known_answer": "PASS",
+    "focused_regression": "PASS_12_TESTS",
+    "synthetic_semantic_probes": "PASS_7_OF_7"
+  },
+  "BEST_UNPROMOTED_SHADOW": "D59_TIMING025_PAIR_AUTO0_AND_PROVENANCE_CORRECTED_AUTO1_RETAINED; D60_NATIVE_HYBRIDS_REJECTED_BY_JERK",
+  "CONTINUOUS_ARTICULATED_COLLISION_STATUS": "SCOPED_PASS_CONSERVATIVE_FK_QT_MODEL_FOR_2_CORRECTLY_ROUTED_FINALISTS; EXACT_EXTERNAL_ARTICULATED_BACKEND_NOT_AVAILABLE",
+  "D60_SCOPE": "OFFLINE_ALGORITHM_ONLY",
+  "CLAIM_SCOPE": "historical scoped software-model evidence; no exact external articulated FK(q(t)) self-CCD or physical safety claim",
+  "ARTICULATED_CCD_CLAIM": {
+    "state": "HISTORICAL_SCOPED_MODEL_RESULT_SUPERSEDED_BY_D61_D62_D63_D64_COVERAGE_ACCOUNTING",
+    "exact_external_articulated_fk_qt_ccd": "UNAVAILABLE_UNVERIFIED",
+    "reader_warning": "The two zero-collision/zero-unresolved observations are model-scoped results, not a complete exact articulated continuous self-CCD proof."
+  },
+  "D60_TASK_STATUS": "PASS_FOR_MEASURED_OFFLINE_DOMAINS_NO_PROMOTION_REMAINING_ALGORITHMIC_GAPS",
+  "FAILED_OR_REJECTED_MAJOR_ROUTES": [
+    "Tesseract BulletCast unavailable in the active environment; no silent substitution",
+    "FCL continuousCollide is a rigid begin/end motion API and cannot by itself certify nonlinear articulated FK(q(t))",
+    "global_0075, asymmetric_005v_010a, local_0075_midpoints: native pass but jerk-gate rejected",
+    "global_015, asymmetric_010v_015a, local_015_midpoints: native pass but jerk-gate rejected",
+    "TOPPRA/COPP and other external research routes were investigated but not integrated into the accepted chain"
+  ],
+  "FINAL_PROTECTED_FLOOR": "c4_clearance_adversarial0101_amp005_consistent_0025",
+  "FINAL_VERIFIED_CHAMPION": "c4_clearance_adversarial0101_amp005_consistent_0025",
+  "FIRST_GENUINELY_UNFINISHED_ACTION": "Obtain or implement a trajectory-aware articulated CCD/certificate with explicit FK(q(t)) semantics, then attack jerk-feasible hybrid path optimization under the same rolling hard gates",
+  "FK_QT_CERTIFICATE_STATUS": "HISTORICAL_SCOPED_PASS_D60_STRIDE1_DEEP_REFINEMENT_2_CASES_0_COLLISION_0_UNRESOLVED_CONSERVATIVE_MODEL_ONLY",
+  "HARD_GATES": {
+    "d60_fk_qt_certificate": {
+      "collision_region_count": 0,
+      "required_pair_coverage_complete": true,
+      "unresolved_is_not_pass": true,
+      "unresolved_region_count": 0
+    },
+    "d60_native_hybrid_v1": "REJECTED_JERK_ALL_3_CANDIDATES",
+    "d60_native_hybrid_v2": "REJECTED_JERK_ALL_3_CANDIDATES",
+    "protected_d59_full_chain": {
+      "articulated_certificate_status": "D56_INHERITED_12_CASE_CONSERVATIVE_PASS; D59_NEW_ROUTE_HISTORICAL_ZERO_UNRESOLVED_SCOPED_TO_MODEL",
+      "campaign": "D56 protected native 12-case regression/perturbation set remeasured through current D59 FK/geometry/task chain",
+      "case_count": 12,
+      "fcl_status": "D59_REVERIFIED_TWO_FINALISTS_ZERO_CONTACTS",
+      "hard_gate_pass": true,
+      "pass_rate": "12/12",
+      "status": "PASS",
+      "synthetic_stress_label": "SOFTWARE_ROBUSTNESS_STRESS_TEST"
+    }
+  },
+  "MATERIAL_REGRESSION": "NO_PROTECTED_REGRESSION; D60 SHADOW HYBRIDS HAVE MATERIAL JERK REGRESSION AND WERE REJECTED",
+  "PROMOTION": "NO_PROMOTION",
+  "REMAINING_ALGORITHMIC_GAPS": [
+    "backend-independent exact or stronger theorem-level continuous articulated self-collision semantics for the realized q(t)",
+    "a hybrid geometry-plus-retiming optimizer that remains within the native jerk contract and demonstrates a net system-level gain",
+    "authorized software thresholds for torque, torque slew, singularity, task-space fidelity, and clearance remain unresolved or relative"
+  ],
+  "STARTING_CANONICAL": "outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3",
+  "STARTING_PROTECTED_FLOOR": "c4_clearance_adversarial0101_amp005_consistent_0025",
+  "SUCCESSFUL_HYBRID_ROUTES": [
+    "native MoveIt2/Ruckig plus Profile.j plus FK-aware conservative certificate plus FCL rigid cross-check plus Pinocchio model dynamics: successful validation composition, not a promoted optimizer",
+    "D59 fixed-q dynamics-aware time search: bounded shadow route passed measured software gates but was equal to the protected floor"
+  ],
+  "SYSTEM_LEVEL_NET_GAIN": "NO_NEW_PROTECTED_SYSTEM_NET_GAIN; D60 ADDED VALIDATED SEMANTIC AND FK_QT EVIDENCE",
+  "TAKEOVER_REORIENTATION_RESULT": "PASS_LIVE_D59_STATE_RECONCILED_NO_PROTECTED_ARTIFACT_MUTATION",
+  "evidence": {
+    "d59_final_status": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_FINAL_STATUS.json",
+    "fk_qt_certificate": "outputs/D60_SYSTEM_LEVEL_CLOSURE/fk_qt_certificate/D60_FK_QT_CERTIFICATE_AUDIT.json",
+    "focused_regression": "python -m pytest -q tests/test_d50_measurement_repairs.py tests/test_d54_articulated_certificate.py tests/test_d57_system_closure.py -> 12 passed",
+    "hybrid_v1": "outputs/D60_SYSTEM_LEVEL_CLOSURE/hybrid_shadows/performance_shadow_report.json",
+    "hybrid_v2": "outputs/D60_SYSTEM_LEVEL_CLOSURE/hybrid_shadows_v2/D60_HYBRID_SHADOWS.json",
+    "semantic_probes": "outputs/D60_SYSTEM_LEVEL_CLOSURE/semantic_probes/D60_SEMANTIC_PROBES.json"
+  },
+  "generated_at_utc": "2026-08-31T23:14:53.923107+00:00",
+  "schema_version": "d60-final-status-v1"
+}

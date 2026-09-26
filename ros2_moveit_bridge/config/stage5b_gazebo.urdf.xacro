@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fairino5_v6_stage5b_gazebo">
+  <xacro:arg name="initial_positions_file" default="$(find fairino5_v6_moveit2_config)/config/initial_positions.yaml" />
+  <xacro:arg name="tool_tcp_xyz" default="0 0 0.150" />
+  <xacro:arg name="tool_tcp_rpy" default="0 0 0" />
+
+  <xacro:include filename="$(find fairino_description)/urdf/fairino5_v6.urdf" />
+  <xacro:property name="initial_positions" value="${load_yaml('$(arg initial_positions_file)')['initial_positions']}" />
+
+  <ros2_control name="Stage5BGazeboSystem" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+    <joint name="j1">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">${initial_positions['j1']}</param></state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="j2">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">${initial_positions['j2']}</param></state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="j3">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">${initial_positions['j3']}</param></state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="j4">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">${initial_positions['j4']}</param></state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="j5">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">${initial_positions['j5']}</param></state_interface>
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="j6">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">${initial_positions['j6']}</param></state_interface>
+      <state_interface name="velocity" />
+    </joint>
+  </ros2_control>
+
+  <gazebo>
+    <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find fr5_tunnel_moveit_bridge)/config/stage5b_gazebo_controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+  <link name="spray_tcp_link" />
+  <joint name="spray_tcp_fixed_joint" type="fixed">
+    <parent link="wrist3_link" />
+    <child link="spray_tcp_link" />
+    <origin xyz="$(arg tool_tcp_xyz)" rpy="$(arg tool_tcp_rpy)" />
+  </joint>
+</robot>

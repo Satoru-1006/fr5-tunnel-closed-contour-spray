@@ -1,0 +1,46 @@
+{
+  "schema_version": "stage3-h3-target-pose-contract-v1",
+  "status": "FROZEN_FOR_H3",
+  "target_semantics": "GEOMETRIC_TASK_TARGET",
+  "coordinate_frame": "H2 target_frame, carried into H3 without reinterpretation",
+  "length_unit": "m",
+  "stand_off": {
+    "value_m": 0.26,
+    "symbol": "nominal_standoff_m",
+    "classification": "DECLARED_BASELINE_PARAMETER",
+    "historical_stage01_value_m": 0.26,
+    "stage3_assumption": true,
+    "provenance": "Historical Stage 0/1 nominal stand-off is carried as a declared H3 baseline parameter; no physical optimum or universal tunnel-surface claim is made.",
+    "post_hoc_tuning": "FORBIDDEN"
+  },
+  "spray_axis": {
+    "surface_normal_semantics": "H2-oriented unit normal at the sampled surface point",
+    "spray_direction_definition": "unit(-surface_normal_unit)",
+    "direction_of_travel": "from TCP/nozzle toward surface"
+  },
+  "tcp_position": "surface_point_xyz_m - nominal_standoff_m * spray_direction_unit",
+  "orientation": {
+    "quaternion_order": "xyzw",
+    "local_axis_mapping": {
+      "+X": "roll tangent selected by deterministic projected reference-axis policy",
+      "+Y": "cross(+Z,+X)",
+      "+Z": "spray_direction_unit"
+    },
+    "rotation_convention": "active right-handed rotation mapping TCP-local axes into coordinate_frame"
+  },
+  "roll_policy": {
+    "method": "projected_global_reference_axis",
+    "reference_axes_in_priority_order": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+    "projection": "reference - dot(reference, spray_direction) * spray_direction",
+    "degeneracy_epsilon": 1e-12,
+    "fallback": "first reference axis whose projection norm exceeds epsilon",
+    "sign_rule": "preserve the sign of the selected reference projection; no arbitrary sign flip",
+    "discontinuity_policy": "reference-axis switching is explicit at degeneracy; continuity is not claimed",
+    "filesystem_order_dependency": false
+  },
+  "reachability": {
+    "checked": false,
+    "semantic_status": "not_available_in_H3",
+    "ik_planning_execution": "forbidden"
+  }
+}

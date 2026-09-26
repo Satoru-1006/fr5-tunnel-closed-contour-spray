@@ -1,0 +1,66 @@
+schema_version: '2.3A.4'
+baseline:
+  id: fr5_scaled_horseshoe_demo_v1
+  authority: author_defined_demo_reference
+  description: FR5 scaled horseshoe tunnel spray demonstration scene
+  real_tunnel_claim: false
+  engineering_deployment_claim: false
+coordinate_system:
+  world_frame: world
+  tunnel_frame: tunnel_frame
+  robot_base_frame: base_link
+  axis_definition: {x: tunnel_longitudinal_forward, y: tunnel_lateral_left, z: upward}
+  units: {length: meter, angle: radian}
+world_to_tunnel: {xyz_m: [0.0, 0.0, 0.0], rpy_rad: [0.0, 0.0, 0.0]}
+tunnel:
+  inner_width_m: 1.10
+  inner_height_m: 1.00
+  length_m: 0.35
+  wall_thickness_m: 0.04
+  crown_radius_m: 0.55
+  straight_sidewall_height_m: 0.45
+robot_base: {xyz_m: [-0.32, 0.00, 0.38], rpy_rad: [0.0, 0.0, 0.0]}
+process:
+  cross_section_x_m: 0.12
+  standoff_nominal_m: 0.10
+  standoff_tolerance_m: 0.005
+  normal_tolerance_deg: 10.0
+  roll_freedom_deg: 15.0
+  waypoint_count: 720
+  sampling: uniform_arc_length
+  closed_loop: true
+  duplicate_terminal_waypoint: false
+tool:
+  # The requested v1 geometry is 120 mm; the frozen Stage 1.9.3 runtime model
+  # actually loaded by the solver uses the repository's explicit 150 mm TCP.
+  requested_flange_to_tcp_xyz_m: [0.0, 0.0, 0.12]
+  flange_to_tcp_xyz_m: [0.0, 0.0, 0.15]
+  flange_to_tcp_rpy_rad: [0.0, 0.0, 0.0]
+  nozzle_length_m: 0.12
+  nozzle_radius_m: 0.025
+  spray_axis: +Z
+mesh_generation:
+  vertex_unit: meter
+  planning_scene_scale: [1.0, 1.0, 1.0]
+  collision_object_count: 1
+  cross_section_samples: 128
+  watertight: true
+  manifold: true
+  duplicate_faces: false
+  degenerate_triangles: false
+  zero_area_triangles: false
+  consistent_normals: true
+waypoint_sampling: {count: 720, method: uniform_arc_length, closed_loop: true, duplicate_terminal_waypoint: false}
+ik_solver:
+  expected_type: deterministic_numeric_urdf_scipy_least_squares
+  algorithm_changed: false
+  solver_version: scipy-least_squares-fixed-v1
+  position_tolerance_m: 0.006
+  tool_z_tolerance_deg: 10.0
+  orientation_weight: 3.0
+  continuity_weight: 0.001
+  max_nfev: 160
+collision:
+  method: adaptive_discrete_interpolation
+  ccd_status: not_available
+  clearance_status: not_available

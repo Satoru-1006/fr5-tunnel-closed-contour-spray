@@ -1,0 +1,400 @@
+{
+  "ARTICULATED_SELF_CCD_STATUS": "SCOPED_CONSERVATIVE_FK_AWARE_MODEL_ONLY_FOR_TWO_CORRECTLY_ROUTED_CANDIDATES; EXACT_EXTERNAL_ARTICULATED_BACKEND_NOT_AVAILABLE",
+  "ARTICULATED_SELF_CCD_CLAIM": {
+    "state": "HISTORICAL_SCOPED_RESULT_SUPERSEDED_AS_CURRENT_CONTINUOUS_CCD_AUTHORITY",
+    "historical_observation": {
+      "candidate_count": 2,
+      "collision_regions": 0,
+      "unresolved_regions": 0
+    },
+    "scope": "accepted conservative FK-aware software model over the two correctly routed D59 finalists",
+    "exact_external_articulated_fk_qt_ccd": "UNAVAILABLE_UNVERIFIED",
+    "superseded_by": [
+      "D61",
+      "D62",
+      "D63",
+      "D64"
+    ],
+    "reader_warning": "Do not interpret the historical zero/zero observation as a complete exact articulated continuous self-CCD proof."
+  },
+  "BEST_UNPROMOTED_SHADOW": "D59_TIMING025_PAIR_AUTO0_AND_PROVENANCE_CORRECTED_AUTO1",
+  "CURRENT_CANONICAL": "outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3",
+  "CURRENT_PROTECTED_FLOOR": "c4_clearance_adversarial0101_amp005_consistent_0025",
+  "D59_SCOPE": "OFFLINE_ALGORITHM_ONLY",
+  "D59_TASK_STATUS": "PASS_FOR_MEASURED_OFFLINE_DOMAINS_NO_PROMOTION",
+  "ENVIRONMENT_CONTINUOUS_CCD_STATUS": "PASS_NATIVE_MOVEIT_ROBOT_WORLD_SEGMENT_CHECK_ZERO_COLLISIONS_ZERO_API_ERRORS",
+  "FINAL_VERIFIED_CHAMPION": "c4_clearance_adversarial0101_amp005_consistent_0025",
+  "FULL_CHAIN_ROBUSTNESS_STATUS": {
+    "articulated_certificate_status": "D56_INHERITED_12_CASE_CONSERVATIVE_PASS; D59_NEW_ROUTE_HISTORICAL_ZERO_UNRESOLVED_SCOPED_TO_MODEL",
+    "campaign": "D56 protected native 12-case regression/perturbation set remeasured through current D59 FK/geometry/task chain",
+    "case_count": 12,
+    "fcl_status": "D59_REVERIFIED_TWO_FINALISTS_ZERO_CONTACTS",
+    "hard_gate_pass": true,
+    "pass_rate": "12/12",
+    "status": "PASS",
+    "synthetic_stress_label": "SOFTWARE_ROBUSTNESS_STRESS_TEST"
+  },
+  "MODEL_DYNAMICS_INTEGRATION_STATUS": "PASS_PINOCCHIO_RNEA_ABA_AND_BOUNDED_UPSTREAM_TIME_SEARCH; MODEL_ONLY_NO_HARDWARE_TORQUE_LIMIT",
+  "OUT_OF_SCOPE_HARDWARE_ITEMS": [
+    "physical base/TCP calibration uncertainty",
+    "encoder, backlash, compliance, deformation, and real tracking error",
+    "physical clearance acceptance",
+    "actuator current/thermal/torque certification"
+  ],
+  "PROMOTION": "NO_PROMOTION",
+  "PROVENANCE_STATUS": "CORRECTED_SCIENTIFIC_DATA_ROUTING_MISMATCH_AUTO1_RERUN",
+  "REMAINING_SOFTWARE_GAPS": [
+    "Exact theorem-level articulated FK(q(t)) CCD backend beyond the accepted conservative FK-aware certificate is unavailable in this environment.",
+    "Tesseract Robotics ContinuousContactManager/BulletCast plugins are not installed; OCR libtesseract is unrelated and was not counted.",
+    "No hardware-independent torque limit or universal task/singularity threshold is authorized; model metrics remain relative.",
+    "TOPP-RA/Tesseract/Crocoddyl are research/route options, not silently substituted into the accepted chain."
+  ],
+  "RESEARCH_ROUTES": {
+    "dynamics_aware_time_search": {
+      "route": "upstream_fixed-q_time_policy",
+      "status": "PASS_BOUNDED_SHADOW_ROUTE"
+    },
+    "fcl_continuous_collide": {
+      "route": "D",
+      "semantics": "rigid_endpoint_sweep_cross_check",
+      "status": "PASS_ZERO_CONTACTS"
+    },
+    "fk_aware_interval_certificate": {
+      "route": "A",
+      "status": "HISTORICAL_SCOPED_PASS_ZERO_COLLISION_ZERO_UNRESOLVED_CONSERVATIVE_MODEL_ONLY",
+      "claim_scope": "D59 historical conservative FK-aware model result; exact external articulated FK(q(t)) self-CCD remains unavailable"
+    },
+    "moveit_bullet_robot_world": {
+      "not_self_ccd": true,
+      "status": "PASS_FOR_TWO_STATE_ROBOT_WORLD_CCD"
+    },
+    "tesseract_bulletcast": {
+      "route": "C",
+      "status": "NOT_AVAILABLE"
+    }
+  },
+  "SINGULARITY_STATUS": "PASS_AVAILABLE_RELATIVE_METRICS; NO_SIGMA_LT_1E-6_IN_12_CASE_CAMPAIGN; NO_ARBITRARY_INDUSTRIAL_THRESHOLD",
+  "SYSTEM_LEVEL_NET_GAIN": "YES_ON_MEASURED_SOFTWARE_CHANNELS; NO_NEW_NET_GAIN_OVER_PROTECTED_D56_FLOOR",
+  "TIMING_OPTIMIZATION_STATUS": {
+    "D58_auto0_reference_duration_s": 561.177833886,
+    "D59_auto0_duration_s": 294.019376723,
+    "D59_auto1_duration_s": 257.193538084,
+    "auto0_reduction_vs_D58_reference": "47.607%",
+    "auto1_D58_comparison": "NOT_COMPARABLE_D58_AUTO1_CONSUMED_MISROUTED_AUTO0_SOURCE",
+    "method": "D59 bounded model-dynamics-aware fixed-q time search followed by native MoveIt2/Ruckig",
+    "q_path_mutated": false,
+    "status": "PASS_D58_INFLATION_REMOVED_IN_SHADOW"
+  },
+  "candidates": [
+    {
+      "acceleration_status": "PASS",
+      "adaptive_discrete_collision_status": "PASS",
+      "articulated_continuous_self_ccd": {
+        "certificate_status": "PASS",
+        "collision_region_count": 0,
+        "exact_backend_status": "NOT_AVAILABLE",
+        "minimum_certified_clearance_m": 0.004214082104332431,
+        "status": "SCOPED_PASS_CONSERVATIVE_FK_AWARE_MODEL_ONLY",
+        "historical_status": "CERTIFIED_COLLISION_FREE_UNDER_FK_AWARE_CONSERVATIVE_MODEL",
+        "claim_scope": "historical D59 model result for this candidate; not exact external articulated FK(q(t)) self-CCD",
+        "unresolved_region_count": 0,
+        "worst_pair": "forearm_link|wrist2_link"
+      },
+      "cartesian_path_fidelity": {
+        "acceptance_policy": "relative_fidelity_monitor_no_arbitrary_hardware_TCP_threshold",
+        "endpoint_position_error_m": 3.7451090445691675e-08,
+        "max_deviation_m": 0.004712346178350872,
+        "p95_deviation_m": 0.003635778118863181
+      },
+      "case_id": "adversarial_0100",
+      "continuous_robot_world_collision": "PASS_NATIVE_MOVEIT_ROBOT_WORLD_SEGMENT_CHECK",
+      "derived_jerk_diagnostic": {
+        "max_abs_jerk_rad_s3": 0.056044423320091546,
+        "status": "PASS"
+      },
+      "deterministic_replay": {
+        "byte_identical": true,
+        "comparison": "SHA256 of original and clean replay native trajectory",
+        "status": "PASS"
+      },
+      "duration_delta_vs_source_s": -0.001289282000016101,
+      "duration_s": 294.019376723,
+      "dynamics_search": "outputs\\D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE\\D59_DYNAMICS_AWARE_SEARCH_AUTO0.json",
+      "fcl_independent_cross_check": {
+        "backend": "FCL_0.7_continuousCollide",
+        "continuous_api_error_count": 0,
+        "continuous_collision_count": 0,
+        "semantics": "rigid_link_endpoint_sweep_cross_check_not_exact_nonlinear_articulated_FK_q_t",
+        "status": "PASS_ZERO_CONTACTS",
+        "swept_interval_count": 7004,
+        "swept_pair_call_count": 10995
+      },
+      "finite_continuity_status": "PASS",
+      "joint_limit_status": "PASS",
+      "model_environment_clearance_m": 0.08904024347790658,
+      "model_self_clearance_m": 0.016623744799313767,
+      "native_execution": true,
+      "native_trajectory": "/mnt/d/robotfucker/outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/timing_scale025_auto0/trajectories/adversarial_0100.csv",
+      "peak_model_aggregate_power_proxy_W": 1.5347513123938927,
+      "peak_model_torque_Nm": 50.92558380411257,
+      "peak_model_torque_slew_Nm_s": 2.52103162012345,
+      "profile_j": {
+        "max_abs_analytic_jerk_rad_s3": 8.0,
+        "segments": 7004,
+        "status": "PASS",
+        "successful_native_profiles": 7004
+      },
+      "q_path_integrity": true,
+      "robustness_pass_rate": "12/12 PASS (shared D59 full-chain robustness run)",
+      "singularity": {
+        "maximum_condition_number": 1501.4810052534515,
+        "minimum_sigma_min": 0.0012374700102014801,
+        "policy": "relative_quality_metric_and_pathology_detector_no_arbitrary_industrial_threshold",
+        "risk_cases_sigma_lt_1e-6": 0
+      },
+      "source_trajectory": "/mnt/d/robotfucker/outputs/D57_STAGE4_ALGORITHMIC_CLOSURE/optimizer_shadow/auto_0_adversarial_0100.csv",
+      "velocity_status": "PASS"
+    },
+    {
+      "acceleration_status": "PASS",
+      "adaptive_discrete_collision_status": "PASS",
+      "articulated_continuous_self_ccd": {
+        "certificate_status": "PASS",
+        "collision_region_count": 0,
+        "exact_backend_status": "NOT_AVAILABLE",
+        "minimum_certified_clearance_m": 0.0064440789403451305,
+        "status": "SCOPED_PASS_CONSERVATIVE_FK_AWARE_MODEL_ONLY",
+        "historical_status": "CERTIFIED_COLLISION_FREE_UNDER_FK_AWARE_CONSERVATIVE_MODEL",
+        "claim_scope": "historical D59 model result for this candidate; not exact external articulated FK(q(t)) self-CCD",
+        "unresolved_region_count": 0,
+        "worst_pair": "forearm_link|wrist2_link"
+      },
+      "cartesian_path_fidelity": {
+        "acceptance_policy": "relative_fidelity_monitor_no_arbitrary_hardware_TCP_threshold",
+        "endpoint_position_error_m": 3.745109062575315e-08,
+        "max_deviation_m": 0.006359292401327267,
+        "p95_deviation_m": 0.0053472669140477635
+      },
+      "case_id": "adversarial_0101",
+      "continuous_robot_world_collision": "PASS_NATIVE_MOVEIT_ROBOT_WORLD_SEGMENT_CHECK",
+      "derived_jerk_diagnostic": {
+        "max_abs_jerk_rad_s3": 0.08552539568919074,
+        "status": "PASS"
+      },
+      "deterministic_replay": {
+        "byte_identical": true,
+        "comparison": "SHA256 of original and clean replay native trajectory",
+        "status": "PASS"
+      },
+      "duration_delta_vs_source_s": -0.0005422219999786648,
+      "duration_s": 257.193538084,
+      "dynamics_search": "outputs\\D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE\\D59_DYNAMICS_AWARE_SEARCH_AUTO1.json",
+      "fcl_independent_cross_check": {
+        "backend": "FCL_0.7_continuousCollide",
+        "continuous_api_error_count": 0,
+        "continuous_collision_count": 0,
+        "semantics": "rigid_link_endpoint_sweep_cross_check_not_exact_nonlinear_articulated_FK_q_t",
+        "status": "PASS_ZERO_CONTACTS",
+        "swept_interval_count": 7029,
+        "swept_pair_call_count": 11060
+      },
+      "finite_continuity_status": "PASS",
+      "joint_limit_status": "PASS",
+      "model_environment_clearance_m": 0.08966877526754523,
+      "model_self_clearance_m": 0.016622086412405337,
+      "native_execution": true,
+      "native_trajectory": "/mnt/d/robotfucker/outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/timing_scale025_corrected_auto1/trajectories/adversarial_0101.csv",
+      "peak_model_aggregate_power_proxy_W": 1.6795200625167646,
+      "peak_model_torque_Nm": 50.77324392827316,
+      "peak_model_torque_slew_Nm_s": 2.3140934983143393,
+      "profile_j": {
+        "max_abs_analytic_jerk_rad_s3": 8.0,
+        "segments": 7029,
+        "status": "PASS",
+        "successful_native_profiles": 7029
+      },
+      "q_path_integrity": true,
+      "robustness_pass_rate": "12/12 PASS (shared D59 full-chain robustness run)",
+      "singularity": {
+        "maximum_condition_number": 830.014833499793,
+        "minimum_sigma_min": 0.0022379578969170897,
+        "policy": "relative_quality_metric_and_pathology_detector_no_arbitrary_industrial_threshold",
+        "risk_cases_sigma_lt_1e-6": 0
+      },
+      "source_trajectory": "/mnt/d/robotfucker/outputs/D57_STAGE4_ALGORITHMIC_CLOSURE/optimizer_shadow/auto_1_adversarial_0101.csv",
+      "velocity_status": "PASS"
+    }
+  ],
+  "decision_table": [
+    {
+      "acceleration_status": "PASS",
+      "articulated_continuous_self_ccd_status": "HISTORICAL_SCOPED_PASS_MODEL_BASED_CONSERVATIVE_CERTIFICATE",
+      "candidate": "PROTECTED_FLOOR::adversarial_0100",
+      "cartesian_path_fidelity": {
+        "acceptance_policy": "relative_fidelity_monitor_no_arbitrary_hardware_TCP_threshold",
+        "endpoint_position_error_m": 3.7451090445691675e-08,
+        "max_deviation_m": 0.004712346178350872,
+        "p95_deviation_m": 0.003635778118863181
+      },
+      "continuous_robot_world_collision_status": "PASS_NATIVE_MOVEIT_ROBOT_WORLD_SEGMENT_CHECK",
+      "deterministic_replay": "PASS_INHERITED_D58",
+      "duration_s": 294.020666005,
+      "epsilon_equivalent_changes": [],
+      "joint_limit_status": "PASS",
+      "meaningful_improvements": [],
+      "meaningful_regressions": [],
+      "model_environment_clearance_m": 0.08904024347790658,
+      "model_self_clearance_m": 0.016623744799313767,
+      "native_execution": true,
+      "peak_model_torque_Nm": 50.93229267435331,
+      "profile_j_jerk_status": "PASS_INHERITED_D58_7004_OF_7004_MAX_8",
+      "promotion": "PROTECTED_FLOOR_RETAINED",
+      "q_path_integrity": true,
+      "regression_status": "PASS",
+      "robustness_pass_rate": "12/12 inherited D56 full native suite",
+      "singularity_metrics": {
+        "maximum_condition_number": 1559.8687481059221,
+        "minimum_sigma_min": 0.0011911522290421151
+      },
+      "torque_slew": 2.52103162012345,
+      "velocity_status": "PASS"
+    },
+    {
+      "acceleration_status": "PASS",
+      "articulated_continuous_self_ccd_status": "HISTORICAL_SCOPED_PASS_MODEL_BASED_CONSERVATIVE_CERTIFICATE",
+      "candidate": "PROTECTED_FLOOR::adversarial_0101",
+      "cartesian_path_fidelity": {
+        "acceptance_policy": "relative_fidelity_monitor_no_arbitrary_hardware_TCP_threshold",
+        "endpoint_position_error_m": 3.745109062575315e-08,
+        "max_deviation_m": 0.006359292401327267,
+        "p95_deviation_m": 0.0053472669140477635
+      },
+      "continuous_robot_world_collision_status": "PASS_NATIVE_MOVEIT_ROBOT_WORLD_SEGMENT_CHECK",
+      "deterministic_replay": "PASS_INHERITED_D58",
+      "duration_s": 257.194080306,
+      "epsilon_equivalent_changes": [],
+      "joint_limit_status": "PASS",
+      "meaningful_improvements": [],
+      "meaningful_regressions": [],
+      "model_environment_clearance_m": 0.08966877526754523,
+      "model_self_clearance_m": 0.016622086412405337,
+      "native_execution": true,
+      "peak_model_torque_Nm": 50.77324392827316,
+      "profile_j_jerk_status": "PASS_INHERITED_D58_7004_OF_7004_MAX_8",
+      "promotion": "PROTECTED_FLOOR_RETAINED",
+      "q_path_integrity": true,
+      "regression_status": "PASS",
+      "robustness_pass_rate": "12/12 inherited D56 full native suite",
+      "singularity_metrics": {
+        "maximum_condition_number": 845.9968059026326,
+        "minimum_sigma_min": 0.0021956518031275574
+      },
+      "torque_slew": 2.3140934983143393,
+      "velocity_status": "PASS"
+    },
+    {
+      "acceleration_status": "PASS",
+      "articulated_continuous_self_ccd_status": "HISTORICAL_SCOPED_PASS_CONSERVATIVE_FK_AWARE_MODEL_ONLY",
+      "candidate": "D59_TIMING025::adversarial_0100",
+      "cartesian_path_fidelity": {
+        "acceptance_policy": "relative_fidelity_monitor_no_arbitrary_hardware_TCP_threshold",
+        "endpoint_position_error_m": 3.7451090445691675e-08,
+        "max_deviation_m": 0.004712346178350872,
+        "p95_deviation_m": 0.003635778118863181
+      },
+      "continuous_robot_world_collision_status": "PASS_NATIVE_MOVEIT_ROBOT_WORLD_SEGMENT_CHECK",
+      "deterministic_replay": {
+        "byte_identical": true,
+        "comparison": "SHA256 of original and clean replay native trajectory",
+        "status": "PASS"
+      },
+      "duration_s": 294.019376723,
+      "epsilon_equivalent_changes": [
+        "duration versus D56 protected floor is below 0.002 s"
+      ],
+      "joint_limit_status": "PASS",
+      "meaningful_improvements": [
+        "removes D58 1.908649704875276x timing inflation while preserving q path"
+      ],
+      "meaningful_regressions": [],
+      "model_environment_clearance_m": 0.08904024347790658,
+      "model_self_clearance_m": 0.016623744799313767,
+      "native_execution": true,
+      "peak_model_torque_Nm": 50.92558380411257,
+      "profile_j_jerk_status": "PASS 7004/7004 max 8.0",
+      "promotion": "NO_PROMOTION_EQUAL_TO_PROTECTED_FLOOR",
+      "q_path_integrity": true,
+      "regression_status": "PASS_12_FOCUSED_TESTS_AND_NATIVE_REPLAY",
+      "robustness_pass_rate": "12/12 PASS (shared D59 full-chain robustness run)",
+      "singularity_metrics": {
+        "maximum_condition_number": 1501.4810052534515,
+        "minimum_sigma_min": 0.0012374700102014801,
+        "policy": "relative_quality_metric_and_pathology_detector_no_arbitrary_industrial_threshold",
+        "risk_cases_sigma_lt_1e-6": 0
+      },
+      "torque_slew": 2.52103162012345,
+      "velocity_status": "PASS"
+    },
+    {
+      "acceleration_status": "PASS",
+      "articulated_continuous_self_ccd_status": "HISTORICAL_SCOPED_PASS_CONSERVATIVE_FK_AWARE_MODEL_ONLY",
+      "candidate": "D59_TIMING025::adversarial_0101_PROVENANCE_CORRECTED",
+      "cartesian_path_fidelity": {
+        "acceptance_policy": "relative_fidelity_monitor_no_arbitrary_hardware_TCP_threshold",
+        "endpoint_position_error_m": 3.745109062575315e-08,
+        "max_deviation_m": 0.006359292401327267,
+        "p95_deviation_m": 0.0053472669140477635
+      },
+      "continuous_robot_world_collision_status": "PASS_NATIVE_MOVEIT_ROBOT_WORLD_SEGMENT_CHECK",
+      "deterministic_replay": {
+        "byte_identical": true,
+        "comparison": "SHA256 of original and clean replay native trajectory",
+        "status": "PASS"
+      },
+      "duration_s": 257.193538084,
+      "epsilon_equivalent_changes": [
+        "model clearances and task fidelity match the corrected D56 floor within replay precision"
+      ],
+      "joint_limit_status": "PASS",
+      "meaningful_improvements": [
+        "corrects actual D57 auto1 source routing and removes D58 timing inflation"
+      ],
+      "meaningful_regressions": [],
+      "model_environment_clearance_m": 0.08966877526754523,
+      "model_self_clearance_m": 0.016622086412405337,
+      "native_execution": true,
+      "peak_model_torque_Nm": 50.77324392827316,
+      "profile_j_jerk_status": "PASS 7029/7029 max 8.0",
+      "promotion": "NO_PROMOTION_EQUAL_TO_PROTECTED_FLOOR",
+      "q_path_integrity": true,
+      "regression_status": "PASS_12_FOCUSED_TESTS_AND_NATIVE_REPLAY",
+      "robustness_pass_rate": "12/12 PASS (shared D59 full-chain robustness run)",
+      "singularity_metrics": {
+        "maximum_condition_number": 830.014833499793,
+        "minimum_sigma_min": 0.0022379578969170897,
+        "policy": "relative_quality_metric_and_pathology_detector_no_arbitrary_industrial_threshold",
+        "risk_cases_sigma_lt_1e-6": 0
+      },
+      "torque_slew": 2.3140934983143393,
+      "velocity_status": "PASS"
+    }
+  ],
+  "evidence": {
+    "articulated_certificate_auto0": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/timing_scale025_auto0_certificate_stride1/D54_CONTINUOUS_SELF_COLLISION_CERTIFICATION.json",
+    "articulated_certificate_auto1": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/timing_scale025_corrected_auto1_certificate_stride1/D54_CONTINUOUS_SELF_COLLISION_CERTIFICATION.json",
+    "dynamics": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/dynamics_timing025_candidates/dynamics_report.json",
+    "dynamics_aware_search_auto0": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_DYNAMICS_AWARE_SEARCH_AUTO0.json",
+    "dynamics_aware_search_auto1": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_DYNAMICS_AWARE_SEARCH_AUTO1.json",
+    "fcl_auto0": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/fcl_routeD_timing025_auto0/continuous_self_collision_summary.json",
+    "fcl_auto1": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/fcl_routeD_timing025_auto1/continuous_self_collision_summary.json",
+    "focused_regression": "python -m pytest -q tests/test_d50_measurement_repairs.py tests/test_d54_articulated_certificate.py tests/test_d57_system_closure.py -> 12 passed",
+    "native_auto0": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/timing_scale025_auto0/execution_form_summary.json",
+    "native_auto1": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/timing_scale025_corrected_auto1/execution_form_summary.json",
+    "profile_j_auto0": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/profile_j_timing025_auto0/summary.json",
+    "profile_j_auto1": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/profile_j_timing025_auto1/summary.json",
+    "provenance_audit": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_PROVENANCE_AUDIT.json",
+    "robustness": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/full_chain_robustness_d56_12case_metrics/metrics.json"
+  },
+  "protected_inputs_unchanged": true,
+  "schema_version": "d59-final-status-v1"
+}

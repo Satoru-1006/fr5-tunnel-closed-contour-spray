@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>stage23b_bullet_representation_overlay</name>
+  <version>0.1.0</version>
+  <description>Auditable Stage 2.3B Bullet mesh representation overlay.</description>
+  <maintainer email="codex@local.invalid">Codex</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>moveit_core</depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

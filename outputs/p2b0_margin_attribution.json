@@ -1,0 +1,1226 @@
+{
+  "D41_D46_FROZEN_HISTORY_MODIFIED": "NO",
+  "D41_and_P2A_j6_boundary": {
+    "D41_buffer_source": "scripts/stage3_h13_d41_execution.py:272; limit projection in ros2_moveit_bridge/plan_closed_contour_moveit.py:1411-1434",
+    "D41_configured_buffer_rad": 0.0001,
+    "P2A_first_fail_joint_limit_violation_rad": 7.499999998827889e-07,
+    "P2A_first_fail_mode": "JOINT_LIMIT_FAILURE",
+    "P2A_first_fail_rad": 0.00010075000000020444,
+    "P2A_first_fail_waypoint": 86,
+    "P2A_refined_boundary_estimate_rad": 0.00010034375000020361,
+    "P2A_refined_last_pass_rad": 9.993750000020278e-05,
+    "buffer_shadow_ablation": {
+      "buffer_values_rad": [
+        0.0001,
+        0.001,
+        0.005,
+        0.01
+      ],
+      "full_D41_candidate_regeneration": "NOT_RUN",
+      "raw_test_proposal_j6_rad": 3.0553,
+      "results": [
+        {
+          "buffer_rad": 0.0001,
+          "known_answer_match": true,
+          "projected_j6_rad": 3.0542,
+          "upper_slack_rad": 0.00010000000000021103
+        },
+        {
+          "buffer_rad": 0.001,
+          "known_answer_match": true,
+          "projected_j6_rad": 3.0533,
+          "upper_slack_rad": 0.0009999999999998899
+        },
+        {
+          "buffer_rad": 0.005,
+          "known_answer_match": true,
+          "projected_j6_rad": 3.0493,
+          "upper_slack_rad": 0.004999999999999893
+        },
+        {
+          "buffer_rad": 0.01,
+          "known_answer_match": true,
+          "projected_j6_rad": 3.0443000000000002,
+          "upper_slack_rad": 0.009999999999999787
+        }
+      ],
+      "scope": "production clip-policy known-answer only; no full D41 solver trajectory regeneration",
+      "status": "PASS"
+    },
+    "full_solver_replay_at_alternate_buffers": "NOT_RUN; D41 batch is full trajectory regeneration and is outside this bounded local mechanism test",
+    "interpretation": "The exact D41 nominal slack equals the configured buffer. This establishes the active solver-policy boundary at that state; local process-null retreat below tests whether task geometry independently blocks retreat.",
+    "j6_lower_rad": -3.0543,
+    "j6_upper_rad": 3.0543,
+    "nominal_j6_at_waypoint_rad": 3.0542,
+    "nominal_j6_upper_slack_rad": 0.00010000000000021103,
+    "trajectory_minimum_joint_limit_margin_rad": 0.00010000000000021103,
+    "urdf": "outputs\\stage3_h4_5_robot_fixture_geometry_codesign_20260809T000000Z\\derived_robot_model.urdf"
+  },
+  "GLOBAL_ROBUSTNESS_CERTIFIED": "NO",
+  "HARDWARE_SAFETY_CERTIFIED": "NO",
+  "J6_BUFFER_SHADOW_ABLATION": "PASS",
+  "J6_CAUSAL_CLASSIFICATION": "SOLVER_POLICY_DOMINATED",
+  "NULLSPACE_RETREAT_FEASIBILITY": "PASS",
+  "NULLSPACE_RETREAT_FEASIBILITY_SCOPE": "measured pre-Ruckig local shadow only; post-Ruckig candidate conversion and validation were not run",
+  "P1_P2A_FROZEN_BASELINE_MODIFIED": "NO",
+  "P2B0_MARGIN_ATTRIBUTION": "COMPLETE",
+  "PHYSICAL_HARDWARE_VALIDATION": "NOT_RUN",
+  "PROCESS_TASK_JACOBIAN": "PASS",
+  "RELEVANT_REGRESSION": "PASS",
+  "baseline_MoveIt_measurement": {
+    "case_id": "p2b0_nominal",
+    "collision_counts": {
+      "native_two_state_robot_world_queries": 0,
+      "self_waypoints": 0,
+      "world_waypoints": 0
+    },
+    "collision_method": "adaptive_discrete_interpolation",
+    "critical_waypoint_j6_rad": 3.0542,
+    "critical_waypoint_j6_upper_slack_rad": 0.00010000000000021103,
+    "local_window_minimum_j6_upper_slack_rad": 0.00010000000000021103,
+    "max_fresh_MoveIt_FK_position_difference_from_D41_trace_m": 0.0,
+    "max_fresh_MoveIt_tool_axis_difference_from_D41_trace_rad": 2.1073424255447017e-08,
+    "minimum_joint_limit_margin_rad": 0.00010000000000021103,
+    "native_status": "PASS",
+    "state_count": 181
+  },
+  "deferred_next_stage": [
+    "Full D41 solver regeneration at alternate buffers 1e-3, 5e-3, 1e-2 rad",
+    "Global path optimization or retreat outside WP80-WP95",
+    "Base/workpiece SE(3) uncertainty, calibrated TCP uncertainty, strict self CCD, hardware tracking",
+    "Ruckig reparameterization of the local shadow candidate"
+  ],
+  "frozen_input_identity": {
+    "D41_FK_trace": "outputs\\stage3_h13_d41_offline_robot_certification\\run_20260827T152326Z\\strict_replay\\moveit_fk_tcp_trace.csv",
+    "D41_post_Ruckig_trajectory": "outputs\\stage3_h13_d41_offline_robot_certification\\run_20260827T152326Z\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+    "P2A_result": "outputs\\p2a_axiswise_robustness_margin.json",
+    "critical_waypoint_indexing": "zero-based",
+    "joint_order": [
+      "j1",
+      "j2",
+      "j3",
+      "j4",
+      "j5",
+      "j6"
+    ],
+    "state_count": 181,
+    "trajectory_sha256_after_measurement": "4849c47a8cc7908eaf8c45fb793f771118ac7edcb4c849037b43558b3528de8f",
+    "trajectory_sha256_verified_once_for_identity": "4849c47a8cc7908eaf8c45fb793f771118ac7edcb4c849037b43558b3528de8f"
+  },
+  "local_nullspace_retreat": {
+    "candidates": [
+      {
+        "case_id": "p2b0_retreat_0p001rad",
+        "clearance_diagnostic_only": {
+          "minimum_environment_clearance_m": 0.08857912592672304,
+          "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+          "minimum_environment_clearance_waypoint": 85,
+          "minimum_self_distance_m": 0.01662339200341774,
+          "minimum_self_distance_pair": "wrist2_link|forearm_link",
+          "minimum_self_distance_waypoint": 89
+        },
+        "collision_counts": {
+          "native_two_state_robot_world_queries": 0,
+          "self_waypoints": 0,
+          "world_waypoints": 0
+        },
+        "collision_method": "adaptive_discrete_interpolation",
+        "collision_status": "PASS",
+        "collision_summary_status": "PASS",
+        "continuity": "PASS",
+        "critical_j6_change_from_frozen_rad": -0.0009999999999998899,
+        "critical_j6_rad": 3.0532,
+        "critical_j6_upper_slack_rad": 0.001100000000000101,
+        "critical_waypoint": 86,
+        "finite_difference_dynamics_audit_only": {
+          "limit_source": "project-configured offline limits; not vendor-certified",
+          "max_acceleration_ratio": 0.009579396534457309,
+          "max_jerk_ratio": 0.00020812999866176964,
+          "max_velocity_ratio": 0.016421107189154592,
+          "post_Ruckig_candidate": "NOT_RUN",
+          "status": "PASS"
+        },
+        "first_collision_segments": {
+          "native_two_state_world": null,
+          "self": null,
+          "world": null
+        },
+        "formal_geometry_gates": {
+          "path_position_6mm": "PASS",
+          "spray_normal_10deg": "PASS",
+          "terminal_position_4mm": "PASS"
+        },
+        "joint_step_gate_rad": 0.3490658503988659,
+        "local_nullspace_solution": {
+          "critical_waypoint": 86,
+          "waypoints": [
+            {
+              "linearized_task_residual_norm_scaled": 2.1327408248806876e-19,
+              "nullspace_delta_norm_rad": 0.0005000623531912101,
+              "nullspace_j6_projection": 0.9997506338824487,
+              "realized_first_order_j6_delta_rad": -0.0005,
+              "requested_j6_retreat_rad": 0.0005,
+              "waypoint": 80
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.1465725946601518e-19,
+              "nullspace_delta_norm_rad": 0.0005335845633700298,
+              "nullspace_j6_projection": 0.9996592608662093,
+              "realized_first_order_j6_delta_rad": -0.0005334936490538903,
+              "requested_j6_retreat_rad": 0.0005334936490538903,
+              "waypoint": 81
+            },
+            {
+              "linearized_task_residual_norm_scaled": 3.3671663851846925e-19,
+              "nullspace_delta_norm_rad": 0.0006251457706479746,
+              "nullspace_j6_projection": 0.9995336970686951,
+              "realized_first_order_j6_delta_rad": -0.000625,
+              "requested_j6_retreat_rad": 0.000625,
+              "waypoint": 82
+            },
+            {
+              "linearized_task_residual_norm_scaled": 5.931462747468605e-19,
+              "nullspace_delta_norm_rad": 0.0007502602556720481,
+              "nullspace_j6_projection": 0.9993063459502178,
+              "realized_first_order_j6_delta_rad": -0.00075,
+              "requested_j6_retreat_rad": 0.00075,
+              "waypoint": 83
+            },
+            {
+              "linearized_task_residual_norm_scaled": 5.590676629129126e-19,
+              "nullspace_delta_norm_rad": 0.0008755047038097201,
+              "nullspace_j6_projection": 0.9988473886347911,
+              "realized_first_order_j6_delta_rad": -0.000875,
+              "requested_j6_retreat_rad": 0.000875,
+              "waypoint": 84
+            },
+            {
+              "linearized_task_residual_norm_scaled": 6.96395272219054e-19,
+              "nullspace_delta_norm_rad": 0.0009676639247888361,
+              "nullspace_j6_projection": 0.9976089188906956,
+              "realized_first_order_j6_delta_rad": -0.0009665063509461097,
+              "requested_j6_retreat_rad": 0.0009665063509461097,
+              "waypoint": 85
+            },
+            {
+              "linearized_task_residual_norm_scaled": 4.1266677602946715e-18,
+              "nullspace_delta_norm_rad": 0.001007165417338747,
+              "nullspace_j6_projection": 0.9858217364256674,
+              "realized_first_order_j6_delta_rad": -0.001,
+              "requested_j6_retreat_rad": 0.001,
+              "waypoint": 86
+            },
+            {
+              "linearized_task_residual_norm_scaled": 2.7383640943591807e-17,
+              "nullspace_delta_norm_rad": 0.0014575662138583505,
+              "nullspace_j6_projection": 0.45661282936342945,
+              "realized_first_order_j6_delta_rad": -0.0009849231551964772,
+              "requested_j6_retreat_rad": 0.0009849231551964772,
+              "waypoint": 87
+            },
+            {
+              "linearized_task_residual_norm_scaled": 4.7170614427266045e-17,
+              "nullspace_delta_norm_rad": 0.00139245021764398,
+              "nullspace_j6_projection": 0.45718454862767555,
+              "realized_first_order_j6_delta_rad": -0.0009415111107797446,
+              "requested_j6_retreat_rad": 0.0009415111107797444,
+              "waypoint": 88
+            },
+            {
+              "linearized_task_residual_norm_scaled": 9.763974041050767e-18,
+              "nullspace_delta_norm_rad": 0.0012932310678510106,
+              "nullspace_j6_projection": 0.457787412976466,
+              "realized_first_order_j6_delta_rad": -0.000875,
+              "requested_j6_retreat_rad": 0.000875,
+              "waypoint": 89
+            },
+            {
+              "linearized_task_residual_norm_scaled": 2.5354137237977652e-17,
+              "nullspace_delta_norm_rad": 0.0011718949183748557,
+              "nullspace_j6_projection": 0.4583742748467329,
+              "realized_first_order_j6_delta_rad": -0.0007934120444167326,
+              "requested_j6_retreat_rad": 0.0007934120444167326,
+              "waypoint": 90
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.2389575241187472e-17,
+              "nullspace_delta_norm_rad": 0.0010430536583574282,
+              "nullspace_j6_projection": 0.45890116388837254,
+              "realized_first_order_j6_delta_rad": -0.0007065879555832675,
+              "requested_j6_retreat_rad": 0.0007065879555832675,
+              "waypoint": 91
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.5939825844584848e-17,
+              "nullspace_delta_norm_rad": 0.0009221834433955031,
+              "nullspace_j6_projection": 0.45933061550327287,
+              "realized_first_order_j6_delta_rad": -0.000625,
+              "requested_j6_retreat_rad": 0.000625,
+              "waypoint": 92
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.8879043827930866e-18,
+              "nullspace_delta_norm_rad": 0.0008237708785141528,
+              "nullspace_j6_projection": 0.4596382951563267,
+              "realized_first_order_j6_delta_rad": -0.0005584888892202556,
+              "requested_j6_retreat_rad": 0.0005584888892202556,
+              "waypoint": 93
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.376110987796361e-17,
+              "nullspace_delta_norm_rad": 0.0007634453002797997,
+              "nullspace_j6_projection": 0.4551852718922621,
+              "realized_first_order_j6_delta_rad": -0.0005150768448035229,
+              "requested_j6_retreat_rad": 0.0005150768448035229,
+              "waypoint": 94
+            },
+            {
+              "linearized_task_residual_norm_scaled": 9.176056907560383e-19,
+              "nullspace_delta_norm_rad": 0.0005020089909318898,
+              "nullspace_j6_projection": 0.9920122106360704,
+              "realized_first_order_j6_delta_rad": -0.0005,
+              "requested_j6_retreat_rad": 0.0005,
+              "waypoint": 95
+            }
+          ]
+        },
+        "local_retreat_feasibility": "PASS",
+        "local_retreat_feasibility_scope": "measured pre-Ruckig local shadow only; not a release-ready trajectory",
+        "local_window_minimum_j6_upper_slack_rad": 0.0006150768448036636,
+        "max_adjacent_joint_step_rad": 0.26165610209215023,
+        "max_spray_axis_normal_change_in_window_deg": 1.7983868442145347e-06,
+        "max_spray_axis_normal_error_deg": 1.0068129181265473,
+        "max_spray_axis_normal_error_rad": 0.017572200372920347,
+        "max_tcp_position_change_in_window_m": 5.400717123417901e-08,
+        "max_tcp_position_error_vs_frozen_fk_m": 5.400717123417901e-08,
+        "minimum_joint_limit_margin_rad": 0.0006150768448036636,
+        "requested_peak_retreat_rad": 0.001,
+        "state_count": 181,
+        "state_joint_bounds": "PASS",
+        "terminal_position_error_vs_frozen_fk_m": 0.0,
+        "window_peak_and_boundary_profile_rad": {
+          "WP80_and_WP95_retreat_rad": 0.0005,
+          "critical_waypoint_retreat_rad": 0.001
+        }
+      },
+      {
+        "case_id": "p2b0_retreat_0p005rad",
+        "clearance_diagnostic_only": {
+          "minimum_environment_clearance_m": 0.08858696181186226,
+          "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+          "minimum_environment_clearance_waypoint": 85,
+          "minimum_self_distance_m": 0.016622743171661913,
+          "minimum_self_distance_pair": "wrist2_link|forearm_link",
+          "minimum_self_distance_waypoint": 89
+        },
+        "collision_counts": {
+          "native_two_state_robot_world_queries": 0,
+          "self_waypoints": 0,
+          "world_waypoints": 0
+        },
+        "collision_method": "adaptive_discrete_interpolation",
+        "collision_status": "PASS",
+        "collision_summary_status": "PASS",
+        "continuity": "PASS",
+        "critical_j6_change_from_frozen_rad": -0.004999999999999893,
+        "critical_j6_rad": 3.0492,
+        "critical_j6_upper_slack_rad": 0.0051000000000001044,
+        "critical_waypoint": 86,
+        "finite_difference_dynamics_audit_only": {
+          "limit_source": "project-configured offline limits; not vendor-certified",
+          "max_acceleration_ratio": 0.009579396534457309,
+          "max_jerk_ratio": 0.00020812999866176964,
+          "max_velocity_ratio": 0.016421107189154592,
+          "post_Ruckig_candidate": "NOT_RUN",
+          "status": "PASS"
+        },
+        "first_collision_segments": {
+          "native_two_state_world": null,
+          "self": null,
+          "world": null
+        },
+        "formal_geometry_gates": {
+          "path_position_6mm": "PASS",
+          "spray_normal_10deg": "PASS",
+          "terminal_position_4mm": "PASS"
+        },
+        "joint_step_gate_rad": 0.3490658503988659,
+        "local_nullspace_solution": {
+          "critical_waypoint": 86,
+          "waypoints": [
+            {
+              "linearized_task_residual_norm_scaled": 1.2736581813849414e-18,
+              "nullspace_delta_norm_rad": 0.0025003117659560506,
+              "nullspace_j6_projection": 0.9997506338824487,
+              "realized_first_order_j6_delta_rad": -0.0025,
+              "requested_j6_retreat_rad": 0.0025,
+              "waypoint": 80
+            },
+            {
+              "linearized_task_residual_norm_scaled": 4.600504106433452e-19,
+              "nullspace_delta_norm_rad": 0.0026679228168501492,
+              "nullspace_j6_projection": 0.9996592608662093,
+              "realized_first_order_j6_delta_rad": -0.0026674682452694515,
+              "requested_j6_retreat_rad": 0.0026674682452694515,
+              "waypoint": 81
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.772654394851456e-18,
+              "nullspace_delta_norm_rad": 0.003125728853239873,
+              "nullspace_j6_projection": 0.9995336970686951,
+              "realized_first_order_j6_delta_rad": -0.003125,
+              "requested_j6_retreat_rad": 0.003125,
+              "waypoint": 82
+            },
+            {
+              "linearized_task_residual_norm_scaled": 3.400769667595044e-18,
+              "nullspace_delta_norm_rad": 0.0037513012783602405,
+              "nullspace_j6_projection": 0.9993063459502178,
+              "realized_first_order_j6_delta_rad": -0.00375,
+              "requested_j6_retreat_rad": 0.00375,
+              "waypoint": 83
+            },
+            {
+              "linearized_task_residual_norm_scaled": 3.0183937961226653e-18,
+              "nullspace_delta_norm_rad": 0.0043775235190486005,
+              "nullspace_j6_projection": 0.9988473886347911,
+              "realized_first_order_j6_delta_rad": -0.004375,
+              "requested_j6_retreat_rad": 0.004375,
+              "waypoint": 84
+            },
+            {
+              "linearized_task_residual_norm_scaled": 3.1689577617672826e-18,
+              "nullspace_delta_norm_rad": 0.004838319623944181,
+              "nullspace_j6_projection": 0.9976089188906956,
+              "realized_first_order_j6_delta_rad": -0.004832531754730549,
+              "requested_j6_retreat_rad": 0.004832531754730549,
+              "waypoint": 85
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.9727780739343984e-17,
+              "nullspace_delta_norm_rad": 0.005035827086693735,
+              "nullspace_j6_projection": 0.9858217364256674,
+              "realized_first_order_j6_delta_rad": -0.005,
+              "requested_j6_retreat_rad": 0.005,
+              "waypoint": 86
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.4054218250395307e-16,
+              "nullspace_delta_norm_rad": 0.007287831069291751,
+              "nullspace_j6_projection": 0.45661282936342945,
+              "realized_first_order_j6_delta_rad": -0.004924615775982385,
+              "requested_j6_retreat_rad": 0.004924615775982385,
+              "waypoint": 87
+            },
+            {
+              "linearized_task_residual_norm_scaled": 2.1886292007213008e-16,
+              "nullspace_delta_norm_rad": 0.006962251088219898,
+              "nullspace_j6_projection": 0.45718454862767555,
+              "realized_first_order_j6_delta_rad": -0.0047075555538987224,
+              "requested_j6_retreat_rad": 0.0047075555538987224,
+              "waypoint": 88
+            },
+            {
+              "linearized_task_residual_norm_scaled": 5.200797128853557e-17,
+              "nullspace_delta_norm_rad": 0.006466155339255054,
+              "nullspace_j6_projection": 0.457787412976466,
+              "realized_first_order_j6_delta_rad": -0.004375,
+              "requested_j6_retreat_rad": 0.004375,
+              "waypoint": 89
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.4248027764906863e-16,
+              "nullspace_delta_norm_rad": 0.005859474591874279,
+              "nullspace_j6_projection": 0.4583742748467329,
+              "realized_first_order_j6_delta_rad": -0.003967060222083664,
+              "requested_j6_retreat_rad": 0.003967060222083664,
+              "waypoint": 90
+            },
+            {
+              "linearized_task_residual_norm_scaled": 6.882427925357108e-17,
+              "nullspace_delta_norm_rad": 0.005215268291787141,
+              "nullspace_j6_projection": 0.45890116388837254,
+              "realized_first_order_j6_delta_rad": -0.0035329397779163374,
+              "requested_j6_retreat_rad": 0.0035329397779163374,
+              "waypoint": 91
+            },
+            {
+              "linearized_task_residual_norm_scaled": 6.722233939652594e-17,
+              "nullspace_delta_norm_rad": 0.004610917216977515,
+              "nullspace_j6_projection": 0.45933061550327287,
+              "realized_first_order_j6_delta_rad": -0.003125,
+              "requested_j6_retreat_rad": 0.003125,
+              "waypoint": 92
+            },
+            {
+              "linearized_task_residual_norm_scaled": 8.131358179287225e-18,
+              "nullspace_delta_norm_rad": 0.004118854392570764,
+              "nullspace_j6_projection": 0.4596382951563267,
+              "realized_first_order_j6_delta_rad": -0.0027924444461012777,
+              "requested_j6_retreat_rad": 0.0027924444461012777,
+              "waypoint": 93
+            },
+            {
+              "linearized_task_residual_norm_scaled": 6.419541287232798e-17,
+              "nullspace_delta_norm_rad": 0.0038172265013989982,
+              "nullspace_j6_projection": 0.4551852718922621,
+              "realized_first_order_j6_delta_rad": -0.0025753842240176144,
+              "requested_j6_retreat_rad": 0.0025753842240176144,
+              "waypoint": 94
+            },
+            {
+              "linearized_task_residual_norm_scaled": 4.5497967722097015e-18,
+              "nullspace_delta_norm_rad": 0.002510044954659449,
+              "nullspace_j6_projection": 0.9920122106360704,
+              "realized_first_order_j6_delta_rad": -0.0025,
+              "requested_j6_retreat_rad": 0.0025,
+              "waypoint": 95
+            }
+          ]
+        },
+        "local_retreat_feasibility": "PASS",
+        "local_retreat_feasibility_scope": "measured pre-Ruckig local shadow only; not a release-ready trajectory",
+        "local_window_minimum_j6_upper_slack_rad": 0.002675384224017918,
+        "max_adjacent_joint_step_rad": 0.26165610209215023,
+        "max_spray_axis_normal_change_in_window_deg": 4.485604112405472e-05,
+        "max_spray_axis_normal_error_deg": 1.0068129181265473,
+        "max_spray_axis_normal_error_rad": 0.017572200372920347,
+        "max_tcp_position_change_in_window_m": 1.3500653276054654e-06,
+        "max_tcp_position_error_vs_frozen_fk_m": 1.3500653276054654e-06,
+        "minimum_joint_limit_margin_rad": 0.002675384224017918,
+        "requested_peak_retreat_rad": 0.005,
+        "state_count": 181,
+        "state_joint_bounds": "PASS",
+        "terminal_position_error_vs_frozen_fk_m": 0.0,
+        "window_peak_and_boundary_profile_rad": {
+          "WP80_and_WP95_retreat_rad": 0.0025,
+          "critical_waypoint_retreat_rad": 0.005
+        }
+      },
+      {
+        "case_id": "p2b0_retreat_0p010rad",
+        "clearance_diagnostic_only": {
+          "minimum_environment_clearance_m": 0.08859678649780557,
+          "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+          "minimum_environment_clearance_waypoint": 85,
+          "minimum_self_distance_m": 0.01662222564476561,
+          "minimum_self_distance_pair": "wrist2_link|forearm_link",
+          "minimum_self_distance_waypoint": 89
+        },
+        "collision_counts": {
+          "native_two_state_robot_world_queries": 0,
+          "self_waypoints": 0,
+          "world_waypoints": 0
+        },
+        "collision_method": "adaptive_discrete_interpolation",
+        "collision_status": "PASS",
+        "collision_summary_status": "PASS",
+        "continuity": "PASS",
+        "critical_j6_change_from_frozen_rad": -0.009999999999999787,
+        "critical_j6_rad": 3.0442,
+        "critical_j6_upper_slack_rad": 0.010099999999999998,
+        "critical_waypoint": 86,
+        "finite_difference_dynamics_audit_only": {
+          "limit_source": "project-configured offline limits; not vendor-certified",
+          "max_acceleration_ratio": 0.009579396534457309,
+          "max_jerk_ratio": 0.00020812999866176964,
+          "max_velocity_ratio": 0.016421107189154592,
+          "post_Ruckig_candidate": "NOT_RUN",
+          "status": "PASS"
+        },
+        "first_collision_segments": {
+          "native_two_state_world": null,
+          "self": null,
+          "world": null
+        },
+        "formal_geometry_gates": {
+          "path_position_6mm": "PASS",
+          "spray_normal_10deg": "PASS",
+          "terminal_position_4mm": "PASS"
+        },
+        "joint_step_gate_rad": 0.3490658503988659,
+        "local_nullspace_solution": {
+          "critical_waypoint": 86,
+          "waypoints": [
+            {
+              "linearized_task_residual_norm_scaled": 2.547316362769883e-18,
+              "nullspace_delta_norm_rad": 0.005000623531912101,
+              "nullspace_j6_projection": 0.9997506338824487,
+              "realized_first_order_j6_delta_rad": -0.005,
+              "requested_j6_retreat_rad": 0.005,
+              "waypoint": 80
+            },
+            {
+              "linearized_task_residual_norm_scaled": 9.201008212866903e-19,
+              "nullspace_delta_norm_rad": 0.0053358456337002985,
+              "nullspace_j6_projection": 0.9996592608662093,
+              "realized_first_order_j6_delta_rad": -0.005334936490538903,
+              "requested_j6_retreat_rad": 0.005334936490538903,
+              "waypoint": 81
+            },
+            {
+              "linearized_task_residual_norm_scaled": 3.545308789702912e-18,
+              "nullspace_delta_norm_rad": 0.006251457706479746,
+              "nullspace_j6_projection": 0.9995336970686951,
+              "realized_first_order_j6_delta_rad": -0.00625,
+              "requested_j6_retreat_rad": 0.00625,
+              "waypoint": 82
+            },
+            {
+              "linearized_task_residual_norm_scaled": 6.801539335190088e-18,
+              "nullspace_delta_norm_rad": 0.007502602556720481,
+              "nullspace_j6_projection": 0.9993063459502178,
+              "realized_first_order_j6_delta_rad": -0.0075,
+              "requested_j6_retreat_rad": 0.0075,
+              "waypoint": 83
+            },
+            {
+              "linearized_task_residual_norm_scaled": 6.0367875922453306e-18,
+              "nullspace_delta_norm_rad": 0.008755047038097201,
+              "nullspace_j6_projection": 0.9988473886347911,
+              "realized_first_order_j6_delta_rad": -0.00875,
+              "requested_j6_retreat_rad": 0.00875,
+              "waypoint": 84
+            },
+            {
+              "linearized_task_residual_norm_scaled": 6.337915523534565e-18,
+              "nullspace_delta_norm_rad": 0.009676639247888362,
+              "nullspace_j6_projection": 0.9976089188906956,
+              "realized_first_order_j6_delta_rad": -0.009665063509461098,
+              "requested_j6_retreat_rad": 0.009665063509461098,
+              "waypoint": 85
+            },
+            {
+              "linearized_task_residual_norm_scaled": 3.945556147868797e-17,
+              "nullspace_delta_norm_rad": 0.01007165417338747,
+              "nullspace_j6_projection": 0.9858217364256674,
+              "realized_first_order_j6_delta_rad": -0.01,
+              "requested_j6_retreat_rad": 0.01,
+              "waypoint": 86
+            },
+            {
+              "linearized_task_residual_norm_scaled": 2.8108436500790614e-16,
+              "nullspace_delta_norm_rad": 0.014575662138583502,
+              "nullspace_j6_projection": 0.45661282936342945,
+              "realized_first_order_j6_delta_rad": -0.00984923155196477,
+              "requested_j6_retreat_rad": 0.00984923155196477,
+              "waypoint": 87
+            },
+            {
+              "linearized_task_residual_norm_scaled": 4.3772584014426015e-16,
+              "nullspace_delta_norm_rad": 0.013924502176439797,
+              "nullspace_j6_projection": 0.45718454862767555,
+              "realized_first_order_j6_delta_rad": -0.009415111107797445,
+              "requested_j6_retreat_rad": 0.009415111107797445,
+              "waypoint": 88
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.0401594257707113e-16,
+              "nullspace_delta_norm_rad": 0.012932310678510108,
+              "nullspace_j6_projection": 0.457787412976466,
+              "realized_first_order_j6_delta_rad": -0.00875,
+              "requested_j6_retreat_rad": 0.00875,
+              "waypoint": 89
+            },
+            {
+              "linearized_task_residual_norm_scaled": 2.8496055529813726e-16,
+              "nullspace_delta_norm_rad": 0.011718949183748557,
+              "nullspace_j6_projection": 0.4583742748467329,
+              "realized_first_order_j6_delta_rad": -0.007934120444167327,
+              "requested_j6_retreat_rad": 0.007934120444167327,
+              "waypoint": 90
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.3764855850714216e-16,
+              "nullspace_delta_norm_rad": 0.010430536583574282,
+              "nullspace_j6_projection": 0.45890116388837254,
+              "realized_first_order_j6_delta_rad": -0.007065879555832675,
+              "requested_j6_retreat_rad": 0.007065879555832675,
+              "waypoint": 91
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.3444467879305188e-16,
+              "nullspace_delta_norm_rad": 0.00922183443395503,
+              "nullspace_j6_projection": 0.45933061550327287,
+              "realized_first_order_j6_delta_rad": -0.00625,
+              "requested_j6_retreat_rad": 0.00625,
+              "waypoint": 92
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.626271635857445e-17,
+              "nullspace_delta_norm_rad": 0.008237708785141528,
+              "nullspace_j6_projection": 0.4596382951563267,
+              "realized_first_order_j6_delta_rad": -0.005584888892202555,
+              "requested_j6_retreat_rad": 0.005584888892202555,
+              "waypoint": 93
+            },
+            {
+              "linearized_task_residual_norm_scaled": 1.2839082574465595e-16,
+              "nullspace_delta_norm_rad": 0.0076344530027979965,
+              "nullspace_j6_projection": 0.4551852718922621,
+              "realized_first_order_j6_delta_rad": -0.005150768448035229,
+              "requested_j6_retreat_rad": 0.005150768448035229,
+              "waypoint": 94
+            },
+            {
+              "linearized_task_residual_norm_scaled": 9.099593544419403e-18,
+              "nullspace_delta_norm_rad": 0.005020089909318898,
+              "nullspace_j6_projection": 0.9920122106360704,
+              "realized_first_order_j6_delta_rad": -0.005,
+              "requested_j6_retreat_rad": 0.005,
+              "waypoint": 95
+            }
+          ]
+        },
+        "local_retreat_feasibility": "PASS",
+        "local_retreat_feasibility_scope": "measured pre-Ruckig local shadow only; not a release-ready trajectory",
+        "local_window_minimum_j6_upper_slack_rad": 0.005250768448035625,
+        "max_adjacent_joint_step_rad": 0.26165610209215023,
+        "max_spray_axis_normal_change_in_window_deg": 0.00017889202722054358,
+        "max_spray_axis_normal_error_deg": 1.0068129181265473,
+        "max_spray_axis_normal_error_rad": 0.017572200372920347,
+        "max_tcp_position_change_in_window_m": 5.39968307810461e-06,
+        "max_tcp_position_error_vs_frozen_fk_m": 5.39968307810461e-06,
+        "minimum_joint_limit_margin_rad": 0.005250768448035625,
+        "requested_peak_retreat_rad": 0.01,
+        "state_count": 181,
+        "state_joint_bounds": "PASS",
+        "terminal_position_error_vs_frozen_fk_m": 0.0,
+        "window_peak_and_boundary_profile_rad": {
+          "WP80_and_WP95_retreat_rad": 0.005,
+          "critical_waypoint_retreat_rad": 0.01
+        }
+      }
+    ],
+    "formal_gate_status": "PASS",
+    "largest_tested_feasible_critical_j6_margin_rad": 0.010099999999999998,
+    "largest_tested_feasible_peak_retreat_rad": 0.01,
+    "method": "minimum-norm delta = -r * N e6 / N66 using the tolerance-scaled process-task null projector",
+    "scope": "WP80-WP95 only; no all-trajectory optimization or D41 canonical regeneration"
+  },
+  "measurement_pipeline": {
+    "baseline_fresh_native_MoveIt_run": "PASS",
+    "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+    "fresh_FK_reproduces_D41_reference": "PASS",
+    "moveit_backend": "MoveIt2 native RobotState Jacobian/FK, PlanningScene Bullet/FCL; world transition query kept separately from adaptive discrete result",
+    "native_executable_selection": "PASS_REUSED_LOCAL_FULL_JACOBIAN_MOVEIT_BINARY",
+    "post_Ruckig_shadow_candidate_validation": "NOT_RUN; no existing q-only candidate import path was used",
+    "scratch_location": "D:\\robotfucker\\tmp (removed after measurement)",
+    "self_collision_semantics": "native discrete/adaptive sampling; strict continuous self collision unavailable",
+    "temporary_workspace_removed": "PASS"
+  },
+  "p2a_boundary_classification": {
+    "acceptance_gate_limited": [
+      "joint:j1:negative",
+      "joint:j1:positive",
+      "joint:j2:negative",
+      "joint:j2:positive",
+      "joint:j3:negative",
+      "joint:j3:positive",
+      "joint:j4:negative",
+      "joint:j4:positive",
+      "joint:j5:negative",
+      "joint:j5:positive",
+      "joint:j6:negative",
+      "tcp_tcp_rotation:x:negative",
+      "tcp_tcp_rotation:x:positive",
+      "tcp_tcp_rotation:y:negative",
+      "tcp_tcp_rotation:y:positive",
+      "tcp_tcp_translation:x:negative",
+      "tcp_tcp_translation:x:positive",
+      "tcp_tcp_translation:y:negative",
+      "tcp_tcp_translation:y:positive",
+      "tcp_tcp_translation:z:negative",
+      "tcp_tcp_translation:z:positive"
+    ],
+    "boundary_provenance": {
+      "D41_DLS_post_generation_gate": {
+        "normal_cross_residual_deg": 5.0,
+        "position_tolerance_m": 0.004
+      },
+      "D41_internal_DLS_convergence": {
+        "normal_cross_residual_rad": 0.0002,
+        "position_tolerance_m": 2e-05
+      },
+      "P2A_formal_acceptance": {
+        "path_position_m": 0.006,
+        "spray_normal_deg": 10.0,
+        "terminal_position_m": 0.004
+      },
+      "diagnostic_only": {
+        "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+        "full_pose_sigma_min": "diagnostic only; not used as process-task singularity claim"
+      }
+    },
+    "collision_limited": [],
+    "other_or_unresolved_axes": [
+      "base_rotation:x:negative",
+      "base_rotation:x:positive",
+      "base_rotation:y:negative",
+      "base_rotation:y:positive",
+      "base_rotation:z:negative",
+      "base_rotation:z:positive",
+      "base_translation:x:negative",
+      "base_translation:x:positive",
+      "base_translation:y:negative",
+      "base_translation:y:positive",
+      "base_translation:z:negative",
+      "base_translation:z:positive",
+      "process:stand_off:negative",
+      "process:stand_off:positive",
+      "process:surface_normal:negative",
+      "process:surface_normal:positive",
+      "process:surface_normal_rotation:negative",
+      "process:surface_normal_rotation:positive",
+      "tcp_tcp_rotation:z:negative",
+      "tcp_tcp_rotation:z:positive"
+    ],
+    "solver_policy_limited": [
+      "joint:j6:positive"
+    ],
+    "task_kinematic_limited": "NOT_SEPARATELY_ESTABLISHED_BY_AXISWISE_FIRST_FAILURE; addressed locally by process-Jacobian retreat",
+    "unresolved_capabilities": [
+      "SE3 base/workpiece uncertainty",
+      "calibrated TCP uncertainty",
+      "strict continuous self-collision CCD",
+      "hardware tracking and physical validation",
+      "global robustness certification"
+    ]
+  },
+  "process_task_jacobian": {
+    "backend": "MoveIt2 RobotState.getJacobian(fairino5_v6_group, spray_tcp_link)",
+    "construction": "J_proc = [J_v; U_n^T J_omega] at spray_tcp_link; U_n is a two-vector orthonormal tangent basis to frozen wall normal",
+    "critical_waypoint_metrics": {
+      "effective_rank": 5,
+      "j6_nullspace_projection": 0.9858217364256674,
+      "nullity": 1,
+      "nullspace_projector_idempotence_error": 1.868480190406683e-18,
+      "nullspace_projector_symmetry_error": 0.0,
+      "process_jacobian_null_residual": 3.808672995812874e-15,
+      "scaled_rank_tolerance": 1.193628313856442e-08,
+      "singular_values_tolerance_scaled": [
+        119.3628313856442,
+        49.50890118847054,
+        25.691004961158328,
+        3.6628999328570884,
+        0.25745716874776925
+      ],
+      "singular_values_unscaled_mixed_units": [
+        1.8562121062915804,
+        1.0175536984375246,
+        0.30400577220013264,
+        0.24079474272620152,
+        0.006813311639416074
+      ],
+      "waypoint": 86
+    },
+    "mixed_unit_raw_singular_values_warning": "raw values are retained for interpretation and are not treated as a physical condition number",
+    "normal_row_scale_rad": 0.17453292519943295,
+    "position_row_scale_m": 0.006,
+    "rank_status": "PASS",
+    "waypoint_metrics": [
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.9997506338824487,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 2.4077200200549056e-20,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 4.58623619159972e-16,
+        "scaled_rank_tolerance": 1.1649394544212687e-08,
+        "singular_values_tolerance_scaled": [
+          116.49394544212686,
+          50.62526833238175,
+          25.127574275115812,
+          3.3765344972407103,
+          1.6274100789831096
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8300910319150276,
+          1.0236910761961122,
+          0.31125689391013267,
+          0.21737452728833304,
+          0.04226965436220002
+        ],
+        "waypoint": 80
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.9996592608662093,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 3.4728350837426314e-20,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 2.201886223236684e-16,
+        "scaled_rank_tolerance": 1.1694343732601209e-08,
+        "singular_values_tolerance_scaled": [
+          116.94343732601209,
+          50.39606286899056,
+          25.2556394099745,
+          3.4242452240299155,
+          1.4315715497781714
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8375173150827537,
+          1.02355203302282,
+          0.30986143005496286,
+          0.22069117062614105,
+          0.03732702619546921
+        ],
+        "waypoint": 81
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.9995336970686951,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 2.490478531273273e-20,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 5.589808261338606e-16,
+        "scaled_rank_tolerance": 1.1740433009363342e-08,
+        "singular_values_tolerance_scaled": [
+          117.40433009363342,
+          50.18561088488783,
+          25.368073390554912,
+          3.4591901898765696,
+          1.27966700209518
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8424854195795166,
+          1.0242082194794306,
+          0.3086954849521393,
+          0.22346965024081697,
+          0.033441794216899245
+        ],
+        "waypoint": 82
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.9993063459502178,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 2.221270896144106e-16,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 9.011384430467638e-16,
+        "scaled_rank_tolerance": 1.1787257130547359e-08,
+        "singular_values_tolerance_scaled": [
+          117.87257130547358,
+          49.99403097439775,
+          25.46391132370558,
+          3.5086661609706162,
+          1.073742548545631
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8476192358411048,
+          1.0230561701373693,
+          0.3074701212983101,
+          0.2273302184560895,
+          0.02815364828157096
+        ],
+        "waypoint": 83
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.9988473886347911,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 2.0905227988779218e-20,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 7.010161159359598e-16,
+        "scaled_rank_tolerance": 1.1834567742469798e-08,
+        "singular_values_tolerance_scaled": [
+          118.34567742469798,
+          49.821331485652124,
+          25.541800870374495,
+          3.558005571969659,
+          0.8551688311411758
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8514861360505823,
+          1.021456890513667,
+          0.3063222108165542,
+          0.2314185754149357,
+          0.02248894114838161
+        ],
+        "waypoint": 84
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.9976089188906956,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 1.1159209019250486e-16,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 6.425287696264141e-16,
+        "scaled_rank_tolerance": 1.1882609104699293e-08,
+        "singular_values_tolerance_scaled": [
+          118.82609104699293,
+          49.66581785299458,
+          25.60636170487252,
+          3.6076103671359196,
+          0.6099911085396416
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8542489366671495,
+          1.019541783212582,
+          0.30521779874094884,
+          0.23575117858589173,
+          0.016085408671541367
+        ],
+        "waypoint": 85
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.9858217364256674,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 1.868480190406683e-18,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 3.808672995812874e-15,
+        "scaled_rank_tolerance": 1.193628313856442e-08,
+        "singular_values_tolerance_scaled": [
+          119.3628313856442,
+          49.50890118847054,
+          25.691004961158328,
+          3.6628999328570884,
+          0.25745716874776925
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8562121062915804,
+          1.0175536984375246,
+          0.30400577220013264,
+          0.24079474272620152,
+          0.006813311639416074
+        ],
+        "waypoint": 86
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.45661282936342945,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 1.256971461475094e-16,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 1.7879386132623597e-14,
+        "scaled_rank_tolerance": 1.1976019984899347e-08,
+        "singular_values_tolerance_scaled": [
+          119.76019984899347,
+          49.42789965749747,
+          25.73652371274023,
+          3.7034331592946548,
+          0.04230244000685957
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8571548073272612,
+          1.0153203042976737,
+          0.3031173546667817,
+          0.24463269560500495,
+          0.0011231467069680587
+        ],
+        "waypoint": 87
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.45718454862767555,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 3.6761821645633123e-16,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 3.3757652567382235e-14,
+        "scaled_rank_tolerance": 1.1996233513562239e-08,
+        "singular_values_tolerance_scaled": [
+          119.96233513562238,
+          49.422909600123745,
+          25.69119415555678,
+          3.7234376266744285,
+          0.04260261388307157
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8575411180958639,
+          1.013330694466883,
+          0.3026803261174546,
+          0.24666309259112407,
+          0.0011312753593223917
+        ],
+        "waypoint": 88
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.457787412976466,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 1.0870482623253488e-16,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 8.208195307542238e-15,
+        "scaled_rank_tolerance": 1.2014019529360318e-08,
+        "singular_values_tolerance_scaled": [
+          120.14019529360317,
+          49.42747276875499,
+          25.659279708770697,
+          3.7420668979304446,
+          0.042823071574157906
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8578141133834358,
+          1.0115918350423554,
+          0.3022832924051511,
+          0.24860377689551172,
+          0.0011375476801506695
+        ],
+        "waypoint": 89
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.4583742748467329,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 2.0239473100220538e-17,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 2.4173553120322872e-14,
+        "scaled_rank_tolerance": 1.2029405156788301e-08,
+        "singular_values_tolerance_scaled": [
+          120.294051567883,
+          49.44106697253065,
+          25.645545771791706,
+          3.7555499492202653,
+          0.043024801847249015
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8580501831944238,
+          1.0111894491425684,
+          0.3019429632071116,
+          0.25014200180845175,
+          0.001142729233464733
+        ],
+        "waypoint": 90
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.45890116388837254,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 2.3642614003948153e-16,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 1.270362057104555e-14,
+        "scaled_rank_tolerance": 1.2042350912346029e-08,
+        "singular_values_tolerance_scaled": [
+          120.42350912346028,
+          49.46371349046359,
+          25.650379556988952,
+          3.7660762776166807,
+          0.04313998214170098
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.858243526829448,
+          1.0114815395100174,
+          0.30165988083420114,
+          0.2514392552812839,
+          0.0011456662646183893
+        ],
+        "waypoint": 91
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.45933061550327287,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 2.535728230444469e-16,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 1.4778729942876612e-14,
+        "scaled_rank_tolerance": 1.2052764018465996e-08,
+        "singular_values_tolerance_scaled": [
+          120.52764018465996,
+          49.49625432292673,
+          25.672482757470767,
+          3.7737494370797324,
+          0.04316878794158262
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8583852267401577,
+          1.0124635252866379,
+          0.30144015763521825,
+          0.2524896053666452,
+          0.0011463533884706427
+        ],
+        "waypoint": 92
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.4596382951563267,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 2.3747859106104378e-16,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 2.701428209878103e-15,
+        "scaled_rank_tolerance": 1.2060485340493237e-08,
+        "singular_values_tolerance_scaled": [
+          120.60485340493236,
+          49.54042120612325,
+          25.70811186623158,
+          3.7788551431428,
+          0.04311533793701055
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8584462373223767,
+          1.0141096057732,
+          0.30128749050596176,
+          0.25330158406234304,
+          0.00114483073853574
+        ],
+        "waypoint": 93
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.4551852718922621,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 8.847302313588879e-17,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 1.6455817675919632e-14,
+        "scaled_rank_tolerance": 1.206528102511334e-08,
+        "singular_values_tolerance_scaled": [
+          120.6528102511334,
+          49.598848308334254,
+          25.751464304607467,
+          3.781823310855447,
+          0.04280420429088611
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8583796122760088,
+          1.0163763027490025,
+          0.30120250597198595,
+          0.2538966032254424,
+          0.0011363253045073567
+        ],
+        "waypoint": 94
+      },
+      {
+        "effective_rank": 5,
+        "j6_nullspace_projection": 0.9920122106360704,
+        "nullity": 1,
+        "nullspace_projector_idempotence_error": 1.130909742827958e-16,
+        "nullspace_projector_symmetry_error": 0.0,
+        "process_jacobian_null_residual": 1.818295574582553e-15,
+        "scaled_rank_tolerance": 1.2056890593702743e-08,
+        "singular_values_tolerance_scaled": [
+          120.56890593702742,
+          49.67663199893447,
+          26.08864515866996,
+          3.7760287044950256,
+          0.3582171258712581
+        ],
+        "singular_values_unscaled_mixed_units": [
+          1.8582924378052414,
+          1.0197373063755137,
+          0.3015064042438561,
+          0.2535056098355936,
+          0.009601578231039836
+        ],
+        "waypoint": 95
+      }
+    ],
+    "window_zero_based": [
+      80,
+      95
+    ]
+  },
+  "relevant_regression": {
+    "command": "C:\\Users\\86198\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m pytest -q -p no:cacheprovider tests/test_p2b0_margin_attribution.py tests/test_p2a_axiswise_robustness.py tests/test_process_aware_stress.py",
+    "status": "PASS",
+    "summary": "31 passed in 23.73s"
+  },
+  "repository": {
+    "branch": "codex/stage-d8-2-b-wp43-52-20260914",
+    "head": "d67333be9dca7489f8e8c029e385f491570d53df",
+    "root": "D:\\robotfucker",
+    "source_baseline": "d67333be9dca7489f8e8c029e385f491570d53df",
+    "working_tree_dirty_at_P2A_execution": true,
+    "working_tree_dirty_at_measurement": true
+  },
+  "schema": "p2b0-margin-attribution-v1"
+}
