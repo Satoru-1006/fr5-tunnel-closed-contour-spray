@@ -164,3 +164,22 @@ global robustness remain unavailable or unverified. This is a measured
 pre-Ruckig shadow, not a release-ready trajectory. Focused regression:
 `31 passed`. Full machine-readable evidence is in
 `outputs/p2b0_margin_attribution.json`.
+
+## P2-B1 — Solver-policy causal ablation
+
+P2-B1 completed nine full 181-point regenerations with MoveIt2, Ruckig,
+post-Ruckig FK/geometry, collision, continuity, joint-limit, and configured
+dynamics validation. A0 exactly reproduced the frozen D41 pre/post-Ruckig
+trajectories and P2-A J6+ margin. The measured classification is
+`MULTIFACTOR`: A1 margins track the selected J6 buffer, while the correct
+5-DOF process formulation raises J6+ margin to `2.81169940586 rad`
+(`28,020.7×` A0). The three tested B1 null-space gains did not further improve
+that margin. This does not optimize the frozen Stage 3 baseline.
+
+The machine-readable result and nine-variant comparison are in
+[`outputs/p2b1_solver_policy_causal_ablation.json`](outputs/p2b1_solver_policy_causal_ablation.json)
+and [`outputs/p2b1_solver_policy_comparison.csv`](outputs/p2b1_solver_policy_comparison.csv).
+See [`docs/P2B1_README.md`](docs/P2B1_README.md) for methods, reproduction,
+validation boundaries, and the next review gate. Collision evidence is
+`adaptive_discrete_interpolation`, not strict CCD; strict self-CCD is
+unavailable, hardware validation is `NOT_RUN`, and hardware safety is `NO`.

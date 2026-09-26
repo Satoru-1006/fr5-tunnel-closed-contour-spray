@@ -1,0 +1,3142 @@
+{
+  "A0_MIN_J6_UPPER_SLACK_RAD": 0.00010000000000021103,
+  "A0_P2A_J6_POSITIVE_MARGIN_RAD": 0.00010034375000020361,
+  "A1_BUFFER_ABLATION": "PASS",
+  "B0_MIN_J6_UPPER_SLACK_RAD": 2.811699233033364,
+  "B0_P2A_J6_POSITIVE_MARGIN_RAD": 2.811699405860896,
+  "B0_PROCESS_5DOF": "PASS",
+  "B1_GAIN_SENSITIVITY": [
+    {
+      "gain": 0.00025,
+      "improvement_ratio_vs_A0": 28020.672995131143,
+      "minimum_j6_upper_slack_rad": 2.811699233033364,
+      "p2a_j6_positive_margin_rad": 2.811699405860896,
+      "validation_status": "PASS"
+    },
+    {
+      "gain": 0.0005,
+      "improvement_ratio_vs_A0": 28020.672995131143,
+      "minimum_j6_upper_slack_rad": 2.811699233033364,
+      "p2a_j6_positive_margin_rad": 2.811699405860896,
+      "validation_status": "PASS"
+    },
+    {
+      "gain": 0.001,
+      "improvement_ratio_vs_A0": 28020.672995131143,
+      "minimum_j6_upper_slack_rad": 2.811699233033364,
+      "p2a_j6_positive_margin_rad": 2.811699405860896,
+      "validation_status": "PASS"
+    }
+  ],
+  "B1_NULLSPACE_AVOIDANCE": "PASS",
+  "BEST_IMPROVEMENT_RATIO_VS_A0": 28020.672995131143,
+  "BEST_VARIANT": "B0_process_5d",
+  "COLLISION_METHOD": "adaptive_discrete_interpolation",
+  "HARDWARE_SAFETY_CERTIFIED": "NO",
+  "HARDWARE_VALIDATION": "NOT_RUN",
+  "MEASUREMENT_OUTPUT_DIRECTORY": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution",
+  "P2A_MARGIN_OBSERVATIONS_CSV": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\p2b1_j6_margin_observations.csv",
+  "P2B1_BASELINE_REPRODUCTION": "PASS",
+  "P2B1_STATUS": "COMPLETE",
+  "POST_RUCKIG_VALIDATION": "PASS",
+  "STRICT_SELF_CCD": "NOT_AVAILABLE",
+  "baseline_reproduction": {
+    "A0_P2A_J6_positive_margin_rad": 0.00010034375000020361,
+    "P2A_margin_abs_difference_rad": 0.0,
+    "frozen_P2A_J6_positive_margin_rad": 0.00010034375000020361,
+    "max_fk_path_error_abs_difference_mm": 0.0,
+    "max_normal_error_abs_difference_deg": 0.0,
+    "post_ruckig_max_abs_joint_delta_rad": 0.0,
+    "post_ruckig_max_abs_time_delta_s": 0.0,
+    "pre_ruckig_max_abs_joint_delta_rad": 0.0,
+    "status": "PASS",
+    "tolerances": {
+      "joint_rad": 1e-06,
+      "time_s": 1e-06
+    }
+  },
+  "causal_classification": "MULTIFACTOR",
+  "execution_code_commit": "458621af8ed8d038931c12b16779debf17602b49",
+  "execution_manifest": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\execution_manifest.json",
+  "execution_tree_clean_at_start": true,
+  "frozen_robot_baseline_performance_status": "MEASURED_SEPARATELY_PER_VARIANT",
+  "limitations": [
+    "P2-A robustness uses the original joint:j6:positive axis definition on candidate-specific post-Ruckig timestamps.",
+    "Collision outcomes use adaptive discrete interpolation; strict self collision CCD is unavailable.",
+    "Configured dynamics bounds are offline project limits, not vendor-certified limits.",
+    "No hardware execution or safety certification was run."
+  ],
+  "measurement_pipeline_status": "COMPLETE",
+  "project": "FAIRINO_FR5",
+  "schema": "p2b1-solver-policy-causal-ablation-v1",
+  "source_base_commit": "ce18bfda76931385e2fbb1f923d8f980b5c487a4",
+  "stage": "P2-B1",
+  "variants": [
+    {
+      "baseline_reproduction": {
+        "A0_P2A_J6_positive_margin_rad": 0.00010034375000020361,
+        "P2A_margin_abs_difference_rad": 0.0,
+        "frozen_P2A_J6_positive_margin_rad": 0.00010034375000020361,
+        "max_fk_path_error_abs_difference_mm": 0.0,
+        "max_normal_error_abs_difference_deg": 0.0,
+        "post_ruckig_max_abs_joint_delta_rad": 0.0,
+        "post_ruckig_max_abs_time_delta_s": 0.0,
+        "pre_ruckig_max_abs_joint_delta_rad": 0.0,
+        "status": "PASS",
+        "tolerances": {
+          "joint_rad": 1e-06,
+          "time_s": 1e-06
+        }
+      },
+      "buffer_rad": 0.0001,
+      "collision_metrics": {
+        "metrics": {
+          "collision_checked_state_count": "993.0",
+          "collision_count": "0.0",
+          "collision_environment_object_count": "181.0",
+          "collision_interpolation_step_deg": "0.5",
+          "first_collision_contact_count": "0.0",
+          "first_collision_index": "-1.0",
+          "first_collision_summary": "none",
+          "first_collision_trajectory_segment": "-1.0",
+          "include_bottom_closure_collision": "not_applicable_open_path",
+          "include_tunnel_floor_collision": "true",
+          "open_path": "true",
+          "status": "pass",
+          "trajectory_waypoint_count": "181.0",
+          "tunnel_floor_z": "-0.2"
+        },
+        "status": "AVAILABLE"
+      },
+      "dynamics_metrics": {
+        "joints": {
+          "j1": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.007836494360714862",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00015631611087056093",
+            "max_acceleration": "0.0054855460525004025",
+            "max_jerk": "0.0012505288869644874",
+            "max_velocity": "0.043305019815502284",
+            "p95_jerk": "0.00025525423916300473",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.013747625338254695"
+          },
+          "j2": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.001900292835048093",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "3.79236575185259e-05",
+            "max_acceleration": "0.001330204984533665",
+            "max_jerk": "0.0003033892601482072",
+            "max_velocity": "0.013057079375568548",
+            "p95_jerk": "0.00013508008387028595",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.004145104563672555"
+          },
+          "j3": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0024313878322135296",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "6.034524415803544e-05",
+            "max_acceleration": "0.0017019714825494707",
+            "max_jerk": "0.00048276195326428354",
+            "max_velocity": "0.012859559654563368",
+            "p95_jerk": "0.00016769402364319057",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0040823998903375775"
+          },
+          "j4": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.009579396534353324",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.000230429428058495",
+            "max_acceleration": "0.006705577574047326",
+            "max_jerk": "0.00184343542446796",
+            "max_velocity": "0.05254754300214191",
+            "p95_jerk": "0.000570082407403576",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.016421107188169345"
+          },
+          "j5": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.003503524432268827",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "9.068048859836026e-05",
+            "max_acceleration": "0.0024524671025881787",
+            "max_jerk": "0.0007254439087868821",
+            "max_velocity": "0.025171153803755036",
+            "p95_jerk": "0.00014539592313865578",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.007865985563673449"
+          },
+          "j6": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0072354784259063745",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00011282136623431681",
+            "max_acceleration": "0.005064834898134462",
+            "max_jerk": "0.0009025709298745345",
+            "max_velocity": "0.03424097198618539",
+            "p95_jerk": "0.00034048219723859744",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.010700303745682935"
+          }
+        },
+        "status": "AVAILABLE"
+      },
+      "fd_consistency_path": null,
+      "j6_margin_improvement_ratio_vs_A0": 1.0,
+      "output_directory": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A0",
+      "p2a_j6_positive": {
+        "axis_id": "joint:j6:positive",
+        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "collision_method": "adaptive_discrete_interpolation",
+        "estimated_raw_axis_margin": {
+          "units": "rad",
+          "value": 0.00010034375000020361
+        },
+        "failure_intervals": [
+          {
+            "first_magnitude": 0.00010075000000020444,
+            "last_magnitude": 0.00010400000000021103,
+            "sample_count": 3
+          }
+        ],
+        "first_failing_perturbation": {
+          "candidate_id": "joint_j6_positive__coarse__0062__0.00010075000000020444",
+          "critical_segment": null,
+          "critical_waypoint": 86,
+          "dominant_failure_mode": "JOINT_LIMIT_FAILURE",
+          "evaluator_capabilities": {
+            "joint_limits": "AVAILABLE"
+          },
+          "evidence": {
+            "joint_index_zero_based": 5,
+            "joint_name": "j6",
+            "lower_rad": -3.0543,
+            "q_rad": 3.05430075,
+            "state_was_clipped": false,
+            "upper_rad": 3.0543
+          },
+          "failure_margin": {
+            "joint_limit_violation_rad": 7.499999998827889e-07
+          },
+          "failure_modes": [
+            "JOINT_LIMIT_FAILURE"
+          ],
+          "magnitude": 0.00010075000000020444,
+          "nominal_margin": {},
+          "realized_perturbation": {
+            "max_abs_error_from_request": 1.1061572664783359e-16,
+            "maximum_signed_value": 0.00010075000000020484,
+            "minimum_signed_value": 0.00010075000000009382,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 0.00010075000000020444
+          },
+          "status": "FAIL"
+        },
+        "last_passing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0000__9.9937500000202783e-05",
+          "critical_segment": null,
+          "critical_waypoint": null,
+          "dominant_failure_mode": null,
+          "evaluator_capabilities": {
+            "calibrated_tcp_uncertainty": "NOT_AVAILABLE",
+            "coating_thickness_or_deposition_physics": "NOT_AVAILABLE",
+            "fcl_environment_and_self_distance": "AVAILABLE",
+            "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "joint_limits": "AVAILABLE",
+            "moveit2_fk": "AVAILABLE",
+            "moveit2_planning_scene": "AVAILABLE",
+            "native_robot_world_two_state_query": "AVAILABLE",
+            "physical_singularity_threshold": "UNKNOWN",
+            "physical_torque": "NOT_AVAILABLE",
+            "robot_world_collision": "AVAILABLE",
+            "self_collision_adaptive_discrete_interpolation": "AVAILABLE",
+            "stand_off_surface_projection": "NOT_AVAILABLE",
+            "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
+            "transition_collision_adaptive_discrete_interpolation": "AVAILABLE"
+          },
+          "evidence": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "collision_method": "adaptive_discrete_interpolation",
+            "derivative_method": "D46 finite_derivatives on frozen D41 timestamps; audit-only perturbation evaluation",
+            "dynamic_limit_provenance": "project configuration; not vendor certified",
+            "first_adaptive_self_collision_segment": null,
+            "first_adaptive_world_collision_segment": null,
+            "first_two_state_world_collision_segment": null,
+            "full_quaternion_difference_max_rad_diagnostic_only": 9.993751015246227e-05,
+            "full_quaternion_difference_terminal_rad_diagnostic_only": 9.993750570879323e-05,
+            "jacobian_is_diagnostic_not_an_unsafe_classification": true,
+            "joint_limit_margin_min_rad": 6.249999984220267e-08,
+            "max_acceleration_ratio": 0.009579396534457309,
+            "max_jerk_ratio": 0.00020812999866176964,
+            "max_joint_step_rad": 0.26165610209215023,
+            "max_spray_axis_normal_error_rad": 0.01757220037291905,
+            "max_spray_axis_normal_error_waypoint": 171,
+            "max_tcp_path_error_m": 1.1443916996305594e-16,
+            "max_tcp_path_error_waypoint": 72,
+            "max_velocity_ratio": 0.016421107189154592,
+            "maximum_jacobian_condition_number": 11822852037.717735,
+            "minimum_environment_clearance_m": 0.08857717027025891,
+            "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+            "minimum_environment_clearance_waypoint": 85,
+            "minimum_jacobian_sigma": 1.572033063704397e-10,
+            "minimum_jacobian_sigma_waypoint": 91,
+            "minimum_self_clearance_m": 0.016622079721570728,
+            "minimum_self_clearance_pair": "wrist2_link|forearm_link",
+            "minimum_self_clearance_waypoint": 88,
+            "native_case_id": "p2a_001_00000",
+            "native_two_state_robot_world_query": {
+              "available": true,
+              "collision_count": 0,
+              "interpretation": "reported as a separate MoveIt2 endpoint-pair diagnostic; not promoted to strict global CCD"
+            },
+            "native_waypoint_self_collision_count": 0,
+            "native_waypoint_world_collision_count": 0,
+            "orientation_failure_gate": "MoveIt2 FK spray_tcp_link +Z versus frozen D41 wall normal; tool-axis roll is not counted as spray-normal error",
+            "process_quality_certified": false,
+            "terminal_position_error_m": 0.0,
+            "terminal_spray_axis_normal_error_rad": 0.016216375813077177
+          },
+          "failure_margin": {},
+          "failure_modes": [],
+          "magnitude": 9.993750000020278e-05,
+          "nominal_margin": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "configured_acceleration_margin_rad_s2": 0.6932944224258798,
+            "configured_jerk_margin_rad_s3": 7.998334960010705,
+            "configured_velocity_margin_rad_s": 3.106694980185138,
+            "environment_clearance_diagnostic_m": 0.08857717027025891,
+            "minimum_joint_limit_margin_rad": 0.00010000000000021103,
+            "self_clearance_diagnostic_m": 0.016622079721570728,
+            "spray_axis_normal_gate_margin_rad": 0.1569607248265138,
+            "tcp_path_error_gate_margin_m": 0.006,
+            "terminal_position_gate_margin_m": 0.004
+          },
+          "realized_perturbation": {
+            "max_abs_error_from_request": 1.66045562716155e-16,
+            "maximum_signed_value": 9.993750000036883e-05,
+            "minimum_signed_value": 9.993750000014678e-05,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 9.993750000020278e-05
+          },
+          "status": "PASS"
+        },
+        "method_source": "src/p2a_axiswise_robustness.py:scan_axes_batched + _D41BatchEvaluator, fresh source-built MoveIt2 D41/FK",
+        "monotonicity_observation": "LOCAL_MONOTONIC_AT_COARSE_SAMPLING_RESOLUTION",
+        "native_batches": 2,
+        "refined_boundary_estimate": {
+          "units": "rad",
+          "value": 0.00010034375000020361
+        },
+        "scan_case_count": 66,
+        "search_completeness": "LOCAL_BRACKET_REFINED",
+        "strict_self_ccd": "NOT_AVAILABLE"
+      },
+      "post_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A0\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+      "post_ruckig_validation_status": "PASS",
+      "pre_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A0\\strict_replay\\moveit_waypoint_joint_trajectory.csv",
+      "quality_metrics": {
+        "metrics": {
+          "fk_normal_error_max_deg": "1.0068129181254613",
+          "fk_normal_error_mean_deg": "0.4043738343471144",
+          "fk_path_deviation_max_mm": "0.14126918172561212",
+          "fk_path_deviation_p95_mm": "0.028219554641211297",
+          "fk_standoff_error_max_abs_mm": "0.10550011330623388",
+          "fk_tcp_speed_mean_m_s": "0.003005357453672808",
+          "fk_tcp_speed_p05_m_s": "0.002999999999609825",
+          "fk_tcp_speed_p05_p95_fluctuation": "2.7373350225124123e-10",
+          "fk_tcp_speed_p95_m_s": "0.003000000000432492",
+          "joint_continuity_status": "pass",
+          "max_ik_joint_step_deg": "20.0",
+          "max_joint_step_deg": "14.991790333724396",
+          "max_joint_step_from_deg": "13.900000053825035",
+          "max_joint_step_from_index": "15",
+          "max_joint_step_joint": "j6",
+          "max_joint_step_raw_deg": "14.991790333724397",
+          "max_joint_step_raw_from_index": "15",
+          "max_joint_step_raw_joint": "j6",
+          "max_joint_step_raw_to_index": "16",
+          "max_joint_step_to_deg": "-1.0917902798993615",
+          "max_joint_step_to_index": "16",
+          "moveit_ee_link": "spray_tcp_link",
+          "moveit_ruckig_smoothing_used": "true",
+          "moveit_time_parameterization": "tcp_arclength",
+          "production_joint_step_limit_deg": "20.0",
+          "stand_off_m": "0.26",
+          "status": "pass",
+          "tcp_points_to_wall": "true",
+          "tool_tcp_calibration_method": "virtual_design_parameter",
+          "tool_tcp_measured_by": "simulation",
+          "tool_tcp_measured_date": "not_applicable_offline",
+          "tool_tcp_rpy": "0 0 0",
+          "tool_tcp_source": "assumed_150mm_placeholder",
+          "tool_tcp_xyz": "0.000 0.000 0.150"
+        },
+        "status": "AVAILABLE"
+      },
+      "secondary_gain": null,
+      "solver": "A0",
+      "solver_pressure_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A0\\solver_pressure.csv",
+      "solver_pressure_wp80_95": {
+        "accepted_secondary_step_count": 0,
+        "joint6_clip_activations": 420,
+        "max_preprojection_j6_buffer_boundary_excess_rad": 0.02172637851718129,
+        "max_preprojection_j6_hard_upper_excess_rad": 0.021626378517181077,
+        "max_primary_task_contribution_norm": 0.10192645346532217,
+        "max_secondary_objective_contribution_norm": 0.0,
+        "record_count": 483,
+        "waypoint_of_max_buffer_boundary_excess": 90,
+        "waypoint_of_max_hard_upper_excess": 90,
+        "wp86_87_joint6_clip_activations": 104,
+        "wp86_87_record_count": 107
+      },
+      "strict_audit_status": "PASS",
+      "strict_metrics": {
+        "audit_status": "pass",
+        "collision_checked_state_count": 993.0,
+        "collision_count": 0.0,
+        "max_fk_path_error_mm": 0.14126918172561212,
+        "max_joint_step_deg": 14.991790333724396,
+        "max_normal_error_deg": 1.0068129181254613,
+        "ruckig_used": true,
+        "time_parameterization": "tcp_arclength"
+      },
+      "strict_runner_exit_code": 0,
+      "trajectory_metrics": {
+        "post_ruckig_min_j6_upper_slack_rad": 0.00010000000000021103,
+        "post_ruckig_min_joint_margin_rad": 0.00010000000000021103,
+        "pre_ruckig_min_j6_upper_slack_rad": 0.00010000000000021103,
+        "pre_ruckig_min_j6_upper_slack_waypoint": 86,
+        "pre_ruckig_min_joint_margin_rad": 0.00010000000000021103,
+        "pre_ruckig_min_joint_margin_waypoint": 86,
+        "waypoint_count": 181
+      },
+      "variant_id": "A0"
+    },
+    {
+      "buffer_rad": 0.0001,
+      "collision_metrics": {
+        "metrics": {
+          "collision_checked_state_count": "993.0",
+          "collision_count": "0.0",
+          "collision_environment_object_count": "181.0",
+          "collision_interpolation_step_deg": "0.5",
+          "first_collision_contact_count": "0.0",
+          "first_collision_index": "-1.0",
+          "first_collision_summary": "none",
+          "first_collision_trajectory_segment": "-1.0",
+          "include_bottom_closure_collision": "not_applicable_open_path",
+          "include_tunnel_floor_collision": "true",
+          "open_path": "true",
+          "status": "pass",
+          "trajectory_waypoint_count": "181.0",
+          "tunnel_floor_z": "-0.2"
+        },
+        "status": "AVAILABLE"
+      },
+      "dynamics_metrics": {
+        "joints": {
+          "j1": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.007836494360714862",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00015631611087056093",
+            "max_acceleration": "0.0054855460525004025",
+            "max_jerk": "0.0012505288869644874",
+            "max_velocity": "0.043305019815502284",
+            "p95_jerk": "0.00025525423916300473",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.013747625338254695"
+          },
+          "j2": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.001900292835048093",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "3.79236575185259e-05",
+            "max_acceleration": "0.001330204984533665",
+            "max_jerk": "0.0003033892601482072",
+            "max_velocity": "0.013057079375568548",
+            "p95_jerk": "0.00013508008387028595",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.004145104563672555"
+          },
+          "j3": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0024313878322135296",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "6.034524415803544e-05",
+            "max_acceleration": "0.0017019714825494707",
+            "max_jerk": "0.00048276195326428354",
+            "max_velocity": "0.012859559654563368",
+            "p95_jerk": "0.00016769402364319057",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0040823998903375775"
+          },
+          "j4": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.009579396534353324",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.000230429428058495",
+            "max_acceleration": "0.006705577574047326",
+            "max_jerk": "0.00184343542446796",
+            "max_velocity": "0.05254754300214191",
+            "p95_jerk": "0.000570082407403576",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.016421107188169345"
+          },
+          "j5": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.003503524432268827",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "9.068048859836026e-05",
+            "max_acceleration": "0.0024524671025881787",
+            "max_jerk": "0.0007254439087868821",
+            "max_velocity": "0.025171153803755036",
+            "p95_jerk": "0.00014539592313865578",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.007865985563673449"
+          },
+          "j6": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0072354784259063745",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00011282136623431681",
+            "max_acceleration": "0.005064834898134462",
+            "max_jerk": "0.0009025709298745345",
+            "max_velocity": "0.03424097198618539",
+            "p95_jerk": "0.00034048219723859744",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.010700303745682935"
+          }
+        },
+        "status": "AVAILABLE"
+      },
+      "fd_consistency_path": null,
+      "j6_margin_improvement_ratio_vs_A0": 1.0,
+      "output_directory": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.0001",
+      "p2a_j6_positive": {
+        "axis_id": "joint:j6:positive",
+        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "collision_method": "adaptive_discrete_interpolation",
+        "estimated_raw_axis_margin": {
+          "units": "rad",
+          "value": 0.00010034375000020361
+        },
+        "failure_intervals": [
+          {
+            "first_magnitude": 0.00010075000000020444,
+            "last_magnitude": 0.00010400000000021103,
+            "sample_count": 3
+          }
+        ],
+        "first_failing_perturbation": {
+          "candidate_id": "joint_j6_positive__coarse__0062__0.00010075000000020444",
+          "critical_segment": null,
+          "critical_waypoint": 86,
+          "dominant_failure_mode": "JOINT_LIMIT_FAILURE",
+          "evaluator_capabilities": {
+            "joint_limits": "AVAILABLE"
+          },
+          "evidence": {
+            "joint_index_zero_based": 5,
+            "joint_name": "j6",
+            "lower_rad": -3.0543,
+            "q_rad": 3.05430075,
+            "state_was_clipped": false,
+            "upper_rad": 3.0543
+          },
+          "failure_margin": {
+            "joint_limit_violation_rad": 7.499999998827889e-07
+          },
+          "failure_modes": [
+            "JOINT_LIMIT_FAILURE"
+          ],
+          "magnitude": 0.00010075000000020444,
+          "nominal_margin": {},
+          "realized_perturbation": {
+            "max_abs_error_from_request": 1.1061572664783359e-16,
+            "maximum_signed_value": 0.00010075000000020484,
+            "minimum_signed_value": 0.00010075000000009382,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 0.00010075000000020444
+          },
+          "status": "FAIL"
+        },
+        "last_passing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0000__9.9937500000202783e-05",
+          "critical_segment": null,
+          "critical_waypoint": null,
+          "dominant_failure_mode": null,
+          "evaluator_capabilities": {
+            "calibrated_tcp_uncertainty": "NOT_AVAILABLE",
+            "coating_thickness_or_deposition_physics": "NOT_AVAILABLE",
+            "fcl_environment_and_self_distance": "AVAILABLE",
+            "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "joint_limits": "AVAILABLE",
+            "moveit2_fk": "AVAILABLE",
+            "moveit2_planning_scene": "AVAILABLE",
+            "native_robot_world_two_state_query": "AVAILABLE",
+            "physical_singularity_threshold": "UNKNOWN",
+            "physical_torque": "NOT_AVAILABLE",
+            "robot_world_collision": "AVAILABLE",
+            "self_collision_adaptive_discrete_interpolation": "AVAILABLE",
+            "stand_off_surface_projection": "NOT_AVAILABLE",
+            "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
+            "transition_collision_adaptive_discrete_interpolation": "AVAILABLE"
+          },
+          "evidence": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "collision_method": "adaptive_discrete_interpolation",
+            "derivative_method": "D46 finite_derivatives on frozen D41 timestamps; audit-only perturbation evaluation",
+            "dynamic_limit_provenance": "project configuration; not vendor certified",
+            "first_adaptive_self_collision_segment": null,
+            "first_adaptive_world_collision_segment": null,
+            "first_two_state_world_collision_segment": null,
+            "full_quaternion_difference_max_rad_diagnostic_only": 9.993751015246227e-05,
+            "full_quaternion_difference_terminal_rad_diagnostic_only": 9.993750570879323e-05,
+            "jacobian_is_diagnostic_not_an_unsafe_classification": true,
+            "joint_limit_margin_min_rad": 6.249999984220267e-08,
+            "max_acceleration_ratio": 0.009579396534457309,
+            "max_jerk_ratio": 0.00020812999866176964,
+            "max_joint_step_rad": 0.26165610209215023,
+            "max_spray_axis_normal_error_rad": 0.01757220037291905,
+            "max_spray_axis_normal_error_waypoint": 171,
+            "max_tcp_path_error_m": 1.1443916996305594e-16,
+            "max_tcp_path_error_waypoint": 72,
+            "max_velocity_ratio": 0.016421107189154592,
+            "maximum_jacobian_condition_number": 11822852037.717735,
+            "minimum_environment_clearance_m": 0.08857717027025891,
+            "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+            "minimum_environment_clearance_waypoint": 85,
+            "minimum_jacobian_sigma": 1.572033063704397e-10,
+            "minimum_jacobian_sigma_waypoint": 91,
+            "minimum_self_clearance_m": 0.016622079721570728,
+            "minimum_self_clearance_pair": "wrist2_link|forearm_link",
+            "minimum_self_clearance_waypoint": 88,
+            "native_case_id": "p2a_001_00000",
+            "native_two_state_robot_world_query": {
+              "available": true,
+              "collision_count": 0,
+              "interpretation": "reported as a separate MoveIt2 endpoint-pair diagnostic; not promoted to strict global CCD"
+            },
+            "native_waypoint_self_collision_count": 0,
+            "native_waypoint_world_collision_count": 0,
+            "orientation_failure_gate": "MoveIt2 FK spray_tcp_link +Z versus frozen D41 wall normal; tool-axis roll is not counted as spray-normal error",
+            "process_quality_certified": false,
+            "terminal_position_error_m": 0.0,
+            "terminal_spray_axis_normal_error_rad": 0.016216375813077177
+          },
+          "failure_margin": {},
+          "failure_modes": [],
+          "magnitude": 9.993750000020278e-05,
+          "nominal_margin": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "configured_acceleration_margin_rad_s2": 0.6932944224258798,
+            "configured_jerk_margin_rad_s3": 7.998334960010705,
+            "configured_velocity_margin_rad_s": 3.106694980185138,
+            "environment_clearance_diagnostic_m": 0.08857717027025891,
+            "minimum_joint_limit_margin_rad": 0.00010000000000021103,
+            "self_clearance_diagnostic_m": 0.016622079721570728,
+            "spray_axis_normal_gate_margin_rad": 0.1569607248265138,
+            "tcp_path_error_gate_margin_m": 0.006,
+            "terminal_position_gate_margin_m": 0.004
+          },
+          "realized_perturbation": {
+            "max_abs_error_from_request": 1.66045562716155e-16,
+            "maximum_signed_value": 9.993750000036883e-05,
+            "minimum_signed_value": 9.993750000014678e-05,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 9.993750000020278e-05
+          },
+          "status": "PASS"
+        },
+        "method_source": "src/p2a_axiswise_robustness.py:scan_axes_batched + _D41BatchEvaluator, fresh source-built MoveIt2 D41/FK",
+        "monotonicity_observation": "LOCAL_MONOTONIC_AT_COARSE_SAMPLING_RESOLUTION",
+        "native_batches": 2,
+        "refined_boundary_estimate": {
+          "units": "rad",
+          "value": 0.00010034375000020361
+        },
+        "scan_case_count": 66,
+        "search_completeness": "LOCAL_BRACKET_REFINED",
+        "strict_self_ccd": "NOT_AVAILABLE"
+      },
+      "post_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.0001\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+      "post_ruckig_validation_status": "PASS",
+      "pre_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.0001\\strict_replay\\moveit_waypoint_joint_trajectory.csv",
+      "quality_metrics": {
+        "metrics": {
+          "fk_normal_error_max_deg": "1.0068129181254613",
+          "fk_normal_error_mean_deg": "0.4043738343471144",
+          "fk_path_deviation_max_mm": "0.14126918172561212",
+          "fk_path_deviation_p95_mm": "0.028219554641211297",
+          "fk_standoff_error_max_abs_mm": "0.10550011330623388",
+          "fk_tcp_speed_mean_m_s": "0.003005357453672808",
+          "fk_tcp_speed_p05_m_s": "0.002999999999609825",
+          "fk_tcp_speed_p05_p95_fluctuation": "2.7373350225124123e-10",
+          "fk_tcp_speed_p95_m_s": "0.003000000000432492",
+          "joint_continuity_status": "pass",
+          "max_ik_joint_step_deg": "20.0",
+          "max_joint_step_deg": "14.991790333724396",
+          "max_joint_step_from_deg": "13.900000053825035",
+          "max_joint_step_from_index": "15",
+          "max_joint_step_joint": "j6",
+          "max_joint_step_raw_deg": "14.991790333724397",
+          "max_joint_step_raw_from_index": "15",
+          "max_joint_step_raw_joint": "j6",
+          "max_joint_step_raw_to_index": "16",
+          "max_joint_step_to_deg": "-1.0917902798993615",
+          "max_joint_step_to_index": "16",
+          "moveit_ee_link": "spray_tcp_link",
+          "moveit_ruckig_smoothing_used": "true",
+          "moveit_time_parameterization": "tcp_arclength",
+          "production_joint_step_limit_deg": "20.0",
+          "stand_off_m": "0.26",
+          "status": "pass",
+          "tcp_points_to_wall": "true",
+          "tool_tcp_calibration_method": "virtual_design_parameter",
+          "tool_tcp_measured_by": "simulation",
+          "tool_tcp_measured_date": "not_applicable_offline",
+          "tool_tcp_rpy": "0 0 0",
+          "tool_tcp_source": "assumed_150mm_placeholder",
+          "tool_tcp_xyz": "0.000 0.000 0.150"
+        },
+        "status": "AVAILABLE"
+      },
+      "secondary_gain": null,
+      "solver": "A1",
+      "solver_pressure_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.0001\\solver_pressure.csv",
+      "solver_pressure_wp80_95": {
+        "accepted_secondary_step_count": 0,
+        "joint6_clip_activations": 420,
+        "max_preprojection_j6_buffer_boundary_excess_rad": 0.02172637851718129,
+        "max_preprojection_j6_hard_upper_excess_rad": 0.021626378517181077,
+        "max_primary_task_contribution_norm": 0.10192645346532217,
+        "max_secondary_objective_contribution_norm": 0.0,
+        "record_count": 483,
+        "waypoint_of_max_buffer_boundary_excess": 90,
+        "waypoint_of_max_hard_upper_excess": 90,
+        "wp86_87_joint6_clip_activations": 104,
+        "wp86_87_record_count": 107
+      },
+      "strict_audit_status": "PASS",
+      "strict_metrics": {
+        "audit_status": "pass",
+        "collision_checked_state_count": 993.0,
+        "collision_count": 0.0,
+        "max_fk_path_error_mm": 0.14126918172561212,
+        "max_joint_step_deg": 14.991790333724396,
+        "max_normal_error_deg": 1.0068129181254613,
+        "ruckig_used": true,
+        "time_parameterization": "tcp_arclength"
+      },
+      "strict_runner_exit_code": 0,
+      "trajectory_metrics": {
+        "post_ruckig_min_j6_upper_slack_rad": 0.00010000000000021103,
+        "post_ruckig_min_joint_margin_rad": 0.00010000000000021103,
+        "pre_ruckig_min_j6_upper_slack_rad": 0.00010000000000021103,
+        "pre_ruckig_min_j6_upper_slack_waypoint": 86,
+        "pre_ruckig_min_joint_margin_rad": 0.00010000000000021103,
+        "pre_ruckig_min_joint_margin_waypoint": 86,
+        "waypoint_count": 181
+      },
+      "variant_id": "A1_buffer_0.0001"
+    },
+    {
+      "buffer_rad": 0.001,
+      "collision_metrics": {
+        "metrics": {
+          "collision_checked_state_count": "993.0",
+          "collision_count": "0.0",
+          "collision_environment_object_count": "181.0",
+          "collision_interpolation_step_deg": "0.5",
+          "first_collision_contact_count": "0.0",
+          "first_collision_index": "-1.0",
+          "first_collision_summary": "none",
+          "first_collision_trajectory_segment": "-1.0",
+          "include_bottom_closure_collision": "not_applicable_open_path",
+          "include_tunnel_floor_collision": "true",
+          "open_path": "true",
+          "status": "pass",
+          "trajectory_waypoint_count": "181.0",
+          "tunnel_floor_z": "-0.2"
+        },
+        "status": "AVAILABLE"
+      },
+      "dynamics_metrics": {
+        "joints": {
+          "j1": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.007836493781687517",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.0001563161023681665",
+            "max_acceleration": "0.005485545647181261",
+            "max_jerk": "0.001250528818945332",
+            "max_velocity": "0.04330501981550201",
+            "p95_jerk": "0.00025525423912848704",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.013747625338254608"
+          },
+          "j2": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0019002926970189634",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "3.792365549173897e-05",
+            "max_acceleration": "0.0013302048879132744",
+            "max_jerk": "0.00030338924393391174",
+            "max_velocity": "0.013057079375568548",
+            "p95_jerk": "0.00013508008387030498",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.004145104563672555"
+          },
+          "j3": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0024313878322136705",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "6.034524415803544e-05",
+            "max_acceleration": "0.0017019714825495691",
+            "max_jerk": "0.00048276195326428354",
+            "max_velocity": "0.012859559654563368",
+            "p95_jerk": "0.0001676940236434664",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0040823998903375775"
+          },
+          "j4": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.009579396534353787",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.000230429428058495",
+            "max_acceleration": "0.006705577574047651",
+            "max_jerk": "0.00184343542446796",
+            "max_velocity": "0.05254754300214191",
+            "p95_jerk": "0.0005700824074045196",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.016421107188169345"
+          },
+          "j5": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.003503524432268827",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "9.068048859836026e-05",
+            "max_acceleration": "0.0024524671025881787",
+            "max_jerk": "0.0007254439087868821",
+            "max_velocity": "0.025171153803755036",
+            "p95_jerk": "0.00014539592313865578",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.007865985563673449"
+          },
+          "j6": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.00719950095917988",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00011282136623431681",
+            "max_acceleration": "0.005039650671425915",
+            "max_jerk": "0.0009025709298745345",
+            "max_velocity": "0.03424097198618539",
+            "p95_jerk": "0.0003367840692461648",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.010700303745682935"
+          }
+        },
+        "status": "AVAILABLE"
+      },
+      "fd_consistency_path": null,
+      "j6_margin_improvement_ratio_vs_A0": 9.968251834492847,
+      "output_directory": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.001",
+      "p2a_j6_positive": {
+        "axis_id": "joint:j6:positive",
+        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "collision_method": "adaptive_discrete_interpolation",
+        "estimated_raw_axis_margin": {
+          "units": "rad",
+          "value": 0.0010002517700194212
+        },
+        "failure_intervals": [
+          {
+            "first_magnitude": 0.0010156249999998881,
+            "last_magnitude": 0.0010156249999998881,
+            "sample_count": 1
+          }
+        ],
+        "first_failing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0003__0.0010007476806639525",
+          "critical_segment": null,
+          "critical_waypoint": 86,
+          "dominant_failure_mode": "JOINT_LIMIT_FAILURE",
+          "evaluator_capabilities": {
+            "joint_limits": "AVAILABLE"
+          },
+          "evidence": {
+            "joint_index_zero_based": 5,
+            "joint_name": "j6",
+            "lower_rad": -3.0543,
+            "q_rad": 3.054300747680664,
+            "state_was_clipped": false,
+            "upper_rad": 3.0543
+          },
+          "failure_margin": {
+            "joint_limit_violation_rad": 7.476806640482891e-07
+          },
+          "failure_modes": [
+            "JOINT_LIMIT_FAILURE"
+          ],
+          "magnitude": 0.0010007476806639525,
+          "nominal_margin": {},
+          "realized_perturbation": {
+            "max_abs_error_from_request": 1.431146867680866e-17,
+            "maximum_signed_value": 0.001000747680663966,
+            "minimum_signed_value": 0.0010007476806639382,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 0.0010007476806639525
+          },
+          "status": "FAIL"
+        },
+        "last_passing_perturbation": {
+          "candidate_id": "joint_j6_positive__coarse__0063__0.00099975585937489",
+          "critical_segment": null,
+          "critical_waypoint": null,
+          "dominant_failure_mode": null,
+          "evaluator_capabilities": {
+            "calibrated_tcp_uncertainty": "NOT_AVAILABLE",
+            "coating_thickness_or_deposition_physics": "NOT_AVAILABLE",
+            "fcl_environment_and_self_distance": "AVAILABLE",
+            "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "joint_limits": "AVAILABLE",
+            "moveit2_fk": "AVAILABLE",
+            "moveit2_planning_scene": "AVAILABLE",
+            "native_robot_world_two_state_query": "AVAILABLE",
+            "physical_singularity_threshold": "UNKNOWN",
+            "physical_torque": "NOT_AVAILABLE",
+            "robot_world_collision": "AVAILABLE",
+            "self_collision_adaptive_discrete_interpolation": "AVAILABLE",
+            "stand_off_surface_projection": "NOT_AVAILABLE",
+            "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
+            "transition_collision_adaptive_discrete_interpolation": "AVAILABLE"
+          },
+          "evidence": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "collision_method": "adaptive_discrete_interpolation",
+            "derivative_method": "D46 finite_derivatives on frozen D41 timestamps; audit-only perturbation evaluation",
+            "dynamic_limit_provenance": "project configuration; not vendor certified",
+            "first_adaptive_self_collision_segment": null,
+            "first_adaptive_world_collision_segment": null,
+            "first_two_state_world_collision_segment": null,
+            "full_quaternion_difference_max_rad_diagnostic_only": 0.0009997558603947667,
+            "full_quaternion_difference_terminal_rad_diagnostic_only": 0.000999755858617976,
+            "jacobian_is_diagnostic_not_an_unsafe_classification": true,
+            "joint_limit_margin_min_rad": 2.44140625049738e-07,
+            "max_acceleration_ratio": 0.009579396534457411,
+            "max_jerk_ratio": 0.00020812999866176799,
+            "max_joint_step_rad": 0.26165610209215023,
+            "max_spray_axis_normal_error_rad": 0.01757220037291916,
+            "max_spray_axis_normal_error_waypoint": 171,
+            "max_tcp_path_error_m": 1.2412670766236366e-16,
+            "max_tcp_path_error_waypoint": 112,
+            "max_velocity_ratio": 0.016421107189154592,
+            "maximum_jacobian_condition_number": 6912725963.933693,
+            "minimum_environment_clearance_m": 0.08857717027025891,
+            "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+            "minimum_environment_clearance_waypoint": 85,
+            "minimum_jacobian_sigma": 2.688651974274875e-10,
+            "minimum_jacobian_sigma_waypoint": 91,
+            "minimum_self_clearance_m": 0.016622079721648204,
+            "minimum_self_clearance_pair": "wrist2_link|forearm_link",
+            "minimum_self_clearance_waypoint": 88,
+            "native_case_id": "p2a_000_00063",
+            "native_two_state_robot_world_query": {
+              "available": true,
+              "collision_count": 0,
+              "interpretation": "reported as a separate MoveIt2 endpoint-pair diagnostic; not promoted to strict global CCD"
+            },
+            "native_waypoint_self_collision_count": 0,
+            "native_waypoint_world_collision_count": 0,
+            "orientation_failure_gate": "MoveIt2 FK spray_tcp_link +Z versus frozen D41 wall normal; tool-axis roll is not counted as spray-normal error",
+            "process_quality_certified": false,
+            "terminal_position_error_m": 1.3877787807814457e-17,
+            "terminal_spray_axis_normal_error_rad": 0.016216375813077565
+          },
+          "failure_margin": {},
+          "failure_modes": [],
+          "magnitude": 0.00099975585937489,
+          "nominal_margin": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "configured_acceleration_margin_rad_s2": 0.6932944224258798,
+            "configured_jerk_margin_rad_s3": 7.998334960010705,
+            "configured_velocity_margin_rad_s": 3.106694980185138,
+            "environment_clearance_diagnostic_m": 0.08857717027025891,
+            "minimum_joint_limit_margin_rad": 0.0009999999999998899,
+            "self_clearance_diagnostic_m": 0.016622079721648204,
+            "spray_axis_normal_gate_margin_rad": 0.15696072482651385,
+            "tcp_path_error_gate_margin_m": 0.006,
+            "terminal_position_gate_margin_m": 0.004
+          },
+          "realized_perturbation": {
+            "max_abs_error_from_request": 4.9873299934333204e-17,
+            "maximum_signed_value": 0.0009997558593748956,
+            "minimum_signed_value": 0.0009997558593748401,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 0.00099975585937489
+          },
+          "status": "PASS"
+        },
+        "method_source": "src/p2a_axiswise_robustness.py:scan_axes_batched + _D41BatchEvaluator, fresh source-built MoveIt2 D41/FK",
+        "monotonicity_observation": "LOCAL_MONOTONIC_AT_COARSE_SAMPLING_RESOLUTION",
+        "native_batches": 1,
+        "refined_boundary_estimate": {
+          "units": "rad",
+          "value": 0.0010002517700194212
+        },
+        "scan_case_count": 69,
+        "search_completeness": "LOCAL_BRACKET_REFINED",
+        "strict_self_ccd": "NOT_AVAILABLE"
+      },
+      "post_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.001\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+      "post_ruckig_validation_status": "PASS",
+      "pre_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.001\\strict_replay\\moveit_waypoint_joint_trajectory.csv",
+      "quality_metrics": {
+        "metrics": {
+          "fk_normal_error_max_deg": "1.0068129181261851",
+          "fk_normal_error_mean_deg": "0.40437383433090185",
+          "fk_path_deviation_max_mm": "0.14126918172561212",
+          "fk_path_deviation_p95_mm": "0.028219554641211297",
+          "fk_standoff_error_max_abs_mm": "0.10550011330623388",
+          "fk_tcp_speed_mean_m_s": "0.003005357453672808",
+          "fk_tcp_speed_p05_m_s": "0.0029999999996098087",
+          "fk_tcp_speed_p05_p95_fluctuation": "2.7374042877563397e-10",
+          "fk_tcp_speed_p95_m_s": "0.0030000000004324965",
+          "joint_continuity_status": "pass",
+          "max_ik_joint_step_deg": "20.0",
+          "max_joint_step_deg": "14.991790333724396",
+          "max_joint_step_from_deg": "13.900000053825035",
+          "max_joint_step_from_index": "15",
+          "max_joint_step_joint": "j6",
+          "max_joint_step_raw_deg": "14.991790333724397",
+          "max_joint_step_raw_from_index": "15",
+          "max_joint_step_raw_joint": "j6",
+          "max_joint_step_raw_to_index": "16",
+          "max_joint_step_to_deg": "-1.0917902798993615",
+          "max_joint_step_to_index": "16",
+          "moveit_ee_link": "spray_tcp_link",
+          "moveit_ruckig_smoothing_used": "true",
+          "moveit_time_parameterization": "tcp_arclength",
+          "production_joint_step_limit_deg": "20.0",
+          "stand_off_m": "0.26",
+          "status": "pass",
+          "tcp_points_to_wall": "true",
+          "tool_tcp_calibration_method": "virtual_design_parameter",
+          "tool_tcp_measured_by": "simulation",
+          "tool_tcp_measured_date": "not_applicable_offline",
+          "tool_tcp_rpy": "0 0 0",
+          "tool_tcp_source": "assumed_150mm_placeholder",
+          "tool_tcp_xyz": "0.000 0.000 0.150"
+        },
+        "status": "AVAILABLE"
+      },
+      "secondary_gain": null,
+      "solver": "A1",
+      "solver_pressure_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.001\\solver_pressure.csv",
+      "solver_pressure_wp80_95": {
+        "accepted_secondary_step_count": 0,
+        "joint6_clip_activations": 421,
+        "max_preprojection_j6_buffer_boundary_excess_rad": 0.02172637960008217,
+        "max_preprojection_j6_hard_upper_excess_rad": 0.02072637960008228,
+        "max_primary_task_contribution_norm": 0.10192645346532217,
+        "max_secondary_objective_contribution_norm": 0.0,
+        "record_count": 484,
+        "waypoint_of_max_buffer_boundary_excess": 90,
+        "waypoint_of_max_hard_upper_excess": 90,
+        "wp86_87_joint6_clip_activations": 104,
+        "wp86_87_record_count": 107
+      },
+      "strict_audit_status": "PASS",
+      "strict_metrics": {
+        "audit_status": "pass",
+        "collision_checked_state_count": 993.0,
+        "collision_count": 0.0,
+        "max_fk_path_error_mm": 0.14126918172561212,
+        "max_joint_step_deg": 14.991790333724396,
+        "max_normal_error_deg": 1.0068129181261851,
+        "ruckig_used": true,
+        "time_parameterization": "tcp_arclength"
+      },
+      "strict_runner_exit_code": 0,
+      "trajectory_metrics": {
+        "post_ruckig_min_j6_upper_slack_rad": 0.0009999999999998899,
+        "post_ruckig_min_joint_margin_rad": 0.0009999999999998899,
+        "pre_ruckig_min_j6_upper_slack_rad": 0.0009999999999998899,
+        "pre_ruckig_min_j6_upper_slack_waypoint": 86,
+        "pre_ruckig_min_joint_margin_rad": 0.0009999999999998899,
+        "pre_ruckig_min_joint_margin_waypoint": 86,
+        "waypoint_count": 181
+      },
+      "variant_id": "A1_buffer_0.001"
+    },
+    {
+      "buffer_rad": 0.005,
+      "collision_metrics": {
+        "metrics": {
+          "collision_checked_state_count": "993.0",
+          "collision_count": "0.0",
+          "collision_environment_object_count": "181.0",
+          "collision_interpolation_step_deg": "0.5",
+          "first_collision_contact_count": "0.0",
+          "first_collision_index": "-1.0",
+          "first_collision_summary": "none",
+          "first_collision_trajectory_segment": "-1.0",
+          "include_bottom_closure_collision": "not_applicable_open_path",
+          "include_tunnel_floor_collision": "true",
+          "open_path": "true",
+          "status": "pass",
+          "trajectory_waypoint_count": "181.0",
+          "tunnel_floor_z": "-0.2"
+        },
+        "status": "AVAILABLE"
+      },
+      "dynamics_metrics": {
+        "joints": {
+          "j1": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.00783649369866198",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00015631610112297413",
+            "max_acceleration": "0.005485545589063386",
+            "max_jerk": "0.001250528808983793",
+            "max_velocity": "0.043305019815502284",
+            "p95_jerk": "0.00025525423916649206",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.013747625338254695"
+          },
+          "j2": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0019002926772250964",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "3.79236551948517e-05",
+            "max_acceleration": "0.0013302048740575674",
+            "max_jerk": "0.0003033892415588136",
+            "max_velocity": "0.013057079375568548",
+            "p95_jerk": "0.00013508008387057597",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.004145104563672555"
+          },
+          "j3": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0024313878322134615",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "6.034524415803544e-05",
+            "max_acceleration": "0.001701971482549423",
+            "max_jerk": "0.00048276195326428354",
+            "max_velocity": "0.012859559654563368",
+            "p95_jerk": "0.00016769402364335181",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0040823998903375775"
+          },
+          "j4": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.009579396534353423",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.000230429428058495",
+            "max_acceleration": "0.0067055775740473954",
+            "max_jerk": "0.00184343542446796",
+            "max_velocity": "0.05254754300214191",
+            "p95_jerk": "0.0005700824074041449",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.016421107188169345"
+          },
+          "j5": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.003503524432268827",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "9.068048859836026e-05",
+            "max_acceleration": "0.0024524671025881787",
+            "max_jerk": "0.0007254439087868821",
+            "max_velocity": "0.025171153803755036",
+            "p95_jerk": "0.00014539592313865578",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.007865985563673449"
+          },
+          "j6": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.007039601107062364",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00011282136623431681",
+            "max_acceleration": "0.004927720774943654",
+            "max_jerk": "0.0009025709298745345",
+            "max_velocity": "0.03424097198618539",
+            "p95_jerk": "0.0003209273711741792",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.010700303745682935"
+          }
+        },
+        "status": "AVAILABLE"
+      },
+      "fd_consistency_path": null,
+      "j6_margin_improvement_ratio_vs_A0": 49.82581505398438,
+      "output_directory": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.005",
+      "p2a_j6_positive": {
+        "axis_id": "joint:j6:positive",
+        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "collision_method": "adaptive_discrete_interpolation",
+        "estimated_raw_axis_margin": {
+          "units": "rad",
+          "value": 0.00499970912933339
+        },
+        "failure_intervals": [
+          {
+            "first_magnitude": 0.005078124999999892,
+            "last_magnitude": 0.005078124999999892,
+            "sample_count": 1
+          }
+        ],
+        "first_failing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0005__0.005000019073486222",
+          "critical_segment": null,
+          "critical_waypoint": 86,
+          "dominant_failure_mode": "JOINT_LIMIT_FAILURE",
+          "evaluator_capabilities": {
+            "joint_limits": "AVAILABLE"
+          },
+          "evidence": {
+            "joint_index_zero_based": 5,
+            "joint_name": "j6",
+            "lower_rad": -3.0543,
+            "q_rad": 3.0543000190734864,
+            "state_was_clipped": false,
+            "upper_rad": 3.0543
+          },
+          "failure_margin": {
+            "joint_limit_violation_rad": 1.907348634588857e-08
+          },
+          "failure_modes": [
+            "JOINT_LIMIT_FAILURE"
+          ],
+          "magnitude": 0.005000019073486222,
+          "nominal_margin": {},
+          "realized_perturbation": {
+            "max_abs_error_from_request": 1.734723475976807e-17,
+            "maximum_signed_value": 0.005000019073486239,
+            "minimum_signed_value": 0.0050000190734862116,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 0.005000019073486222
+          },
+          "status": "FAIL"
+        },
+        "last_passing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0006__0.0049993991851805582",
+          "critical_segment": null,
+          "critical_waypoint": null,
+          "dominant_failure_mode": null,
+          "evaluator_capabilities": {
+            "calibrated_tcp_uncertainty": "NOT_AVAILABLE",
+            "coating_thickness_or_deposition_physics": "NOT_AVAILABLE",
+            "fcl_environment_and_self_distance": "AVAILABLE",
+            "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "joint_limits": "AVAILABLE",
+            "moveit2_fk": "AVAILABLE",
+            "moveit2_planning_scene": "AVAILABLE",
+            "native_robot_world_two_state_query": "AVAILABLE",
+            "physical_singularity_threshold": "UNKNOWN",
+            "physical_torque": "NOT_AVAILABLE",
+            "robot_world_collision": "AVAILABLE",
+            "self_collision_adaptive_discrete_interpolation": "AVAILABLE",
+            "stand_off_surface_projection": "NOT_AVAILABLE",
+            "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
+            "transition_collision_adaptive_discrete_interpolation": "AVAILABLE"
+          },
+          "evidence": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "collision_method": "adaptive_discrete_interpolation",
+            "derivative_method": "D46 finite_derivatives on frozen D41 timestamps; audit-only perturbation evaluation",
+            "dynamic_limit_provenance": "project configuration; not vendor certified",
+            "first_adaptive_self_collision_segment": null,
+            "first_adaptive_world_collision_segment": null,
+            "first_two_state_world_collision_segment": null,
+            "full_quaternion_difference_max_rad_diagnostic_only": 0.00499939918536781,
+            "full_quaternion_difference_terminal_rad_diagnostic_only": 0.004999399184923667,
+            "jacobian_is_diagnostic_not_an_unsafe_classification": true,
+            "joint_limit_margin_min_rad": 6.008148192293561e-07,
+            "max_acceleration_ratio": 0.00957939653445737,
+            "max_jerk_ratio": 0.0002081299986617677,
+            "max_joint_step_rad": 0.26165610209215023,
+            "max_spray_axis_normal_error_rad": 0.01757220037291855,
+            "max_spray_axis_normal_error_waypoint": 171,
+            "max_tcp_path_error_m": 1.1443916996305594e-16,
+            "max_tcp_path_error_waypoint": 72,
+            "max_velocity_ratio": 0.016421107189154592,
+            "maximum_jacobian_condition_number": 3987560053.1587915,
+            "minimum_environment_clearance_m": 0.08857717027025891,
+            "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+            "minimum_environment_clearance_waypoint": 85,
+            "minimum_jacobian_sigma": 4.660974145275405e-10,
+            "minimum_jacobian_sigma_waypoint": 91,
+            "minimum_self_clearance_m": 0.01662207972190712,
+            "minimum_self_clearance_pair": "wrist2_link|forearm_link",
+            "minimum_self_clearance_waypoint": 88,
+            "native_case_id": "p2a_001_00000",
+            "native_two_state_robot_world_query": {
+              "available": true,
+              "collision_count": 0,
+              "interpretation": "reported as a separate MoveIt2 endpoint-pair diagnostic; not promoted to strict global CCD"
+            },
+            "native_waypoint_self_collision_count": 0,
+            "native_waypoint_world_collision_count": 0,
+            "orientation_failure_gate": "MoveIt2 FK spray_tcp_link +Z versus frozen D41 wall normal; tool-axis roll is not counted as spray-normal error",
+            "process_quality_certified": false,
+            "terminal_position_error_m": 5.721958498152797e-17,
+            "terminal_spray_axis_normal_error_rad": 0.01621637581307762
+          },
+          "failure_margin": {},
+          "failure_modes": [],
+          "magnitude": 0.004999399185180558,
+          "nominal_margin": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "configured_acceleration_margin_rad_s2": 0.6932944224258798,
+            "configured_jerk_margin_rad_s3": 7.998334960010705,
+            "configured_velocity_margin_rad_s": 3.106694980185138,
+            "environment_clearance_diagnostic_m": 0.08857717027025891,
+            "minimum_joint_limit_margin_rad": 0.004999999999999893,
+            "self_clearance_diagnostic_m": 0.01662207972190712,
+            "spray_axis_normal_gate_margin_rad": 0.15696072482651402,
+            "tcp_path_error_gate_margin_m": 0.006,
+            "terminal_position_gate_margin_m": 0.004
+          },
+          "realized_perturbation": {
+            "max_abs_error_from_request": 1.0581813203458523e-16,
+            "maximum_signed_value": 0.004999399185180664,
+            "minimum_signed_value": 0.004999399185180553,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 0.004999399185180558
+          },
+          "status": "PASS"
+        },
+        "method_source": "src/p2a_axiswise_robustness.py:scan_axes_batched + _D41BatchEvaluator, fresh source-built MoveIt2 D41/FK",
+        "monotonicity_observation": "LOCAL_MONOTONIC_AT_COARSE_SAMPLING_RESOLUTION",
+        "native_batches": 2,
+        "refined_boundary_estimate": {
+          "units": "rad",
+          "value": 0.00499970912933339
+        },
+        "scan_case_count": 72,
+        "search_completeness": "LOCAL_BRACKET_REFINED",
+        "strict_self_ccd": "NOT_AVAILABLE"
+      },
+      "post_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.005\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+      "post_ruckig_validation_status": "PASS",
+      "pre_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.005\\strict_replay\\moveit_waypoint_joint_trajectory.csv",
+      "quality_metrics": {
+        "metrics": {
+          "fk_normal_error_max_deg": "1.0068129181254613",
+          "fk_normal_error_mean_deg": "0.4043738343288554",
+          "fk_path_deviation_max_mm": "0.14126918172561212",
+          "fk_path_deviation_p95_mm": "0.028219554641211297",
+          "fk_standoff_error_max_abs_mm": "0.10550011330623388",
+          "fk_tcp_speed_mean_m_s": "0.003005357453672808",
+          "fk_tcp_speed_p05_m_s": "0.0029999999996098235",
+          "fk_tcp_speed_p05_p95_fluctuation": "2.7373855284194426e-10",
+          "fk_tcp_speed_p95_m_s": "0.0030000000004325057",
+          "joint_continuity_status": "pass",
+          "max_ik_joint_step_deg": "20.0",
+          "max_joint_step_deg": "14.991790333724396",
+          "max_joint_step_from_deg": "13.900000053825035",
+          "max_joint_step_from_index": "15",
+          "max_joint_step_joint": "j6",
+          "max_joint_step_raw_deg": "14.991790333724397",
+          "max_joint_step_raw_from_index": "15",
+          "max_joint_step_raw_joint": "j6",
+          "max_joint_step_raw_to_index": "16",
+          "max_joint_step_to_deg": "-1.0917902798993615",
+          "max_joint_step_to_index": "16",
+          "moveit_ee_link": "spray_tcp_link",
+          "moveit_ruckig_smoothing_used": "true",
+          "moveit_time_parameterization": "tcp_arclength",
+          "production_joint_step_limit_deg": "20.0",
+          "stand_off_m": "0.26",
+          "status": "pass",
+          "tcp_points_to_wall": "true",
+          "tool_tcp_calibration_method": "virtual_design_parameter",
+          "tool_tcp_measured_by": "simulation",
+          "tool_tcp_measured_date": "not_applicable_offline",
+          "tool_tcp_rpy": "0 0 0",
+          "tool_tcp_source": "assumed_150mm_placeholder",
+          "tool_tcp_xyz": "0.000 0.000 0.150"
+        },
+        "status": "AVAILABLE"
+      },
+      "secondary_gain": null,
+      "solver": "A1",
+      "solver_pressure_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.005\\solver_pressure.csv",
+      "solver_pressure_wp80_95": {
+        "accepted_secondary_step_count": 0,
+        "joint6_clip_activations": 420,
+        "max_preprojection_j6_buffer_boundary_excess_rad": 0.021726381370369197,
+        "max_preprojection_j6_hard_upper_excess_rad": 0.016726381370369303,
+        "max_primary_task_contribution_norm": 0.10192645346532217,
+        "max_secondary_objective_contribution_norm": 0.0,
+        "record_count": 482,
+        "waypoint_of_max_buffer_boundary_excess": 90,
+        "waypoint_of_max_hard_upper_excess": 90,
+        "wp86_87_joint6_clip_activations": 105,
+        "wp86_87_record_count": 107
+      },
+      "strict_audit_status": "PASS",
+      "strict_metrics": {
+        "audit_status": "pass",
+        "collision_checked_state_count": 993.0,
+        "collision_count": 0.0,
+        "max_fk_path_error_mm": 0.14126918172561212,
+        "max_joint_step_deg": 14.991790333724396,
+        "max_normal_error_deg": 1.0068129181254613,
+        "ruckig_used": true,
+        "time_parameterization": "tcp_arclength"
+      },
+      "strict_runner_exit_code": 0,
+      "trajectory_metrics": {
+        "post_ruckig_min_j6_upper_slack_rad": 0.004999999999999893,
+        "post_ruckig_min_joint_margin_rad": 0.004999999999999893,
+        "pre_ruckig_min_j6_upper_slack_rad": 0.004999999999999893,
+        "pre_ruckig_min_j6_upper_slack_waypoint": 86,
+        "pre_ruckig_min_joint_margin_rad": 0.004999999999999893,
+        "pre_ruckig_min_joint_margin_waypoint": 86,
+        "waypoint_count": 181
+      },
+      "variant_id": "A1_buffer_0.005"
+    },
+    {
+      "buffer_rad": 0.01,
+      "collision_metrics": {
+        "metrics": {
+          "collision_checked_state_count": "993.0",
+          "collision_count": "0.0",
+          "collision_environment_object_count": "181.0",
+          "collision_interpolation_step_deg": "0.5",
+          "first_collision_contact_count": "0.0",
+          "first_collision_index": "-1.0",
+          "first_collision_summary": "none",
+          "first_collision_trajectory_segment": "-1.0",
+          "include_bottom_closure_collision": "not_applicable_open_path",
+          "include_tunnel_floor_collision": "true",
+          "open_path": "true",
+          "status": "pass",
+          "trajectory_waypoint_count": "181.0",
+          "tunnel_floor_z": "-0.2"
+        },
+        "status": "AVAILABLE"
+      },
+      "dynamics_metrics": {
+        "joints": {
+          "j1": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.007836494025011638",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00015631610592022397",
+            "max_acceleration": "0.005485545817508146",
+            "max_jerk": "0.0012505288473617917",
+            "max_velocity": "0.04330501981550201",
+            "p95_jerk": "0.0002552542391774296",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.013747625338254608"
+          },
+          "j2": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0019002927550210936",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "3.792365633842526e-05",
+            "max_acceleration": "0.0013302049285147655",
+            "max_jerk": "0.0003033892507074021",
+            "max_velocity": "0.013057079375568548",
+            "p95_jerk": "0.00013508008387039946",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.004145104563672555"
+          },
+          "j3": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.002431387832213487",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "6.034524415803544e-05",
+            "max_acceleration": "0.0017019714825494408",
+            "max_jerk": "0.00048276195326428354",
+            "max_velocity": "0.012859559654563368",
+            "p95_jerk": "0.00016769402364316002",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0040823998903375775"
+          },
+          "j4": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.009579396534353291",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.000230429428058495",
+            "max_acceleration": "0.0067055775740473035",
+            "max_jerk": "0.00184343542446796",
+            "max_velocity": "0.05254754300214191",
+            "p95_jerk": "0.000570082407403525",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.016421107188169345"
+          },
+          "j5": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.003503524432268827",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "9.068048859836026e-05",
+            "max_acceleration": "0.0024524671025881787",
+            "max_jerk": "0.0007254439087868821",
+            "max_velocity": "0.025171153803755036",
+            "p95_jerk": "0.00014539592313865578",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.007865985563673449"
+          },
+          "j6": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.006839726291915367",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00011282136623431681",
+            "max_acceleration": "0.004787808404340756",
+            "max_jerk": "0.0009025709298745345",
+            "max_velocity": "0.03424097198618539",
+            "p95_jerk": "0.00034048219723859744",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.010700303745682935"
+          }
+        },
+        "status": "AVAILABLE"
+      },
+      "fd_consistency_path": null,
+      "j6_margin_improvement_ratio_vs_A0": 99.6547189316656,
+      "output_directory": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.01",
+      "p2a_j6_positive": {
+        "axis_id": "joint:j6:positive",
+        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "collision_method": "adaptive_discrete_interpolation",
+        "estimated_raw_axis_margin": {
+          "units": "rad",
+          "value": 0.009999728202819611
+        },
+        "failure_intervals": [
+          {
+            "first_magnitude": 0.010156249999999784,
+            "last_magnitude": 0.010156249999999784,
+            "sample_count": 1
+          }
+        ],
+        "first_failing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0005__0.010000038146972444",
+          "critical_segment": null,
+          "critical_waypoint": 86,
+          "dominant_failure_mode": "JOINT_LIMIT_FAILURE",
+          "evaluator_capabilities": {
+            "joint_limits": "AVAILABLE"
+          },
+          "evidence": {
+            "joint_index_zero_based": 5,
+            "joint_name": "j6",
+            "lower_rad": -3.0543,
+            "q_rad": 3.0543000381469727,
+            "state_was_clipped": false,
+            "upper_rad": 3.0543
+          },
+          "failure_margin": {
+            "joint_limit_violation_rad": 3.814697269177714e-08
+          },
+          "failure_modes": [
+            "JOINT_LIMIT_FAILURE"
+          ],
+          "magnitude": 0.010000038146972444,
+          "nominal_margin": {},
+          "realized_perturbation": {
+            "max_abs_error_from_request": 3.469446951953614e-17,
+            "maximum_signed_value": 0.010000038146972479,
+            "minimum_signed_value": 0.010000038146972423,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 0.010000038146972444
+          },
+          "status": "FAIL"
+        },
+        "last_passing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0007__0.0099994182586667802",
+          "critical_segment": null,
+          "critical_waypoint": null,
+          "dominant_failure_mode": null,
+          "evaluator_capabilities": {
+            "calibrated_tcp_uncertainty": "NOT_AVAILABLE",
+            "coating_thickness_or_deposition_physics": "NOT_AVAILABLE",
+            "fcl_environment_and_self_distance": "AVAILABLE",
+            "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "joint_limits": "AVAILABLE",
+            "moveit2_fk": "AVAILABLE",
+            "moveit2_planning_scene": "AVAILABLE",
+            "native_robot_world_two_state_query": "AVAILABLE",
+            "physical_singularity_threshold": "UNKNOWN",
+            "physical_torque": "NOT_AVAILABLE",
+            "robot_world_collision": "AVAILABLE",
+            "self_collision_adaptive_discrete_interpolation": "AVAILABLE",
+            "stand_off_surface_projection": "NOT_AVAILABLE",
+            "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
+            "transition_collision_adaptive_discrete_interpolation": "AVAILABLE"
+          },
+          "evidence": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "collision_method": "adaptive_discrete_interpolation",
+            "derivative_method": "D46 finite_derivatives on frozen D41 timestamps; audit-only perturbation evaluation",
+            "dynamic_limit_provenance": "project configuration; not vendor certified",
+            "first_adaptive_self_collision_segment": null,
+            "first_adaptive_world_collision_segment": null,
+            "first_two_state_world_collision_segment": null,
+            "full_quaternion_difference_max_rad_diagnostic_only": 0.009999418258741075,
+            "full_quaternion_difference_terminal_rad_diagnostic_only": 0.009999418258696663,
+            "jacobian_is_diagnostic_not_an_unsafe_classification": true,
+            "joint_limit_margin_min_rad": 5.817413328834675e-07,
+            "max_acceleration_ratio": 0.009579396534457305,
+            "max_jerk_ratio": 0.00020812999866176533,
+            "max_joint_step_rad": 0.26165610209215023,
+            "max_spray_axis_normal_error_rad": 0.017572200372918997,
+            "max_spray_axis_normal_error_waypoint": 171,
+            "max_tcp_path_error_m": 1.1443916996305594e-16,
+            "max_tcp_path_error_waypoint": 72,
+            "max_velocity_ratio": 0.016421107189154592,
+            "maximum_jacobian_condition_number": 5477268195.850233,
+            "minimum_environment_clearance_m": 0.08857717027025891,
+            "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+            "minimum_environment_clearance_waypoint": 85,
+            "minimum_jacobian_sigma": 3.393281768567883e-10,
+            "minimum_jacobian_sigma_waypoint": 91,
+            "minimum_self_clearance_m": 0.016622079721860833,
+            "minimum_self_clearance_pair": "wrist2_link|forearm_link",
+            "minimum_self_clearance_waypoint": 88,
+            "native_case_id": "p2a_002_00000",
+            "native_two_state_robot_world_query": {
+              "available": true,
+              "collision_count": 0,
+              "interpretation": "reported as a separate MoveIt2 endpoint-pair diagnostic; not promoted to strict global CCD"
+            },
+            "native_waypoint_self_collision_count": 0,
+            "native_waypoint_world_collision_count": 0,
+            "orientation_failure_gate": "MoveIt2 FK spray_tcp_link +Z versus frozen D41 wall normal; tool-axis roll is not counted as spray-normal error",
+            "process_quality_certified": false,
+            "terminal_position_error_m": 1.3877787807814457e-17,
+            "terminal_spray_axis_normal_error_rad": 0.016216375813077343
+          },
+          "failure_margin": {},
+          "failure_modes": [],
+          "magnitude": 0.00999941825866678,
+          "nominal_margin": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "configured_acceleration_margin_rad_s2": 0.6932944224258798,
+            "configured_jerk_margin_rad_s3": 7.998334960010706,
+            "configured_velocity_margin_rad_s": 3.106694980185138,
+            "environment_clearance_diagnostic_m": 0.08857717027025891,
+            "minimum_joint_limit_margin_rad": 0.009999999999999787,
+            "self_clearance_diagnostic_m": 0.016622079721860833,
+            "spray_axis_normal_gate_margin_rad": 0.1569607248265139,
+            "tcp_path_error_gate_margin_m": 0.006,
+            "terminal_position_gate_margin_m": 0.004
+          },
+          "realized_perturbation": {
+            "max_abs_error_from_request": 1.231653667943533e-16,
+            "maximum_signed_value": 0.009999418258666903,
+            "minimum_signed_value": 0.009999418258666681,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 0.00999941825866678
+          },
+          "status": "PASS"
+        },
+        "method_source": "src/p2a_axiswise_robustness.py:scan_axes_batched + _D41BatchEvaluator, fresh source-built MoveIt2 D41/FK",
+        "monotonicity_observation": "LOCAL_MONOTONIC_AT_COARSE_SAMPLING_RESOLUTION",
+        "native_batches": 3,
+        "refined_boundary_estimate": {
+          "units": "rad",
+          "value": 0.009999728202819611
+        },
+        "scan_case_count": 73,
+        "search_completeness": "LOCAL_BRACKET_REFINED",
+        "strict_self_ccd": "NOT_AVAILABLE"
+      },
+      "post_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.01\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+      "post_ruckig_validation_status": "PASS",
+      "pre_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.01\\strict_replay\\moveit_waypoint_joint_trajectory.csv",
+      "quality_metrics": {
+        "metrics": {
+          "fk_normal_error_max_deg": "1.0068129181261851",
+          "fk_normal_error_mean_deg": "0.4043738343084624",
+          "fk_path_deviation_max_mm": "0.14126918172561212",
+          "fk_path_deviation_p95_mm": "0.028219554641211297",
+          "fk_standoff_error_max_abs_mm": "0.10550011330623388",
+          "fk_tcp_speed_mean_m_s": "0.003005357453672808",
+          "fk_tcp_speed_p05_m_s": "0.0029999999996098183",
+          "fk_tcp_speed_p05_p95_fluctuation": "2.7372729723980605e-10",
+          "fk_tcp_speed_p95_m_s": "0.0030000000004324666",
+          "joint_continuity_status": "pass",
+          "max_ik_joint_step_deg": "20.0",
+          "max_joint_step_deg": "14.991790333724396",
+          "max_joint_step_from_deg": "13.900000053825035",
+          "max_joint_step_from_index": "15",
+          "max_joint_step_joint": "j6",
+          "max_joint_step_raw_deg": "14.991790333724397",
+          "max_joint_step_raw_from_index": "15",
+          "max_joint_step_raw_joint": "j6",
+          "max_joint_step_raw_to_index": "16",
+          "max_joint_step_to_deg": "-1.0917902798993615",
+          "max_joint_step_to_index": "16",
+          "moveit_ee_link": "spray_tcp_link",
+          "moveit_ruckig_smoothing_used": "true",
+          "moveit_time_parameterization": "tcp_arclength",
+          "production_joint_step_limit_deg": "20.0",
+          "stand_off_m": "0.26",
+          "status": "pass",
+          "tcp_points_to_wall": "true",
+          "tool_tcp_calibration_method": "virtual_design_parameter",
+          "tool_tcp_measured_by": "simulation",
+          "tool_tcp_measured_date": "not_applicable_offline",
+          "tool_tcp_rpy": "0 0 0",
+          "tool_tcp_source": "assumed_150mm_placeholder",
+          "tool_tcp_xyz": "0.000 0.000 0.150"
+        },
+        "status": "AVAILABLE"
+      },
+      "secondary_gain": null,
+      "solver": "A1",
+      "solver_pressure_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\A1_buffer_0.01\\solver_pressure.csv",
+      "solver_pressure_wp80_95": {
+        "accepted_secondary_step_count": 0,
+        "joint6_clip_activations": 420,
+        "max_preprojection_j6_buffer_boundary_excess_rad": 0.02172638137036964,
+        "max_preprojection_j6_hard_upper_excess_rad": 0.011726381370369854,
+        "max_primary_task_contribution_norm": 0.10192645346532217,
+        "max_secondary_objective_contribution_norm": 0.0,
+        "record_count": 482,
+        "waypoint_of_max_buffer_boundary_excess": 90,
+        "waypoint_of_max_hard_upper_excess": 90,
+        "wp86_87_joint6_clip_activations": 105,
+        "wp86_87_record_count": 107
+      },
+      "strict_audit_status": "PASS",
+      "strict_metrics": {
+        "audit_status": "pass",
+        "collision_checked_state_count": 993.0,
+        "collision_count": 0.0,
+        "max_fk_path_error_mm": 0.14126918172561212,
+        "max_joint_step_deg": 14.991790333724396,
+        "max_normal_error_deg": 1.0068129181261851,
+        "ruckig_used": true,
+        "time_parameterization": "tcp_arclength"
+      },
+      "strict_runner_exit_code": 0,
+      "trajectory_metrics": {
+        "post_ruckig_min_j6_upper_slack_rad": 0.009999999999999787,
+        "post_ruckig_min_joint_margin_rad": 0.009999999999999787,
+        "pre_ruckig_min_j6_upper_slack_rad": 0.009999999999999787,
+        "pre_ruckig_min_j6_upper_slack_waypoint": 86,
+        "pre_ruckig_min_joint_margin_rad": 0.009999999999999787,
+        "pre_ruckig_min_joint_margin_waypoint": 86,
+        "waypoint_count": 181
+      },
+      "variant_id": "A1_buffer_0.01"
+    },
+    {
+      "buffer_rad": 0.0001,
+      "collision_metrics": {
+        "metrics": {
+          "collision_checked_state_count": "936.0",
+          "collision_count": "0.0",
+          "collision_environment_object_count": "181.0",
+          "collision_interpolation_step_deg": "0.5",
+          "first_collision_contact_count": "0.0",
+          "first_collision_index": "-1.0",
+          "first_collision_summary": "none",
+          "first_collision_trajectory_segment": "-1.0",
+          "include_bottom_closure_collision": "not_applicable_open_path",
+          "include_tunnel_floor_collision": "true",
+          "open_path": "true",
+          "status": "pass",
+          "trajectory_waypoint_count": "181.0",
+          "tunnel_floor_z": "-0.2"
+        },
+        "status": "AVAILABLE"
+      },
+      "dynamics_metrics": {
+        "joints": {
+          "j1": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.007849086376220804",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.0001567429698220139",
+            "max_acceleration": "0.005494360463354563",
+            "max_jerk": "0.0012539437585761112",
+            "max_velocity": "0.04317741657623142",
+            "p95_jerk": "0.00025874707069074973",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0137071163734068"
+          },
+          "j2": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0019033941299352183",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "3.80291834655488e-05",
+            "max_acceleration": "0.0013323758909546527",
+            "max_jerk": "0.0003042334677243904",
+            "max_velocity": "0.013057079375568548",
+            "p95_jerk": "0.00013508061391153702",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.004145104563672555"
+          },
+          "j3": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0024313947793678805",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "6.215295745382832e-05",
+            "max_acceleration": "0.0017019763455575162",
+            "max_jerk": "0.0004972236596306266",
+            "max_velocity": "0.012859559654563368",
+            "p95_jerk": "0.0001676941820986504",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0040823998903375775"
+          },
+          "j4": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.009579409244078704",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00023676112337913448",
+            "max_acceleration": "0.006705586470855092",
+            "max_jerk": "0.0018940889870330759",
+            "max_velocity": "0.05254754300214191",
+            "p95_jerk": "0.0005700818369143328",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.016421107188169345"
+          },
+          "j5": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.003503524432268827",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "9.046468617717841e-05",
+            "max_acceleration": "0.0024524671025881787",
+            "max_jerk": "0.0007237174894174273",
+            "max_velocity": "0.025171153803755036",
+            "p95_jerk": "0.00014539592313865578",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.007865985563673449"
+          },
+          "j6": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "5.426734150892442e-13",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "1.2672198624647749e-14",
+            "max_acceleration": "3.7987139056247094e-13",
+            "max_jerk": "1.0137758899718199e-13",
+            "max_velocity": "2.1619928070037986e-12",
+            "p95_jerk": "4.8181670413262036e-18",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "6.756227521886871e-13"
+          }
+        },
+        "status": "AVAILABLE"
+      },
+      "fd_consistency_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B0_process_5d\\process_jacobian_fd.json",
+      "j6_margin_improvement_ratio_vs_A0": 28020.672995131143,
+      "output_directory": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B0_process_5d",
+      "p2a_j6_positive": {
+        "axis_id": "joint:j6:positive",
+        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "collision_method": "adaptive_discrete_interpolation",
+        "estimated_raw_axis_margin": {
+          "units": "rad",
+          "value": 2.811699405860896
+        },
+        "failure_intervals": [
+          {
+            "first_magnitude": 2.8556320335495102,
+            "last_magnitude": 2.8556320335495102,
+            "sample_count": 1
+          }
+        ],
+        "first_failing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0015__2.8116997462787623",
+          "critical_segment": null,
+          "critical_waypoint": 0,
+          "dominant_failure_mode": "JOINT_LIMIT_FAILURE",
+          "evaluator_capabilities": {
+            "joint_limits": "AVAILABLE"
+          },
+          "evidence": {
+            "joint_index_zero_based": 5,
+            "joint_name": "j6",
+            "lower_rad": -3.0543,
+            "q_rad": 3.054300513233093,
+            "state_was_clipped": false,
+            "upper_rad": 3.0543
+          },
+          "failure_margin": {
+            "joint_limit_violation_rad": 5.132330929136231e-07
+          },
+          "failure_modes": [
+            "JOINT_LIMIT_FAILURE"
+          ],
+          "magnitude": 2.8116997462787623,
+          "nominal_margin": {},
+          "realized_perturbation": {
+            "max_abs_error_from_request": 0.0,
+            "maximum_signed_value": 2.8116997462787623,
+            "minimum_signed_value": 2.8116997462787623,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 2.8116997462787623
+          },
+          "status": "FAIL"
+        },
+        "last_passing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0011__2.8116990654430301",
+          "critical_segment": null,
+          "critical_waypoint": null,
+          "dominant_failure_mode": null,
+          "evaluator_capabilities": {
+            "calibrated_tcp_uncertainty": "NOT_AVAILABLE",
+            "coating_thickness_or_deposition_physics": "NOT_AVAILABLE",
+            "fcl_environment_and_self_distance": "AVAILABLE",
+            "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "joint_limits": "AVAILABLE",
+            "moveit2_fk": "AVAILABLE",
+            "moveit2_planning_scene": "AVAILABLE",
+            "native_robot_world_two_state_query": "AVAILABLE",
+            "physical_singularity_threshold": "UNKNOWN",
+            "physical_torque": "NOT_AVAILABLE",
+            "robot_world_collision": "AVAILABLE",
+            "self_collision_adaptive_discrete_interpolation": "AVAILABLE",
+            "stand_off_surface_projection": "NOT_AVAILABLE",
+            "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
+            "transition_collision_adaptive_discrete_interpolation": "AVAILABLE"
+          },
+          "evidence": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "collision_method": "adaptive_discrete_interpolation",
+            "derivative_method": "D46 finite_derivatives on frozen D41 timestamps; audit-only perturbation evaluation",
+            "dynamic_limit_provenance": "project configuration; not vendor certified",
+            "first_adaptive_self_collision_segment": null,
+            "first_adaptive_world_collision_segment": null,
+            "first_two_state_world_collision_segment": null,
+            "full_quaternion_difference_max_rad_diagnostic_only": 2.811699065443031,
+            "full_quaternion_difference_terminal_rad_diagnostic_only": 2.81169906544303,
+            "jacobian_is_diagnostic_not_an_unsafe_classification": true,
+            "joint_limit_margin_min_rad": 1.6759033405477908e-07,
+            "max_acceleration_ratio": 0.009579409241562151,
+            "max_jerk_ratio": 0.0002081299864624698,
+            "max_joint_step_rad": 0.2314989226091304,
+            "max_spray_axis_normal_error_rad": 0.017571288139830204,
+            "max_spray_axis_normal_error_waypoint": 171,
+            "max_tcp_path_error_m": 0.0,
+            "max_tcp_path_error_waypoint": 0,
+            "max_velocity_ratio": 0.016421107189154592,
+            "maximum_jacobian_condition_number": 15559753.083383705,
+            "minimum_environment_clearance_m": 0.08854440471744933,
+            "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+            "minimum_environment_clearance_waypoint": 85,
+            "minimum_jacobian_sigma": 1.1943856894599287e-07,
+            "minimum_jacobian_sigma_waypoint": 90,
+            "minimum_self_clearance_m": 0.016622079818704765,
+            "minimum_self_clearance_pair": "wrist2_link|forearm_link",
+            "minimum_self_clearance_waypoint": 88,
+            "native_case_id": "p2a_006_00000",
+            "native_two_state_robot_world_query": {
+              "available": true,
+              "collision_count": 0,
+              "interpretation": "reported as a separate MoveIt2 endpoint-pair diagnostic; not promoted to strict global CCD"
+            },
+            "native_waypoint_self_collision_count": 0,
+            "native_waypoint_world_collision_count": 0,
+            "orientation_failure_gate": "MoveIt2 FK spray_tcp_link +Z versus frozen D41 wall normal; tool-axis roll is not counted as spray-normal error",
+            "process_quality_certified": false,
+            "terminal_position_error_m": 0.0,
+            "terminal_spray_axis_normal_error_rad": 0.016217032675096166
+          },
+          "failure_margin": {},
+          "failure_modes": [],
+          "magnitude": 2.81169906544303,
+          "nominal_margin": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "configured_acceleration_margin_rad_s2": 0.6932944135309065,
+            "configured_jerk_margin_rad_s3": 7.9983349601083,
+            "configured_velocity_margin_rad_s": 3.1068225834239556,
+            "environment_clearance_diagnostic_m": 0.08854440471744933,
+            "minimum_joint_limit_margin_rad": 0.21980500643299639,
+            "self_clearance_diagnostic_m": 0.016622079818704765,
+            "spray_axis_normal_gate_margin_rad": 0.15696163705960287,
+            "tcp_path_error_gate_margin_m": 0.006,
+            "terminal_position_gate_margin_m": 0.004
+          },
+          "realized_perturbation": {
+            "max_abs_error_from_request": 0.0,
+            "maximum_signed_value": 2.81169906544303,
+            "minimum_signed_value": 2.81169906544303,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 2.81169906544303
+          },
+          "status": "PASS"
+        },
+        "method_source": "src/p2a_axiswise_robustness.py:scan_axes_batched + _D41BatchEvaluator, fresh source-built MoveIt2 D41/FK",
+        "monotonicity_observation": "LOCAL_MONOTONIC_AT_COARSE_SAMPLING_RESOLUTION",
+        "native_batches": 7,
+        "refined_boundary_estimate": {
+          "units": "rad",
+          "value": 2.811699405860896
+        },
+        "scan_case_count": 81,
+        "search_completeness": "LOCAL_BRACKET_REFINED",
+        "strict_self_ccd": "NOT_AVAILABLE"
+      },
+      "post_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B0_process_5d\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+      "post_ruckig_validation_status": "PASS",
+      "pre_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B0_process_5d\\strict_replay\\moveit_waypoint_joint_trajectory.csv",
+      "quality_metrics": {
+        "metrics": {
+          "fk_normal_error_max_deg": "1.0067608255387768",
+          "fk_normal_error_mean_deg": "0.4044622119752059",
+          "fk_path_deviation_max_mm": "0.14126918172561212",
+          "fk_path_deviation_p95_mm": "0.028219554641211297",
+          "fk_standoff_error_max_abs_mm": "0.10550011330623388",
+          "fk_tcp_speed_mean_m_s": "0.0030053574613445274",
+          "fk_tcp_speed_p05_m_s": "0.0029999999995841686",
+          "fk_tcp_speed_p05_p95_fluctuation": "2.764436485168138e-10",
+          "fk_tcp_speed_p95_m_s": "0.0030000000004149806",
+          "joint_continuity_status": "pass",
+          "max_ik_joint_step_deg": "20.0",
+          "max_joint_step_deg": "13.263911227328856",
+          "max_joint_step_from_deg": "-103.57382687457516",
+          "max_joint_step_from_index": "15",
+          "max_joint_step_joint": "j2",
+          "max_joint_step_raw_deg": "13.263911227328844",
+          "max_joint_step_raw_from_index": "15",
+          "max_joint_step_raw_joint": "j2",
+          "max_joint_step_raw_to_index": "16",
+          "max_joint_step_to_deg": "-90.30991564724631",
+          "max_joint_step_to_index": "16",
+          "moveit_ee_link": "spray_tcp_link",
+          "moveit_ruckig_smoothing_used": "true",
+          "moveit_time_parameterization": "tcp_arclength",
+          "production_joint_step_limit_deg": "20.0",
+          "stand_off_m": "0.26",
+          "status": "pass",
+          "tcp_points_to_wall": "true",
+          "tool_tcp_calibration_method": "virtual_design_parameter",
+          "tool_tcp_measured_by": "simulation",
+          "tool_tcp_measured_date": "not_applicable_offline",
+          "tool_tcp_rpy": "0 0 0",
+          "tool_tcp_source": "assumed_150mm_placeholder",
+          "tool_tcp_xyz": "0.000 0.000 0.150"
+        },
+        "status": "AVAILABLE"
+      },
+      "secondary_gain": null,
+      "solver": "B0",
+      "solver_pressure_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B0_process_5d\\solver_pressure.csv",
+      "solver_pressure_wp80_95": {
+        "accepted_secondary_step_count": 0,
+        "joint6_clip_activations": 0,
+        "max_preprojection_j6_buffer_boundary_excess_rad": 0.0,
+        "max_preprojection_j6_hard_upper_excess_rad": 0.0,
+        "max_primary_task_contribution_norm": 0.08800144272395542,
+        "max_secondary_objective_contribution_norm": 0.0,
+        "record_count": 214,
+        "waypoint_of_max_buffer_boundary_excess": 80,
+        "waypoint_of_max_hard_upper_excess": 80,
+        "wp86_87_joint6_clip_activations": 0,
+        "wp86_87_record_count": 45
+      },
+      "strict_audit_status": "PASS",
+      "strict_metrics": {
+        "audit_status": "pass",
+        "collision_checked_state_count": 936.0,
+        "collision_count": 0.0,
+        "max_fk_path_error_mm": 0.14126918172561212,
+        "max_joint_step_deg": 13.263911227328856,
+        "max_normal_error_deg": 1.0067608255387768,
+        "ruckig_used": true,
+        "time_parameterization": "tcp_arclength"
+      },
+      "strict_runner_exit_code": 0,
+      "trajectory_metrics": {
+        "post_ruckig_min_j6_upper_slack_rad": 2.811699233033364,
+        "post_ruckig_min_joint_margin_rad": 0.21980500643299639,
+        "pre_ruckig_min_j6_upper_slack_rad": 2.811699233033364,
+        "pre_ruckig_min_j6_upper_slack_waypoint": 2,
+        "pre_ruckig_min_joint_margin_rad": 0.21980500643299639,
+        "pre_ruckig_min_joint_margin_waypoint": 159,
+        "waypoint_count": 181
+      },
+      "variant_id": "B0_process_5d"
+    },
+    {
+      "buffer_rad": 0.0001,
+      "collision_metrics": {
+        "metrics": {
+          "collision_checked_state_count": "936.0",
+          "collision_count": "0.0",
+          "collision_environment_object_count": "181.0",
+          "collision_interpolation_step_deg": "0.5",
+          "first_collision_contact_count": "0.0",
+          "first_collision_index": "-1.0",
+          "first_collision_summary": "none",
+          "first_collision_trajectory_segment": "-1.0",
+          "include_bottom_closure_collision": "not_applicable_open_path",
+          "include_tunnel_floor_collision": "true",
+          "open_path": "true",
+          "status": "pass",
+          "trajectory_waypoint_count": "181.0",
+          "tunnel_floor_z": "-0.2"
+        },
+        "status": "AVAILABLE"
+      },
+      "dynamics_metrics": {
+        "joints": {
+          "j1": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.007900704262319274",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.0001588138339327018",
+            "max_acceleration": "0.005530492983623491",
+            "max_jerk": "0.0012705106714616145",
+            "max_velocity": "0.04373752579850229",
+            "p95_jerk": "0.0002681398216364369",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.013884928824921363"
+          },
+          "j2": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0019165018291342044",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "3.855384235122383e-05",
+            "max_acceleration": "0.001341551280393943",
+            "max_jerk": "0.00030843073880979064",
+            "max_velocity": "0.013057079375568548",
+            "p95_jerk": "0.00013508077566540388",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.004145104563672555"
+          },
+          "j3": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0024304862634635573",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "6.071432933410792e-05",
+            "max_acceleration": "0.00170134038442449",
+            "max_jerk": "0.00048571463467286336",
+            "max_velocity": "0.012859559654563368",
+            "p95_jerk": "0.0001676918205152459",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0040823998903375775"
+          },
+          "j4": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.009575083382263374",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.0002321746891041544",
+            "max_acceleration": "0.006702558367584361",
+            "max_jerk": "0.0018573975128332353",
+            "max_velocity": "0.05254754300214191",
+            "p95_jerk": "0.0005700667271465714",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.016421107188169345"
+          },
+          "j5": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.003503524432268827",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "9.195150392276171e-05",
+            "max_acceleration": "0.0024524671025881787",
+            "max_jerk": "0.0007356120313820937",
+            "max_velocity": "0.025171153803755036",
+            "p95_jerk": "0.00014539592313865578",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.007865985563673449"
+          },
+          "j6": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "3.6992704488044114e-05",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "1.2437712232298862e-06",
+            "max_acceleration": "2.5894893141630877e-05",
+            "max_jerk": "9.95016978583909e-06",
+            "max_velocity": "0.00031873210285911224",
+            "p95_jerk": "2.5038999622618284e-06",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "9.960378214347258e-05"
+          }
+        },
+        "status": "AVAILABLE"
+      },
+      "fd_consistency_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.00025\\process_jacobian_fd.json",
+      "j6_margin_improvement_ratio_vs_A0": 28020.672995131143,
+      "output_directory": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.00025",
+      "p2a_j6_positive": {
+        "axis_id": "joint:j6:positive",
+        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "collision_method": "adaptive_discrete_interpolation",
+        "estimated_raw_axis_margin": {
+          "units": "rad",
+          "value": 2.811699405860896
+        },
+        "failure_intervals": [
+          {
+            "first_magnitude": 2.8556320335495102,
+            "last_magnitude": 2.8556320335495102,
+            "sample_count": 1
+          }
+        ],
+        "first_failing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0015__2.8116997462787623",
+          "critical_segment": null,
+          "critical_waypoint": 0,
+          "dominant_failure_mode": "JOINT_LIMIT_FAILURE",
+          "evaluator_capabilities": {
+            "joint_limits": "AVAILABLE"
+          },
+          "evidence": {
+            "joint_index_zero_based": 5,
+            "joint_name": "j6",
+            "lower_rad": -3.0543,
+            "q_rad": 3.054300513233093,
+            "state_was_clipped": false,
+            "upper_rad": 3.0543
+          },
+          "failure_margin": {
+            "joint_limit_violation_rad": 5.132330929136231e-07
+          },
+          "failure_modes": [
+            "JOINT_LIMIT_FAILURE"
+          ],
+          "magnitude": 2.8116997462787623,
+          "nominal_margin": {},
+          "realized_perturbation": {
+            "max_abs_error_from_request": 0.0,
+            "maximum_signed_value": 2.8116997462787623,
+            "minimum_signed_value": 2.8116997462787623,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 2.8116997462787623
+          },
+          "status": "FAIL"
+        },
+        "last_passing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0011__2.8116990654430301",
+          "critical_segment": null,
+          "critical_waypoint": null,
+          "dominant_failure_mode": null,
+          "evaluator_capabilities": {
+            "calibrated_tcp_uncertainty": "NOT_AVAILABLE",
+            "coating_thickness_or_deposition_physics": "NOT_AVAILABLE",
+            "fcl_environment_and_self_distance": "AVAILABLE",
+            "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "joint_limits": "AVAILABLE",
+            "moveit2_fk": "AVAILABLE",
+            "moveit2_planning_scene": "AVAILABLE",
+            "native_robot_world_two_state_query": "AVAILABLE",
+            "physical_singularity_threshold": "UNKNOWN",
+            "physical_torque": "NOT_AVAILABLE",
+            "robot_world_collision": "AVAILABLE",
+            "self_collision_adaptive_discrete_interpolation": "AVAILABLE",
+            "stand_off_surface_projection": "NOT_AVAILABLE",
+            "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
+            "transition_collision_adaptive_discrete_interpolation": "AVAILABLE"
+          },
+          "evidence": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "collision_method": "adaptive_discrete_interpolation",
+            "derivative_method": "D46 finite_derivatives on frozen D41 timestamps; audit-only perturbation evaluation",
+            "dynamic_limit_provenance": "project configuration; not vendor certified",
+            "first_adaptive_self_collision_segment": null,
+            "first_adaptive_world_collision_segment": null,
+            "first_two_state_world_collision_segment": null,
+            "full_quaternion_difference_max_rad_diagnostic_only": 2.811699065443031,
+            "full_quaternion_difference_terminal_rad_diagnostic_only": 2.8116990654430305,
+            "jacobian_is_diagnostic_not_an_unsafe_classification": true,
+            "joint_limit_margin_min_rad": 1.6759033405477908e-07,
+            "max_acceleration_ratio": 0.009575083377793142,
+            "max_jerk_ratio": 0.00020813043972506336,
+            "max_joint_step_rad": 0.23145615780540996,
+            "max_spray_axis_normal_error_rad": 0.0175639222989691,
+            "max_spray_axis_normal_error_waypoint": 171,
+            "max_tcp_path_error_m": 1.1188630228279524e-16,
+            "max_tcp_path_error_waypoint": 103,
+            "max_velocity_ratio": 0.016421107189154592,
+            "maximum_jacobian_condition_number": 15559753.070678752,
+            "minimum_environment_clearance_m": 0.08850687315204224,
+            "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+            "minimum_environment_clearance_waypoint": 85,
+            "minimum_jacobian_sigma": 1.1943856904351763e-07,
+            "minimum_jacobian_sigma_waypoint": 90,
+            "minimum_self_clearance_m": 0.016622079818704668,
+            "minimum_self_clearance_pair": "wrist2_link|forearm_link",
+            "minimum_self_clearance_waypoint": 88,
+            "native_case_id": "p2a_006_00000",
+            "native_two_state_robot_world_query": {
+              "available": true,
+              "collision_count": 0,
+              "interpretation": "reported as a separate MoveIt2 endpoint-pair diagnostic; not promoted to strict global CCD"
+            },
+            "native_waypoint_self_collision_count": 0,
+            "native_waypoint_world_collision_count": 0,
+            "orientation_failure_gate": "MoveIt2 FK spray_tcp_link +Z versus frozen D41 wall normal; tool-axis roll is not counted as spray-normal error",
+            "process_quality_certified": false,
+            "terminal_position_error_m": 0.0,
+            "terminal_spray_axis_normal_error_rad": 0.01622096805857482
+          },
+          "failure_margin": {},
+          "failure_modes": [],
+          "magnitude": 2.81169906544303,
+          "nominal_margin": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "configured_acceleration_margin_rad_s2": 0.6932974416355447,
+            "configured_jerk_margin_rad_s3": 7.998334956482199,
+            "configured_velocity_margin_rad_s": 3.106262474200227,
+            "environment_clearance_diagnostic_m": 0.08850687315204224,
+            "minimum_joint_limit_margin_rad": 0.21979470409816537,
+            "self_clearance_diagnostic_m": 0.016622079818704668,
+            "spray_axis_normal_gate_margin_rad": 0.15696900290046384,
+            "tcp_path_error_gate_margin_m": 0.006,
+            "terminal_position_gate_margin_m": 0.004
+          },
+          "realized_perturbation": {
+            "max_abs_error_from_request": 4.440892098500626e-16,
+            "maximum_signed_value": 2.8116990654430305,
+            "minimum_signed_value": 2.8116990654430296,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 2.81169906544303
+          },
+          "status": "PASS"
+        },
+        "method_source": "src/p2a_axiswise_robustness.py:scan_axes_batched + _D41BatchEvaluator, fresh source-built MoveIt2 D41/FK",
+        "monotonicity_observation": "LOCAL_MONOTONIC_AT_COARSE_SAMPLING_RESOLUTION",
+        "native_batches": 7,
+        "refined_boundary_estimate": {
+          "units": "rad",
+          "value": 2.811699405860896
+        },
+        "scan_case_count": 81,
+        "search_completeness": "LOCAL_BRACKET_REFINED",
+        "strict_self_ccd": "NOT_AVAILABLE"
+      },
+      "post_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.00025\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+      "post_ruckig_validation_status": "PASS",
+      "pre_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.00025\\strict_replay\\moveit_waypoint_joint_trajectory.csv",
+      "quality_metrics": {
+        "metrics": {
+          "fk_normal_error_max_deg": "1.006328071257072",
+          "fk_normal_error_mean_deg": "0.40457192568869077",
+          "fk_path_deviation_max_mm": "0.14126918172561212",
+          "fk_path_deviation_p95_mm": "0.028219554641211297",
+          "fk_standoff_error_max_abs_mm": "0.10550011330623388",
+          "fk_tcp_speed_mean_m_s": "0.0030053576040927643",
+          "fk_tcp_speed_p05_m_s": "0.002999999999594043",
+          "fk_tcp_speed_p05_p95_fluctuation": "2.7571014535035565e-10",
+          "fk_tcp_speed_p95_m_s": "0.0030000000004226507",
+          "joint_continuity_status": "pass",
+          "max_ik_joint_step_deg": "20.0",
+          "max_joint_step_deg": "13.26146098456397",
+          "max_joint_step_from_deg": "-103.57382687457516",
+          "max_joint_step_from_index": "15",
+          "max_joint_step_joint": "j2",
+          "max_joint_step_raw_deg": "13.261460984563957",
+          "max_joint_step_raw_from_index": "15",
+          "max_joint_step_raw_joint": "j2",
+          "max_joint_step_raw_to_index": "16",
+          "max_joint_step_to_deg": "-90.3123658900112",
+          "max_joint_step_to_index": "16",
+          "moveit_ee_link": "spray_tcp_link",
+          "moveit_ruckig_smoothing_used": "true",
+          "moveit_time_parameterization": "tcp_arclength",
+          "production_joint_step_limit_deg": "20.0",
+          "stand_off_m": "0.26",
+          "status": "pass",
+          "tcp_points_to_wall": "true",
+          "tool_tcp_calibration_method": "virtual_design_parameter",
+          "tool_tcp_measured_by": "simulation",
+          "tool_tcp_measured_date": "not_applicable_offline",
+          "tool_tcp_rpy": "0 0 0",
+          "tool_tcp_source": "assumed_150mm_placeholder",
+          "tool_tcp_xyz": "0.000 0.000 0.150"
+        },
+        "status": "AVAILABLE"
+      },
+      "secondary_gain": 0.00025,
+      "solver": "B1",
+      "solver_pressure_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.00025\\solver_pressure.csv",
+      "solver_pressure_wp80_95": {
+        "accepted_secondary_step_count": 789,
+        "joint6_clip_activations": 0,
+        "max_preprojection_j6_buffer_boundary_excess_rad": 0.0,
+        "max_preprojection_j6_hard_upper_excess_rad": 0.0,
+        "max_primary_task_contribution_norm": 0.08741618164636554,
+        "max_secondary_objective_contribution_norm": 5.66784985355531e-06,
+        "record_count": 797,
+        "waypoint_of_max_buffer_boundary_excess": 80,
+        "waypoint_of_max_hard_upper_excess": 80,
+        "wp86_87_joint6_clip_activations": 0,
+        "wp86_87_record_count": 109
+      },
+      "strict_audit_status": "PASS",
+      "strict_metrics": {
+        "audit_status": "pass",
+        "collision_checked_state_count": 936.0,
+        "collision_count": 0.0,
+        "max_fk_path_error_mm": 0.14126918172561212,
+        "max_joint_step_deg": 13.26146098456397,
+        "max_normal_error_deg": 1.006328071257072,
+        "ruckig_used": true,
+        "time_parameterization": "tcp_arclength"
+      },
+      "strict_runner_exit_code": 0,
+      "trajectory_metrics": {
+        "post_ruckig_min_j6_upper_slack_rad": 2.811699233033364,
+        "post_ruckig_min_joint_margin_rad": 0.21979470409816537,
+        "pre_ruckig_min_j6_upper_slack_rad": 2.811699233033364,
+        "pre_ruckig_min_j6_upper_slack_waypoint": 2,
+        "pre_ruckig_min_joint_margin_rad": 0.21979470409816537,
+        "pre_ruckig_min_joint_margin_waypoint": 159,
+        "waypoint_count": 181
+      },
+      "variant_id": "B1_gain_0.00025"
+    },
+    {
+      "buffer_rad": 0.0001,
+      "collision_metrics": {
+        "metrics": {
+          "collision_checked_state_count": "936.0",
+          "collision_count": "0.0",
+          "collision_environment_object_count": "181.0",
+          "collision_interpolation_step_deg": "0.5",
+          "first_collision_contact_count": "0.0",
+          "first_collision_index": "-1.0",
+          "first_collision_summary": "none",
+          "first_collision_trajectory_segment": "-1.0",
+          "include_bottom_closure_collision": "not_applicable_open_path",
+          "include_tunnel_floor_collision": "true",
+          "open_path": "true",
+          "status": "pass",
+          "trajectory_waypoint_count": "181.0",
+          "tunnel_floor_z": "-0.2"
+        },
+        "status": "AVAILABLE"
+      },
+      "dynamics_metrics": {
+        "joints": {
+          "j1": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.007900704262319043",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00015881383393269539",
+            "max_acceleration": "0.005530492983623329",
+            "max_jerk": "0.001270510671461563",
+            "max_velocity": "0.04373752579850229",
+            "p95_jerk": "0.00026813982163647585",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.013884928824921363"
+          },
+          "j2": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.001916501829134112",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "3.855384235122127e-05",
+            "max_acceleration": "0.0013415512803938783",
+            "max_jerk": "0.00030843073880977014",
+            "max_velocity": "0.013057079375568548",
+            "p95_jerk": "0.00013508077566540388",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.004145104563672555"
+          },
+          "j3": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0024304862634635573",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "6.071432933410792e-05",
+            "max_acceleration": "0.00170134038442449",
+            "max_jerk": "0.00048571463467286336",
+            "max_velocity": "0.012859559654563368",
+            "p95_jerk": "0.0001676918205152459",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0040823998903375775"
+          },
+          "j4": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.009575083382263374",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.0002321746891041544",
+            "max_acceleration": "0.006702558367584361",
+            "max_jerk": "0.0018573975128332353",
+            "max_velocity": "0.05254754300214191",
+            "p95_jerk": "0.0005700667271465714",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.016421107188169345"
+          },
+          "j5": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.003503524432268827",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "9.195150392276171e-05",
+            "max_acceleration": "0.0024524671025881787",
+            "max_jerk": "0.0007356120313820937",
+            "max_velocity": "0.025171153803755036",
+            "p95_jerk": "0.00014539592313865578",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.007865985563673449"
+          },
+          "j6": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "5.451735452117312e-05",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "2.519995933596162e-06",
+            "max_acceleration": "3.816214816482118e-05",
+            "max_jerk": "2.0159967468769297e-05",
+            "max_velocity": "0.0006348248644273413",
+            "p95_jerk": "4.296681442237828e-06",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.00019838277013354416"
+          }
+        },
+        "status": "AVAILABLE"
+      },
+      "fd_consistency_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.0005\\process_jacobian_fd.json",
+      "j6_margin_improvement_ratio_vs_A0": 28020.672995131143,
+      "output_directory": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.0005",
+      "p2a_j6_positive": {
+        "axis_id": "joint:j6:positive",
+        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "collision_method": "adaptive_discrete_interpolation",
+        "estimated_raw_axis_margin": {
+          "units": "rad",
+          "value": 2.811699405860896
+        },
+        "failure_intervals": [
+          {
+            "first_magnitude": 2.8556320335495102,
+            "last_magnitude": 2.8556320335495102,
+            "sample_count": 1
+          }
+        ],
+        "first_failing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0015__2.8116997462787623",
+          "critical_segment": null,
+          "critical_waypoint": 0,
+          "dominant_failure_mode": "JOINT_LIMIT_FAILURE",
+          "evaluator_capabilities": {
+            "joint_limits": "AVAILABLE"
+          },
+          "evidence": {
+            "joint_index_zero_based": 5,
+            "joint_name": "j6",
+            "lower_rad": -3.0543,
+            "q_rad": 3.054300513233093,
+            "state_was_clipped": false,
+            "upper_rad": 3.0543
+          },
+          "failure_margin": {
+            "joint_limit_violation_rad": 5.132330929136231e-07
+          },
+          "failure_modes": [
+            "JOINT_LIMIT_FAILURE"
+          ],
+          "magnitude": 2.8116997462787623,
+          "nominal_margin": {},
+          "realized_perturbation": {
+            "max_abs_error_from_request": 0.0,
+            "maximum_signed_value": 2.8116997462787623,
+            "minimum_signed_value": 2.8116997462787623,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 2.8116997462787623
+          },
+          "status": "FAIL"
+        },
+        "last_passing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0011__2.8116990654430301",
+          "critical_segment": null,
+          "critical_waypoint": null,
+          "dominant_failure_mode": null,
+          "evaluator_capabilities": {
+            "calibrated_tcp_uncertainty": "NOT_AVAILABLE",
+            "coating_thickness_or_deposition_physics": "NOT_AVAILABLE",
+            "fcl_environment_and_self_distance": "AVAILABLE",
+            "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "joint_limits": "AVAILABLE",
+            "moveit2_fk": "AVAILABLE",
+            "moveit2_planning_scene": "AVAILABLE",
+            "native_robot_world_two_state_query": "AVAILABLE",
+            "physical_singularity_threshold": "UNKNOWN",
+            "physical_torque": "NOT_AVAILABLE",
+            "robot_world_collision": "AVAILABLE",
+            "self_collision_adaptive_discrete_interpolation": "AVAILABLE",
+            "stand_off_surface_projection": "NOT_AVAILABLE",
+            "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
+            "transition_collision_adaptive_discrete_interpolation": "AVAILABLE"
+          },
+          "evidence": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "collision_method": "adaptive_discrete_interpolation",
+            "derivative_method": "D46 finite_derivatives on frozen D41 timestamps; audit-only perturbation evaluation",
+            "dynamic_limit_provenance": "project configuration; not vendor certified",
+            "first_adaptive_self_collision_segment": null,
+            "first_adaptive_world_collision_segment": null,
+            "first_two_state_world_collision_segment": null,
+            "full_quaternion_difference_max_rad_diagnostic_only": 2.8116990654430314,
+            "full_quaternion_difference_terminal_rad_diagnostic_only": 2.81169906544303,
+            "jacobian_is_diagnostic_not_an_unsafe_classification": true,
+            "joint_limit_margin_min_rad": 1.6759033405477908e-07,
+            "max_acceleration_ratio": 0.009575083377793142,
+            "max_jerk_ratio": 0.00020813043972506336,
+            "max_joint_step_rad": 0.23145615780540996,
+            "max_spray_axis_normal_error_rad": 0.017563922298969043,
+            "max_spray_axis_normal_error_waypoint": 171,
+            "max_tcp_path_error_m": 1.2412670766236366e-16,
+            "max_tcp_path_error_waypoint": 125,
+            "max_velocity_ratio": 0.016421107189154592,
+            "maximum_jacobian_condition_number": 15559753.072331803,
+            "minimum_environment_clearance_m": 0.08850687315204224,
+            "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+            "minimum_environment_clearance_waypoint": 85,
+            "minimum_jacobian_sigma": 1.1943856903082854e-07,
+            "minimum_jacobian_sigma_waypoint": 90,
+            "minimum_self_clearance_m": 0.016622079818704668,
+            "minimum_self_clearance_pair": "wrist2_link|forearm_link",
+            "minimum_self_clearance_waypoint": 88,
+            "native_case_id": "p2a_006_00000",
+            "native_two_state_robot_world_query": {
+              "available": true,
+              "collision_count": 0,
+              "interpretation": "reported as a separate MoveIt2 endpoint-pair diagnostic; not promoted to strict global CCD"
+            },
+            "native_waypoint_self_collision_count": 0,
+            "native_waypoint_world_collision_count": 0,
+            "orientation_failure_gate": "MoveIt2 FK spray_tcp_link +Z versus frozen D41 wall normal; tool-axis roll is not counted as spray-normal error",
+            "process_quality_certified": false,
+            "terminal_position_error_m": 0.0,
+            "terminal_spray_axis_normal_error_rad": 0.016220968058574932
+          },
+          "failure_margin": {},
+          "failure_modes": [],
+          "magnitude": 2.81169906544303,
+          "nominal_margin": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "configured_acceleration_margin_rad_s2": 0.6932974416355447,
+            "configured_jerk_margin_rad_s3": 7.998334956482199,
+            "configured_velocity_margin_rad_s": 3.106262474200227,
+            "environment_clearance_diagnostic_m": 0.08850687315204224,
+            "minimum_joint_limit_margin_rad": 0.21979470409816537,
+            "self_clearance_diagnostic_m": 0.016622079818704668,
+            "spray_axis_normal_gate_margin_rad": 0.15696900290046384,
+            "tcp_path_error_gate_margin_m": 0.006,
+            "terminal_position_gate_margin_m": 0.004
+          },
+          "realized_perturbation": {
+            "max_abs_error_from_request": 4.440892098500626e-16,
+            "maximum_signed_value": 2.8116990654430305,
+            "minimum_signed_value": 2.8116990654430296,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 2.81169906544303
+          },
+          "status": "PASS"
+        },
+        "method_source": "src/p2a_axiswise_robustness.py:scan_axes_batched + _D41BatchEvaluator, fresh source-built MoveIt2 D41/FK",
+        "monotonicity_observation": "LOCAL_MONOTONIC_AT_COARSE_SAMPLING_RESOLUTION",
+        "native_batches": 7,
+        "refined_boundary_estimate": {
+          "units": "rad",
+          "value": 2.811699405860896
+        },
+        "scan_case_count": 81,
+        "search_completeness": "LOCAL_BRACKET_REFINED",
+        "strict_self_ccd": "NOT_AVAILABLE"
+      },
+      "post_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.0005\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+      "post_ruckig_validation_status": "PASS",
+      "pre_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.0005\\strict_replay\\moveit_waypoint_joint_trajectory.csv",
+      "quality_metrics": {
+        "metrics": {
+          "fk_normal_error_max_deg": "1.006328071257072",
+          "fk_normal_error_mean_deg": "0.4045719256886756",
+          "fk_path_deviation_max_mm": "0.14126918172561212",
+          "fk_path_deviation_p95_mm": "0.028219554641211297",
+          "fk_standoff_error_max_abs_mm": "0.10550011330623388",
+          "fk_tcp_speed_mean_m_s": "0.0030053576040927643",
+          "fk_tcp_speed_p05_m_s": "0.002999999999594043",
+          "fk_tcp_speed_p05_p95_fluctuation": "2.7571014535035565e-10",
+          "fk_tcp_speed_p95_m_s": "0.0030000000004226507",
+          "joint_continuity_status": "pass",
+          "max_ik_joint_step_deg": "20.0",
+          "max_joint_step_deg": "13.26146098456397",
+          "max_joint_step_from_deg": "-103.57382687457516",
+          "max_joint_step_from_index": "15",
+          "max_joint_step_joint": "j2",
+          "max_joint_step_raw_deg": "13.261460984563957",
+          "max_joint_step_raw_from_index": "15",
+          "max_joint_step_raw_joint": "j2",
+          "max_joint_step_raw_to_index": "16",
+          "max_joint_step_to_deg": "-90.3123658900112",
+          "max_joint_step_to_index": "16",
+          "moveit_ee_link": "spray_tcp_link",
+          "moveit_ruckig_smoothing_used": "true",
+          "moveit_time_parameterization": "tcp_arclength",
+          "production_joint_step_limit_deg": "20.0",
+          "stand_off_m": "0.26",
+          "status": "pass",
+          "tcp_points_to_wall": "true",
+          "tool_tcp_calibration_method": "virtual_design_parameter",
+          "tool_tcp_measured_by": "simulation",
+          "tool_tcp_measured_date": "not_applicable_offline",
+          "tool_tcp_rpy": "0 0 0",
+          "tool_tcp_source": "assumed_150mm_placeholder",
+          "tool_tcp_xyz": "0.000 0.000 0.150"
+        },
+        "status": "AVAILABLE"
+      },
+      "secondary_gain": 0.0005,
+      "solver": "B1",
+      "solver_pressure_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.0005\\solver_pressure.csv",
+      "solver_pressure_wp80_95": {
+        "accepted_secondary_step_count": 789,
+        "joint6_clip_activations": 0,
+        "max_preprojection_j6_buffer_boundary_excess_rad": 0.0,
+        "max_preprojection_j6_hard_upper_excess_rad": 0.0,
+        "max_primary_task_contribution_norm": 0.08741618164636554,
+        "max_secondary_objective_contribution_norm": 9.88226005995523e-06,
+        "record_count": 797,
+        "waypoint_of_max_buffer_boundary_excess": 80,
+        "waypoint_of_max_hard_upper_excess": 80,
+        "wp86_87_joint6_clip_activations": 0,
+        "wp86_87_record_count": 109
+      },
+      "strict_audit_status": "PASS",
+      "strict_metrics": {
+        "audit_status": "pass",
+        "collision_checked_state_count": 936.0,
+        "collision_count": 0.0,
+        "max_fk_path_error_mm": 0.14126918172561212,
+        "max_joint_step_deg": 13.26146098456397,
+        "max_normal_error_deg": 1.006328071257072,
+        "ruckig_used": true,
+        "time_parameterization": "tcp_arclength"
+      },
+      "strict_runner_exit_code": 0,
+      "trajectory_metrics": {
+        "post_ruckig_min_j6_upper_slack_rad": 2.811699233033364,
+        "post_ruckig_min_joint_margin_rad": 0.21979470409816537,
+        "pre_ruckig_min_j6_upper_slack_rad": 2.811699233033364,
+        "pre_ruckig_min_j6_upper_slack_waypoint": 2,
+        "pre_ruckig_min_joint_margin_rad": 0.21979470409816537,
+        "pre_ruckig_min_joint_margin_waypoint": 159,
+        "waypoint_count": 181
+      },
+      "variant_id": "B1_gain_0.0005"
+    },
+    {
+      "buffer_rad": 0.0001,
+      "collision_metrics": {
+        "metrics": {
+          "collision_checked_state_count": "936.0",
+          "collision_count": "0.0",
+          "collision_environment_object_count": "181.0",
+          "collision_interpolation_step_deg": "0.5",
+          "first_collision_contact_count": "0.0",
+          "first_collision_index": "-1.0",
+          "first_collision_summary": "none",
+          "first_collision_trajectory_segment": "-1.0",
+          "include_bottom_closure_collision": "not_applicable_open_path",
+          "include_tunnel_floor_collision": "true",
+          "open_path": "true",
+          "status": "pass",
+          "trajectory_waypoint_count": "181.0",
+          "tunnel_floor_z": "-0.2"
+        },
+        "status": "AVAILABLE"
+      },
+      "dynamics_metrics": {
+        "joints": {
+          "j1": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.00790070426231893",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.00015881383393269663",
+            "max_acceleration": "0.00553049298362325",
+            "max_jerk": "0.001270510671461573",
+            "max_velocity": "0.04373752579850229",
+            "p95_jerk": "0.00026813982163645633",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.013884928824921363"
+          },
+          "j2": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0019165018291341454",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "3.855384235122297e-05",
+            "max_acceleration": "0.0013415512803939017",
+            "max_jerk": "0.00030843073880978375",
+            "max_velocity": "0.013057079375568548",
+            "p95_jerk": "0.00013508077566540388",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.004145104563672555"
+          },
+          "j3": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.0024304862634635573",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "6.071432933410792e-05",
+            "max_acceleration": "0.00170134038442449",
+            "max_jerk": "0.00048571463467286336",
+            "max_velocity": "0.012859559654563368",
+            "p95_jerk": "0.0001676918205152459",
+            "velocity_limit": "3.15",
+            "velocity_ratio": "0.0040823998903375775"
+          },
+          "j4": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.009575083382263374",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "0.0002321746891041544",
+            "max_acceleration": "0.006702558367584361",
+            "max_jerk": "0.0018573975128332353",
+            "max_velocity": "0.05254754300214191",
+            "p95_jerk": "0.0005700667271465714",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.016421107188169345"
+          },
+          "j5": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "0.003503524432268827",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "9.195150392276171e-05",
+            "max_acceleration": "0.0024524671025881787",
+            "max_jerk": "0.0007356120313820937",
+            "max_velocity": "0.025171153803755036",
+            "p95_jerk": "0.00014539592313865578",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.007865985563673449"
+          },
+          "j6": {
+            "acceleration_limit": "0.7",
+            "acceleration_ratio": "9.92746079509548e-05",
+            "jerk_limit": "8.0",
+            "jerk_ratio": "5.167618802598777e-06",
+            "max_acceleration": "6.949222556566835e-05",
+            "max_jerk": "4.134095042079021e-05",
+            "max_velocity": "0.0012591631485401877",
+            "p95_jerk": "5.640977855031035e-06",
+            "velocity_limit": "3.2",
+            "velocity_ratio": "0.00039348848391880867"
+          }
+        },
+        "status": "AVAILABLE"
+      },
+      "fd_consistency_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.001\\process_jacobian_fd.json",
+      "j6_margin_improvement_ratio_vs_A0": 28020.672995131143,
+      "output_directory": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.001",
+      "p2a_j6_positive": {
+        "axis_id": "joint:j6:positive",
+        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "collision_method": "adaptive_discrete_interpolation",
+        "estimated_raw_axis_margin": {
+          "units": "rad",
+          "value": 2.811699405860896
+        },
+        "failure_intervals": [
+          {
+            "first_magnitude": 2.8556320335495102,
+            "last_magnitude": 2.8556320335495102,
+            "sample_count": 1
+          }
+        ],
+        "first_failing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0015__2.8116997462787623",
+          "critical_segment": null,
+          "critical_waypoint": 0,
+          "dominant_failure_mode": "JOINT_LIMIT_FAILURE",
+          "evaluator_capabilities": {
+            "joint_limits": "AVAILABLE"
+          },
+          "evidence": {
+            "joint_index_zero_based": 5,
+            "joint_name": "j6",
+            "lower_rad": -3.0543,
+            "q_rad": 3.054300513233093,
+            "state_was_clipped": false,
+            "upper_rad": 3.0543
+          },
+          "failure_margin": {
+            "joint_limit_violation_rad": 5.132330929136231e-07
+          },
+          "failure_modes": [
+            "JOINT_LIMIT_FAILURE"
+          ],
+          "magnitude": 2.8116997462787623,
+          "nominal_margin": {},
+          "realized_perturbation": {
+            "max_abs_error_from_request": 0.0,
+            "maximum_signed_value": 2.8116997462787623,
+            "minimum_signed_value": 2.8116997462787623,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 2.8116997462787623
+          },
+          "status": "FAIL"
+        },
+        "last_passing_perturbation": {
+          "candidate_id": "joint_j6_positive__refinement__0011__2.8116990654430301",
+          "critical_segment": null,
+          "critical_waypoint": null,
+          "dominant_failure_mode": null,
+          "evaluator_capabilities": {
+            "calibrated_tcp_uncertainty": "NOT_AVAILABLE",
+            "coating_thickness_or_deposition_physics": "NOT_AVAILABLE",
+            "fcl_environment_and_self_distance": "AVAILABLE",
+            "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "joint_limits": "AVAILABLE",
+            "moveit2_fk": "AVAILABLE",
+            "moveit2_planning_scene": "AVAILABLE",
+            "native_robot_world_two_state_query": "AVAILABLE",
+            "physical_singularity_threshold": "UNKNOWN",
+            "physical_torque": "NOT_AVAILABLE",
+            "robot_world_collision": "AVAILABLE",
+            "self_collision_adaptive_discrete_interpolation": "AVAILABLE",
+            "stand_off_surface_projection": "NOT_AVAILABLE",
+            "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
+            "transition_collision_adaptive_discrete_interpolation": "AVAILABLE"
+          },
+          "evidence": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "collision_method": "adaptive_discrete_interpolation",
+            "derivative_method": "D46 finite_derivatives on frozen D41 timestamps; audit-only perturbation evaluation",
+            "dynamic_limit_provenance": "project configuration; not vendor certified",
+            "first_adaptive_self_collision_segment": null,
+            "first_adaptive_world_collision_segment": null,
+            "first_two_state_world_collision_segment": null,
+            "full_quaternion_difference_max_rad_diagnostic_only": 2.8116990654430314,
+            "full_quaternion_difference_terminal_rad_diagnostic_only": 2.81169906544303,
+            "jacobian_is_diagnostic_not_an_unsafe_classification": true,
+            "joint_limit_margin_min_rad": 1.6759033405477908e-07,
+            "max_acceleration_ratio": 0.009575083377793142,
+            "max_jerk_ratio": 0.00020813043972506336,
+            "max_joint_step_rad": 0.23145615780540996,
+            "max_spray_axis_normal_error_rad": 0.017563922298969265,
+            "max_spray_axis_normal_error_waypoint": 171,
+            "max_tcp_path_error_m": 1.1188630228279524e-16,
+            "max_tcp_path_error_waypoint": 98,
+            "max_velocity_ratio": 0.016421107189154592,
+            "maximum_jacobian_condition_number": 15559753.073857594,
+            "minimum_environment_clearance_m": 0.08850687315204224,
+            "minimum_environment_clearance_pair": "upperarm_link|horseshoe_wall_25",
+            "minimum_environment_clearance_waypoint": 85,
+            "minimum_jacobian_sigma": 1.1943856901911644e-07,
+            "minimum_jacobian_sigma_waypoint": 90,
+            "minimum_self_clearance_m": 0.016622079818704713,
+            "minimum_self_clearance_pair": "wrist2_link|forearm_link",
+            "minimum_self_clearance_waypoint": 88,
+            "native_case_id": "p2a_006_00000",
+            "native_two_state_robot_world_query": {
+              "available": true,
+              "collision_count": 0,
+              "interpretation": "reported as a separate MoveIt2 endpoint-pair diagnostic; not promoted to strict global CCD"
+            },
+            "native_waypoint_self_collision_count": 0,
+            "native_waypoint_world_collision_count": 0,
+            "orientation_failure_gate": "MoveIt2 FK spray_tcp_link +Z versus frozen D41 wall normal; tool-axis roll is not counted as spray-normal error",
+            "process_quality_certified": false,
+            "terminal_position_error_m": 0.0,
+            "terminal_spray_axis_normal_error_rad": 0.01622096805857482
+          },
+          "failure_margin": {},
+          "failure_modes": [],
+          "magnitude": 2.81169906544303,
+          "nominal_margin": {
+            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            "configured_acceleration_margin_rad_s2": 0.6932974416355447,
+            "configured_jerk_margin_rad_s3": 7.998334956482199,
+            "configured_velocity_margin_rad_s": 3.106262474200227,
+            "environment_clearance_diagnostic_m": 0.08850687315204224,
+            "minimum_joint_limit_margin_rad": 0.21979470409816537,
+            "self_clearance_diagnostic_m": 0.016622079818704713,
+            "spray_axis_normal_gate_margin_rad": 0.15696900290046356,
+            "tcp_path_error_gate_margin_m": 0.006,
+            "terminal_position_gate_margin_m": 0.004
+          },
+          "realized_perturbation": {
+            "max_abs_error_from_request": 4.440892098500626e-16,
+            "maximum_signed_value": 2.8116990654430305,
+            "minimum_signed_value": 2.8116990654430296,
+            "request_match": "YES",
+            "status": "APPLIED",
+            "units": "rad"
+          },
+          "requested_perturbation": {
+            "units": "rad",
+            "value": 2.81169906544303
+          },
+          "status": "PASS"
+        },
+        "method_source": "src/p2a_axiswise_robustness.py:scan_axes_batched + _D41BatchEvaluator, fresh source-built MoveIt2 D41/FK",
+        "monotonicity_observation": "LOCAL_MONOTONIC_AT_COARSE_SAMPLING_RESOLUTION",
+        "native_batches": 7,
+        "refined_boundary_estimate": {
+          "units": "rad",
+          "value": 2.811699405860896
+        },
+        "scan_case_count": 81,
+        "search_completeness": "LOCAL_BRACKET_REFINED",
+        "strict_self_ccd": "NOT_AVAILABLE"
+      },
+      "post_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.001\\strict_replay\\moveit_smoothed_joint_trajectory.csv",
+      "post_ruckig_validation_status": "PASS",
+      "pre_ruckig_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.001\\strict_replay\\moveit_waypoint_joint_trajectory.csv",
+      "quality_metrics": {
+        "metrics": {
+          "fk_normal_error_max_deg": "1.006328071257072",
+          "fk_normal_error_mean_deg": "0.40457192568867206",
+          "fk_path_deviation_max_mm": "0.14126918172561212",
+          "fk_path_deviation_p95_mm": "0.028219554641211297",
+          "fk_standoff_error_max_abs_mm": "0.10550011330623388",
+          "fk_tcp_speed_mean_m_s": "0.0030053576040927643",
+          "fk_tcp_speed_p05_m_s": "0.002999999999594043",
+          "fk_tcp_speed_p05_p95_fluctuation": "2.7571014535035565e-10",
+          "fk_tcp_speed_p95_m_s": "0.0030000000004226507",
+          "joint_continuity_status": "pass",
+          "max_ik_joint_step_deg": "20.0",
+          "max_joint_step_deg": "13.26146098456397",
+          "max_joint_step_from_deg": "-103.57382687457516",
+          "max_joint_step_from_index": "15",
+          "max_joint_step_joint": "j2",
+          "max_joint_step_raw_deg": "13.261460984563957",
+          "max_joint_step_raw_from_index": "15",
+          "max_joint_step_raw_joint": "j2",
+          "max_joint_step_raw_to_index": "16",
+          "max_joint_step_to_deg": "-90.3123658900112",
+          "max_joint_step_to_index": "16",
+          "moveit_ee_link": "spray_tcp_link",
+          "moveit_ruckig_smoothing_used": "true",
+          "moveit_time_parameterization": "tcp_arclength",
+          "production_joint_step_limit_deg": "20.0",
+          "stand_off_m": "0.26",
+          "status": "pass",
+          "tcp_points_to_wall": "true",
+          "tool_tcp_calibration_method": "virtual_design_parameter",
+          "tool_tcp_measured_by": "simulation",
+          "tool_tcp_measured_date": "not_applicable_offline",
+          "tool_tcp_rpy": "0 0 0",
+          "tool_tcp_source": "assumed_150mm_placeholder",
+          "tool_tcp_xyz": "0.000 0.000 0.150"
+        },
+        "status": "AVAILABLE"
+      },
+      "secondary_gain": 0.001,
+      "solver": "B1",
+      "solver_pressure_path": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\variants\\B1_gain_0.001\\solver_pressure.csv",
+      "solver_pressure_wp80_95": {
+        "accepted_secondary_step_count": 789,
+        "joint6_clip_activations": 0,
+        "max_preprojection_j6_buffer_boundary_excess_rad": 0.0,
+        "max_preprojection_j6_hard_upper_excess_rad": 0.0,
+        "max_primary_task_contribution_norm": 0.08741618164636554,
+        "max_secondary_objective_contribution_norm": 1.5020949109936045e-05,
+        "record_count": 797,
+        "waypoint_of_max_buffer_boundary_excess": 80,
+        "waypoint_of_max_hard_upper_excess": 80,
+        "wp86_87_joint6_clip_activations": 0,
+        "wp86_87_record_count": 109
+      },
+      "strict_audit_status": "PASS",
+      "strict_metrics": {
+        "audit_status": "pass",
+        "collision_checked_state_count": 936.0,
+        "collision_count": 0.0,
+        "max_fk_path_error_mm": 0.14126918172561212,
+        "max_joint_step_deg": 13.26146098456397,
+        "max_normal_error_deg": 1.006328071257072,
+        "ruckig_used": true,
+        "time_parameterization": "tcp_arclength"
+      },
+      "strict_runner_exit_code": 0,
+      "trajectory_metrics": {
+        "post_ruckig_min_j6_upper_slack_rad": 2.811699233033364,
+        "post_ruckig_min_joint_margin_rad": 0.21979470409816537,
+        "pre_ruckig_min_j6_upper_slack_rad": 2.811699233033364,
+        "pre_ruckig_min_j6_upper_slack_waypoint": 2,
+        "pre_ruckig_min_joint_margin_rad": 0.21979470409816537,
+        "pre_ruckig_min_joint_margin_waypoint": 159,
+        "waypoint_count": 181
+      },
+      "variant_id": "B1_gain_0.001"
+    }
+  ]
+}
