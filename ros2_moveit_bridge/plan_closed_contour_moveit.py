@@ -33,6 +33,18 @@ from moveit.core.collision_detection import CollisionResult
 from moveit.planning import MoveItPy
 from shape_msgs.msg import SolidPrimitive
 from trajectory_msgs.msg import JointTrajectoryPoint
+from p2b1_solver_policy_ablation import (
+    append_pressure_record as _append_p2b1_pressure_record,
+    dls_primary_command as _p2b1_dls_primary_command,
+    joint_centering_objective as _p2b1_joint_centering_objective,
+    nullspace_metrics as _p2b1_nullspace_metrics,
+    process_jacobian as _p2b1_process_jacobian,
+    process_residual as _p2b1_process_residual,
+    project_joint_limits as _p2b1_project_joint_limits,
+    secondary_command as _p2b1_secondary_command,
+    tangent_bases as _p2b1_tangent_bases,
+    weighted_task as _p2b1_weighted_task,
+)
 
 
 def _configured_jerk_limits() -> dict[str, float]:
@@ -44,6 +56,86 @@ def _configured_jerk_limits() -> dict[str, float]:
         for joint_name, joint_config in data.get("joint_limits", {}).items()
         if joint_config.get("has_jerk_limits", False)
     }
+
+
+def validate_p2b1_moveit_fd_consistency(
+    moveit, group_name: str, ee_link: str, target_poses: list[Pose], target_normals: np.ndarray,
+    frozen_q_csv: str | Path, output_json: str | Path,
+) -> dict[str, object]:
+    """Finite-difference the five process residuals at frozen D41 states."""
+    q_columns = [f"j{index}_q" for index in range(1, 7)]
+    with Path(frozen_q_csv).open(newline="", encoding="utf-8-sig") as stream:
+        rows = list(csv.DictReader(stream))
+    if len(rows) != len(target_poses) or len(rows) != len(target_normals):
+        raise RuntimeError("p2b1_fd_frozen_waypoint_count_mismatch")
+    frozen_q = np.asarray([[float(row[name]) for name in q_columns] for row in rows], dtype=np.float64)
+    if frozen_q.shape != (len(target_poses), 6) or not np.isfinite(frozen_q).all():
+        raise RuntimeError("p2b1_fd_frozen_joint_matrix_invalid")
+    indices = sorted(set(index for index in (80, 81, 86, 87, 95) if index < len(frozen_q)))
+    if len(indices) < 3:
+        raise RuntimeError("p2b1_fd_requires_multiple_frozen_waypoints")
+    patterns = (
+        np.asarray([1, -1, 1, -1, 1, -1], dtype=np.float64),
+        np.asarray([0, 0, 0, 0, 0, 1], dtype=np.float64),
+        np.asarray([1, 1, -1, -1, 1, 1], dtype=np.float64),
+    )
+    steps = (1.0e-5, 5.0e-5)
+    state = RobotState(moveit.get_robot_model())
+    records: list[dict[str, object]] = []
+    for index in indices:
+        q = frozen_q[index]
+        normal, basis, _angular_basis = _p2b1_tangent_bases(target_normals[index])
+        state.set_joint_group_positions(group_name, q)
+        state.update()
+        transform = _transform_matrix(state.get_global_link_transform(ee_link))
+        jacobian = np.asarray(state.get_jacobian(group_name, ee_link, np.zeros(3, dtype=float), False), dtype=np.float64)
+        if jacobian.shape != (6, 6) or not np.isfinite(jacobian).all():
+            raise RuntimeError(f"p2b1_fd_invalid_moveit_jacobian:index={index}")
+        tool_z = transform[:3, 2] / max(float(np.linalg.norm(transform[:3, 2])), 1e-12)
+        analytic = _p2b1_process_jacobian(jacobian[:3], jacobian[3:], tool_z, normal, basis)
+        target_position = np.asarray([
+            target_poses[index].position.x, target_poses[index].position.y, target_poses[index].position.z,
+        ], dtype=np.float64)
+        baseline_residual = _p2b1_process_residual(transform[:3, 3], target_position, tool_z, normal, basis)
+        for pattern_index, raw_pattern in enumerate(patterns):
+            direction = raw_pattern / np.linalg.norm(raw_pattern)
+            for epsilon in steps:
+                delta_q = direction * epsilon
+                q_plus = q + delta_q
+                state.set_joint_group_positions(group_name, q_plus)
+                state.update()
+                transform_plus = _transform_matrix(state.get_global_link_transform(ee_link))
+                tool_z_plus = transform_plus[:3, 2] / max(float(np.linalg.norm(transform_plus[:3, 2])), 1e-12)
+                residual_plus = _p2b1_process_residual(
+                    transform_plus[:3, 3], target_position, tool_z_plus, normal, basis,
+                )
+                observed = residual_plus - baseline_residual
+                predicted = analytic @ delta_q
+                error = float(np.linalg.norm(observed - predicted))
+                scale = float(np.linalg.norm(delta_q))
+                error_limit = 2.0e-8 + 5.0 * scale * scale
+                records.append({
+                    "waypoint": index, "pattern": pattern_index, "step_rad": epsilon,
+                    "delta_norm_rad": scale, "first_order_prediction_error": error,
+                    "second_order_allowance": 5.0 * scale * scale,
+                    "absolute_error_tolerance": 2.0e-8, "status": "PASS" if error <= error_limit else "FAIL",
+                })
+    result = {
+        "schema": "p2b1-process-jacobian-fd-v1", "status": "PASS" if all(row["status"] == "PASS" for row in records) else "FAIL",
+        "waypoint_indices_zero_based": indices, "perturbation_directions_per_waypoint": len(patterns),
+        "step_sizes_rad": list(steps), "finite_difference_case_count": len(records),
+        "residual": "[p(q)-p_target; B_n^T(z(q)-n)]",
+        "jacobian": "[J_v; -B_n^T[z(q)]x J_omega]",
+        "aligned_state_identity": "U_n=[n]xB_n; lower block equals U_n^T J_omega when z=n",
+        "convention": "MoveIt2 RobotState global-link transform and spatial angular Jacobian; checked numerically",
+        "maximum_first_order_prediction_error": max((float(row["first_order_prediction_error"]) for row in records), default=None),
+        "cases": records,
+    }
+    Path(output_json).parent.mkdir(parents=True, exist_ok=True)
+    Path(output_json).write_text(json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
+    if result["status"] != "PASS":
+        raise RuntimeError("p2b1_process_residual_jacobian_fd_consistency_failed")
+    return result
 
 
 def load_tcp_poses(csv_path: Path) -> list[Pose]:
@@ -1370,6 +1462,219 @@ def build_seed_joint_trajectory(joint_seeds: np.ndarray, joint_names: list[str])
     return result
 
 
+def build_p2b1_process_task_dls_trajectory(
+    moveit,
+    group_name: str,
+    ee_link: str,
+    target_poses: list[Pose],
+    target_normals: np.ndarray,
+    joint_seeds: np.ndarray,
+    joint_names: list[str],
+    *,
+    variant: str,
+    warm_start_rows: int = 16,
+    iterations_per_waypoint: int = 80,
+    damping: float = 1.0e-2,
+    position_weight: float = 100.0,
+    normal_weight: float = 0.1,
+    max_joint_step_rad: float = 0.16,
+    position_tolerance_m: float = 2.0e-5,
+    normal_tolerance_rad: float = 2.0e-4,
+) -> RobotTrajectoryMsg:
+    """P2-B1's exact five-dimensional position-plus-direction task solver."""
+    variant = str(variant).upper()
+    if variant not in {"B0", "B1"}:
+        raise ValueError("P2B1_process_solver_variant_must_be_B0_or_B1")
+    if len(target_poses) != len(target_normals) or len(target_poses) != len(joint_seeds):
+        raise ValueError("p2b1_target_seed_count_mismatch")
+    if len(target_poses) < 2 or len(joint_names) != 6:
+        raise ValueError("p2b1_invalid_trajectory_shape")
+    if warm_start_rows < 1 or warm_start_rows >= len(target_poses):
+        raise ValueError("p2b1_invalid_warm_start_rows")
+    pressure_path = os.environ.get("P2B1_SOLVER_PRESSURE_CSV", "").strip()
+    if not pressure_path:
+        raise RuntimeError("P2B1_SOLVER_PRESSURE_CSV_required_for_candidate_solver")
+    if variant in {"B0", "B1"}:
+        frozen_q_path = os.environ.get("P2B1_FROZEN_D41_Q_CSV", "").strip()
+        fd_json_path = os.environ.get("P2B1_FD_CONSISTENCY_JSON", "").strip()
+        if not frozen_q_path or not fd_json_path:
+            raise RuntimeError("P2B1_process_solver_requires_frozen_D41_FD_inputs_and_output")
+        validate_p2b1_moveit_fd_consistency(
+            moveit, group_name, ee_link, target_poses, target_normals, frozen_q_path, fd_json_path,
+        )
+    case_id = os.environ.get("D41_DLS_CASE_ID", "unspecified").strip() or "unspecified"
+    gain = float(os.environ.get("P2B1_SECONDARY_GAIN", "0")) if variant == "B1" else 0.0
+    if variant == "B1" and (not np.isfinite(gain) or gain <= 0.0):
+        raise RuntimeError("P2B1_B1_requires_positive_global_secondary_gain")
+    try:
+        lower = np.asarray([float(value) for value in os.environ["D41_DLS_LOWER_LIMITS"].split()], dtype=float)
+        upper = np.asarray([float(value) for value in os.environ["D41_DLS_UPPER_LIMITS"].split()], dtype=float)
+        buffer_rad = float(os.environ.get("D41_DLS_LIMIT_BUFFER_RAD", "1.0e-4"))
+    except (KeyError, ValueError) as exc:
+        raise RuntimeError("P2B1_solver_requires_authoritative_joint_limits_and_buffer") from exc
+    if lower.shape != (6,) or upper.shape != (6,) or not np.isfinite(np.r_[lower, upper, buffer_rad]).all():
+        raise RuntimeError("P2B1_invalid_joint_limit_inputs")
+    if np.any(upper - lower <= 2.0 * buffer_rad):
+        raise RuntimeError("P2B1_buffer_collapses_joint_interval")
+
+    state = RobotState(moveit.get_robot_model())
+    output = RobotTrajectoryMsg()
+    output.joint_trajectory.joint_names = joint_names
+    seeds = np.asarray(joint_seeds, dtype=np.float64)
+    if seeds.shape != (len(target_poses), 6) or not np.isfinite(seeds).all():
+        raise ValueError("p2b1_seed_matrix_shape_or_finiteness")
+
+    def target_position(index: int) -> np.ndarray:
+        pose = target_poses[index]
+        return np.asarray([pose.position.x, pose.position.y, pose.position.z], dtype=np.float64)
+
+    def linearize(q: np.ndarray, index: int):
+        state.set_joint_group_positions(group_name, q)
+        state.update()
+        transform = _transform_matrix(state.get_global_link_transform(ee_link))
+        jacobian = np.asarray(state.get_jacobian(group_name, ee_link, np.zeros(3, dtype=float), False), dtype=np.float64)
+        if jacobian.shape != (6, 6) or not np.isfinite(jacobian).all():
+            raise RuntimeError(f"p2b1_invalid_moveit_jacobian:index={index}:shape={jacobian.shape}")
+        normal, basis, angular_basis = _p2b1_tangent_bases(target_normals[index])
+        tool_z = transform[:3, 2] / max(float(np.linalg.norm(transform[:3, 2])), 1e-12)
+        residual = _p2b1_process_residual(transform[:3, 3], target_position(index), tool_z, normal, basis)
+        task_jacobian = _p2b1_process_jacobian(jacobian[:3], jacobian[3:], tool_z, normal, basis)
+        weighted_error, weighted_jacobian = _p2b1_weighted_task(residual, task_jacobian, position_weight, normal_weight)
+        position_norm = float(np.linalg.norm(residual[:3]))
+        normal_angle = float(np.arccos(np.clip(float(np.dot(tool_z, normal)), -1.0, 1.0)))
+        return residual, task_jacobian, weighted_error, weighted_jacobian, position_norm, normal_angle
+
+    def pressure_row(
+        *, index: int, iteration: int, current: np.ndarray, raw_primary: np.ndarray,
+        secondary: np.ndarray, step: np.ndarray, proposal: np.ndarray, projected: np.ndarray,
+        accepted: np.ndarray, alpha: float, clipped_joints: list[int], residual: np.ndarray,
+        weighted_error: np.ndarray, metrics, objective_before: float, objective_after: float,
+        accepted_step: bool,
+    ) -> None:
+        proposed_j6 = float(proposal[5])
+        projected_j6 = float(projected[5])
+        upper_excess = max(0.0, proposed_j6 - float(upper[5]))
+        buffer_boundary_excess = max(0.0, proposed_j6 - float(upper[5] - buffer_rad))
+        _append_p2b1_pressure_record(pressure_path, {
+            "case_id": case_id, "variant": variant, "waypoint": index, "iteration": iteration,
+            "current_q": current.tolist(), "raw_dls_delta": raw_primary.tolist(),
+            "primary_task_contribution": raw_primary.tolist(), "secondary_objective_contribution": secondary.tolist(),
+            "trust_region_delta": step.tolist(), "proposed_q_before_projection": proposal.tolist(),
+            "projected_q": projected.tolist(), "accepted_q": accepted.tolist(), "accepted_alpha": alpha,
+            "projection_triggered": bool(clipped_joints), "projected_joints": clipped_joints,
+            "j6_pre_projection": proposed_j6, "j6_post_projection": projected_j6,
+            "j6_upper_slack_pre": float(upper[5] - proposed_j6),
+            "j6_lower_slack_pre": float(proposed_j6 - lower[5]),
+            "j6_upper_slack_post": float(upper[5] - projected_j6),
+            "j6_lower_slack_post": float(projected_j6 - lower[5]),
+            "max_j6_upper_bound_excess": upper_excess,
+            "max_j6_buffer_boundary_excess": buffer_boundary_excess,
+            "process_residual_norm": float(np.linalg.norm(residual)),
+            "weighted_process_residual_norm": float(np.linalg.norm(weighted_error)),
+            "position_residual_m": residual[:3].tolist(), "normal_residual": residual[3:].tolist(),
+            "primary_task_contribution_norm": float(np.linalg.norm(raw_primary)),
+            "secondary_objective_contribution_norm": float(np.linalg.norm(secondary)),
+            "trust_region_delta_norm": float(np.linalg.norm(step)),
+            "process_jacobian_rank": metrics.rank,
+            "singular_values": metrics.singular_values.tolist(), "nullspace_dimension": metrics.nullity,
+            "j6_nullspace_projection": float(metrics.projector[5, 5]),
+            "secondary_objective_before": objective_before, "secondary_objective_after": objective_after,
+            "line_search_accepted": accepted_step,
+        })
+
+    for row_index, row in enumerate(seeds[:warm_start_rows]):
+        point = JointTrajectoryPoint()
+        point.positions = [float(value) for value in row]
+        point.time_from_start = _duration_from_seconds(0.0)
+        output.joint_trajectory.points.append(point)
+        residual, _task_j, weighted_error, weighted_j, _position_norm, _normal_angle = linearize(row, row_index)
+        metrics = _p2b1_nullspace_metrics(weighted_j)
+        objective, _gradient = _p2b1_joint_centering_objective(row, lower, upper)
+        pressure_row(
+            index=row_index, iteration=-1, current=row, raw_primary=np.zeros(6), secondary=np.zeros(6),
+            step=np.zeros(6), proposal=row, projected=row, accepted=row, alpha=0.0,
+            clipped_joints=[], residual=residual, weighted_error=weighted_error, metrics=metrics,
+            objective_before=objective, objective_after=objective, accepted_step=True,
+        )
+
+    current, _initial_clips = _p2b1_project_joint_limits(seeds[warm_start_rows - 1], lower, upper, buffer_rad)
+    for index in range(warm_start_rows, len(target_poses)):
+        accepted = current.copy()
+        for iteration in range(int(iterations_per_waypoint)):
+            iteration_q = accepted.copy()
+            residual, task_jacobian, weighted_error, weighted_jacobian, position_norm, normal_angle = linearize(accepted, index)
+            metrics = _p2b1_nullspace_metrics(weighted_jacobian)
+            objective_before, _gradient = _p2b1_joint_centering_objective(accepted, lower, upper)
+            primary_converged = position_norm <= float(position_tolerance_m) and normal_angle <= float(normal_tolerance_rad)
+            if primary_converged and variant == "B0":
+                pressure_row(
+                    index=index, iteration=iteration, current=accepted, raw_primary=np.zeros(6), secondary=np.zeros(6),
+                    step=np.zeros(6), proposal=accepted, projected=accepted, accepted=accepted, alpha=0.0,
+                    clipped_joints=[], residual=residual, weighted_error=weighted_error, metrics=metrics,
+                    objective_before=objective_before, objective_after=objective_before, accepted_step=True,
+                )
+                break
+            primary = _p2b1_dls_primary_command(weighted_jacobian, weighted_error, damping)
+            if variant == "B1":
+                secondary, _secondary_norm = _p2b1_secondary_command(accepted, lower, upper, metrics.projector, gain)
+            else:
+                secondary = np.zeros(6, dtype=np.float64)
+            raw_step = primary + secondary
+            step = np.clip(raw_step, -float(max_joint_step_rad), float(max_joint_step_rad))
+            base_cost = float(np.linalg.norm(weighted_error))
+            improved = False
+            accepted_alpha = 0.0
+            proposal_before_projection = accepted.copy()
+            projected_proposal = accepted.copy()
+            clipped_joints: list[int] = []
+            objective_after = objective_before
+            for alpha in (1.0, 0.5, 0.25, 0.125, 0.0625):
+                proposal_before_projection = accepted + float(alpha) * step
+                projected_proposal, clipped_joints = _p2b1_project_joint_limits(
+                    proposal_before_projection, lower, upper, buffer_rad
+                )
+                candidate_residual, _candidate_j, candidate_weighted_error, _candidate_wj, candidate_position_norm, candidate_normal_angle = linearize(projected_proposal, index)
+                candidate_cost = float(np.linalg.norm(candidate_weighted_error))
+                objective_after, _candidate_gradient = _p2b1_joint_centering_objective(projected_proposal, lower, upper)
+                candidate_converged = candidate_position_norm <= float(position_tolerance_m) and candidate_normal_angle <= float(normal_tolerance_rad)
+                task_improved = candidate_cost < base_cost - 1e-12
+                secondary_improved_within_task_tolerance = (
+                    variant == "B1" and primary_converged and candidate_converged
+                    and objective_after < objective_before - 1e-12
+                )
+                if task_improved or secondary_improved_within_task_tolerance:
+                    accepted = projected_proposal.copy()
+                    improved = True
+                    accepted_alpha = float(alpha)
+                    break
+            pressure_row(
+                index=index, iteration=iteration, current=iteration_q,
+                raw_primary=primary, secondary=secondary, step=step,
+                proposal=proposal_before_projection, projected=projected_proposal, accepted=accepted,
+                alpha=accepted_alpha, clipped_joints=clipped_joints, residual=residual,
+                weighted_error=weighted_error, metrics=metrics, objective_before=objective_before,
+                objective_after=objective_after, accepted_step=improved,
+            )
+            if not improved:
+                break
+            if variant == "B1" and iteration + 1 >= int(iterations_per_waypoint):
+                break
+        final_residual, _final_j, _final_error, _final_wj, position_norm, normal_angle = linearize(accepted, index)
+        if position_norm > 4.0e-3 or normal_angle > np.deg2rad(5.0):
+            raise RuntimeError(
+                f"p2b1_process_geometry_residual:index={index}:position_mm={position_norm * 1000.0:.4f}:"
+                f"normal_deg={np.rad2deg(normal_angle):.4f}"
+            )
+        current = accepted.copy()
+        point = JointTrajectoryPoint()
+        point.positions = [float(value) for value in current]
+        point.time_from_start = _duration_from_seconds(0.0)
+        output.joint_trajectory.points.append(point)
+    if len(output.joint_trajectory.points) != len(target_poses):
+        raise RuntimeError("p2b1_output_count_mismatch")
+    return output
+
+
 def build_normal_constrained_dls_trajectory(
     moveit,
     group_name: str,
@@ -1397,6 +1702,19 @@ def build_normal_constrained_dls_trajectory(
     only the previous accepted state thereafter.
     """
 
+    p2b1_variant = os.environ.get("P2B1_DLS_VARIANT", "").strip().upper()
+    if p2b1_variant in {"B0", "B1"}:
+        return build_p2b1_process_task_dls_trajectory(
+            moveit, group_name, ee_link, target_poses, target_normals, joint_seeds, joint_names,
+            variant=p2b1_variant, warm_start_rows=warm_start_rows,
+            iterations_per_waypoint=iterations_per_waypoint, damping=damping,
+            position_weight=position_weight, normal_weight=normal_weight,
+            max_joint_step_rad=max_joint_step_rad, position_tolerance_m=position_tolerance_m,
+            normal_tolerance_rad=normal_tolerance_rad,
+        )
+    if p2b1_variant not in {"", "A0", "A1"}:
+        raise ValueError(f"unsupported_P2B1_DLS_VARIANT:{p2b1_variant}")
+
     if len(target_poses) != len(target_normals) or len(target_poses) != len(joint_seeds):
         raise ValueError("normal_dls_target_seed_count_mismatch")
     if len(target_poses) < 2 or len(joint_names) != 6:
@@ -1407,6 +1725,7 @@ def build_normal_constrained_dls_trajectory(
     output = RobotTrajectoryMsg()
     output.joint_trajectory.joint_names = joint_names
     diagnostics_path = os.environ.get("D41_DLS_DIAGNOSTICS_CSV", "").strip()
+    p2b1_pressure_path = os.environ.get("P2B1_SOLVER_PRESSURE_CSV", "").strip()
     diagnostics_case = os.environ.get("D41_DLS_CASE_ID", "unspecified").strip() or "unspecified"
     d41_limit_aware = os.environ.get("D41_DLS_LIMIT_AWARE", "false").strip().lower() == "true"
     d41_lower_limits = None
@@ -1490,12 +1809,85 @@ def build_normal_constrained_dls_trajectory(
             float(np.linalg.norm(normal_error)),
         )
 
+    def write_original_pressure(
+        index: int, iteration: int, current_q: np.ndarray, raw_delta: np.ndarray,
+        step_delta: np.ndarray, proposal_preprojection: np.ndarray, projected_q: np.ndarray,
+        accepted_q: np.ndarray, alpha: float, clipped_joints: list[int],
+        error: np.ndarray, position_norm: float, normal_norm: float, accepted_step: bool,
+    ) -> None:
+        if not p2b1_pressure_path:
+            return
+        state.set_joint_group_positions(group_name, current_q)
+        state.update()
+        transform = _transform_matrix(state.get_global_link_transform(ee_link))
+        jacobian = np.asarray(state.get_jacobian(group_name, ee_link, np.zeros(3, dtype=float), False), dtype=float)
+        if jacobian.shape != (6, 6) or not np.isfinite(jacobian).all():
+            raise RuntimeError(f"p2b1_original_pressure_invalid_jacobian:index={index}")
+        normal, basis, _angular_basis = _p2b1_tangent_bases(normalized_normal(index))
+        tool_z = transform[:3, 2] / max(float(np.linalg.norm(transform[:3, 2])), 1e-12)
+        task_jacobian = _p2b1_process_jacobian(jacobian[:3], jacobian[3:], tool_z, normal, basis)
+        process_residual = _p2b1_process_residual(
+            transform[:3, 3], target_position(index), tool_z, normal, basis,
+        )
+        weighted_error, weighted_task_jacobian = _p2b1_weighted_task(
+            process_residual, task_jacobian, position_weight, normal_weight,
+        )
+        metrics = _p2b1_nullspace_metrics(weighted_task_jacobian)
+        proposed_j6 = float(proposal_preprojection[5])
+        projected_j6 = float(projected_q[5])
+        objective_before = objective_after = None
+        if d41_lower_limits is not None and d41_upper_limits is not None:
+            objective_before, _ = _p2b1_joint_centering_objective(current_q, d41_lower_limits, d41_upper_limits)
+            objective_after, _ = _p2b1_joint_centering_objective(accepted_q, d41_lower_limits, d41_upper_limits)
+        upper_bound = float(d41_upper_limits[5] - d41_limit_buffer) if d41_upper_limits is not None else None
+        lower_bound = float(d41_lower_limits[5] + d41_limit_buffer) if d41_lower_limits is not None else None
+        _append_p2b1_pressure_record(p2b1_pressure_path, {
+            "case_id": diagnostics_case, "variant": p2b1_variant or "A0", "waypoint": index,
+            "iteration": iteration, "current_q": current_q.tolist(), "raw_dls_delta": raw_delta.tolist(),
+            "primary_task_contribution": raw_delta.tolist(), "secondary_objective_contribution": np.zeros(6).tolist(),
+            "trust_region_delta": step_delta.tolist(), "proposed_q_before_projection": proposal_preprojection.tolist(),
+            "projected_q": projected_q.tolist(), "accepted_q": accepted_q.tolist(), "accepted_alpha": alpha,
+            "projection_triggered": bool(clipped_joints), "projected_joints": clipped_joints,
+            "j6_pre_projection": proposed_j6, "j6_post_projection": projected_j6,
+            "j6_upper_slack_pre": float(d41_upper_limits[5] - proposed_j6) if d41_upper_limits is not None else None,
+            "j6_lower_slack_pre": float(proposed_j6 - d41_lower_limits[5]) if d41_lower_limits is not None else None,
+            "j6_upper_slack_post": float(d41_upper_limits[5] - projected_j6) if d41_upper_limits is not None else None,
+            "j6_lower_slack_post": float(projected_j6 - d41_lower_limits[5]) if d41_lower_limits is not None else None,
+            "max_j6_upper_bound_excess": max(0.0, proposed_j6 - float(d41_upper_limits[5])) if d41_upper_limits is not None else None,
+            "max_j6_buffer_boundary_excess": max(0.0, proposed_j6 - upper_bound) if upper_bound is not None else None,
+            "process_residual_norm": float(np.linalg.norm(process_residual)),
+            "weighted_process_residual_norm": float(np.linalg.norm(weighted_error)),
+            "position_residual_m": (error[:3] / float(position_weight)).tolist(),
+            "normal_residual": (error[3:] / float(normal_weight)).tolist(),
+            "primary_task_contribution_norm": float(np.linalg.norm(raw_delta)),
+            "secondary_objective_contribution_norm": 0.0,
+            "trust_region_delta_norm": float(np.linalg.norm(step_delta)),
+            "process_jacobian_rank": metrics.rank, "singular_values": metrics.singular_values.tolist(),
+            "nullspace_dimension": metrics.nullity, "j6_nullspace_projection": float(metrics.projector[5, 5]),
+            "secondary_objective_before": objective_before, "secondary_objective_after": objective_after,
+            "line_search_accepted": accepted_step,
+        })
+
+    if p2b1_pressure_path:
+        for row_index, row in enumerate(seed_values[:warm_start_rows]):
+            seed_error, seed_position_norm, seed_normal_norm = residual(np.asarray(row, dtype=float), row_index)
+            write_original_pressure(
+                row_index, -1, np.asarray(row, dtype=float), np.zeros(6), np.zeros(6),
+                np.asarray(row, dtype=float), np.asarray(row, dtype=float), np.asarray(row, dtype=float),
+                0.0, [], seed_error, seed_position_norm, seed_normal_norm, True,
+            )
+
     current = enforce_d41_position_limits(np.asarray(seed_values[warm_start_rows - 1], dtype=float).copy())
     for index in range(warm_start_rows, len(target_poses)):
         accepted = current.copy()
         for _iteration in range(int(iterations_per_waypoint)):
+            iteration_q = accepted.copy()
             error, position_norm, normal_norm = residual(accepted, index)
             if position_norm <= float(position_tolerance_m) and normal_norm <= float(normal_tolerance_rad):
+                write_original_pressure(
+                    index, _iteration, accepted, np.zeros(6), np.zeros(6), accepted, accepted, accepted,
+                    0.0, [], error, position_norm, normal_norm, True,
+                )
                 write_diagnostic({
                     "case_id": diagnostics_case, "waypoint": index, "iteration": _iteration,
                     "pre_position_mm": position_norm * 1000.0, "pre_normal_deg": np.rad2deg(normal_norm),
@@ -1534,8 +1926,14 @@ def build_normal_constrained_dls_trajectory(
             accepted_alpha = 0.0
             post_position_norm = position_norm
             post_normal_norm = normal_norm
+            proposal_before_projection = accepted.copy()
+            projected_proposal = accepted.copy()
+            clipped_joints: list[int] = []
             for alpha in (1.0, 0.5, 0.25, 0.125, 0.0625):
-                proposal = enforce_d41_position_limits(accepted + float(alpha) * delta)
+                proposal_before_projection = accepted + float(alpha) * delta
+                proposal = enforce_d41_position_limits(proposal_before_projection)
+                projected_proposal = proposal
+                clipped_joints = np.flatnonzero(np.abs(proposal - proposal_before_projection) > 1e-12).astype(int).tolist()
                 proposal_error, _proposal_position, _proposal_normal = residual(proposal, index)
                 if float(np.linalg.norm(proposal_error)) < base_cost:
                     accepted = proposal
@@ -1544,6 +1942,11 @@ def build_normal_constrained_dls_trajectory(
                     post_position_norm = float(_proposal_position)
                     post_normal_norm = float(_proposal_normal)
                     break
+            write_original_pressure(
+                index, _iteration, iteration_q,
+                unclipped_delta, delta, proposal_before_projection, projected_proposal,
+                accepted, accepted_alpha, clipped_joints, error, position_norm, normal_norm, improved,
+            )
             write_diagnostic({
                 "case_id": diagnostics_case, "waypoint": index, "iteration": _iteration,
                 "pre_position_mm": position_norm * 1000.0, "pre_normal_deg": np.rad2deg(normal_norm),
