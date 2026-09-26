@@ -142,3 +142,25 @@ unavailable or uncertified.
 ## GitHub project scope
 
 The FR5-only source, evidence scope, reproduction boundary, and P2-A provenance note are documented in [docs/GITHUB_PROJECT_SCOPE.md](docs/GITHUB_PROJECT_SCOPE.md).
+
+## P2-B0 — J6 margin attribution and task-constrained sensitivity
+
+`src/p2b0_margin_attribution.py` measures the frozen D41 path and tests local
+process-task null-space retreats over WP80–95. At WP86, nominal J6 slack is
+`0.00010000000000021103 rad`, matching D41's configured `1e-4 rad` buffer;
+P2-A's refined first-failure boundary is `0.00010034375 rad` and is a joint
+limit failure. The tolerance-scaled 5×6 process Jacobian has rank 5 and
+nullity 1 at WP86, with J6 null-space projection `0.9858`.
+
+The 10 mrad local retreat increases WP86 J6 slack to `0.0101 rad` while
+changing TCP position by at most `5.4 µm` and spray-normal angle by at most
+`0.000179°` within the tested window. Joint bounds, continuity, adaptive
+discrete-interpolation collision checks, and project-configured finite-
+difference dynamics pass for the shadow candidate. These results support a
+`SOLVER_POLICY_DOMINATED` local attribution; alternate-buffer full D41
+regeneration and post-Ruckig candidate validation were not run. Strict
+continuous self-collision, clearance acceptance, hardware validation, and
+global robustness remain unavailable or unverified. This is a measured
+pre-Ruckig shadow, not a release-ready trajectory. Focused regression:
+`31 passed`. Full machine-readable evidence is in
+`outputs/p2b0_margin_attribution.json`.
