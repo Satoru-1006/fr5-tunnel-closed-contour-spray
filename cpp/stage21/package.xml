@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>stage21_native_diagnostics</name>
+  <version>0.1.0</version>
+  <description>Native MoveIt2 contact and collision-configuration diagnostics for Stage 2.1.</description>
+  <maintainer email="stage21@example.com">stage21</maintainer>
+  <license>BSD-3-Clause</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>geometry_msgs</depend>
+  <depend>moveit_core</depend>
+  <depend>moveit_msgs</depend>
+  <depend>moveit_ros_planning</depend>
+  <depend>rclcpp</depend>
+  <depend>shape_msgs</depend>
+  <depend>urdf</depend>
+</package>

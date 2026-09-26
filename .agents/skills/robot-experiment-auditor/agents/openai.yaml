@@ -1,0 +1,4 @@
+interface:
+  display_name: "Robot Experiment Auditor"
+  short_description: "Audit baseline and candidate evidence"
+  default_prompt: "Use robot-experiment-auditor for baseline/candidate/champion comparisons, routing checks, reproducibility, and honest status gates."

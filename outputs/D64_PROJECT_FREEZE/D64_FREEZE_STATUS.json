@@ -1,0 +1,158 @@
+{
+  "D64_STATUS": "SOFTWARE_SCOPE_FROZEN_WITH_EXPLICIT_P0_BOUNDARY",
+  "canonical": "outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3",
+  "claim_scope": "software evidence-chain freeze only; no exact external articulated FK(q(t)) self-CCD or physical safety claim",
+  "d59_status": "PASS_FOR_MEASURED_OFFLINE_DOMAINS_NO_PROMOTION",
+  "d60_status": "PASS_FOR_MEASURED_OFFLINE_DOMAINS_NO_PROMOTION_REMAINING_ALGORITHMIC_GAPS",
+  "d61_status": "PARTIALLY_EXECUTED_MEASURED_NO_PROMOTION",
+  "d62_coverage": {
+    "auto0": {
+      "certified_intervals": 3567,
+      "collision_intervals": 0,
+      "requested_intervals": 7004,
+      "resource_limit_reached": false,
+      "status": "UNRESOLVED",
+      "unresolved_intervals": 3437
+    },
+    "auto1": {
+      "certified_intervals": 3628,
+      "collision_intervals": 0,
+      "requested_intervals": 7029,
+      "resource_limit_reached": false,
+      "status": "UNRESOLVED",
+      "unresolved_intervals": 3401
+    }
+  },
+  "d62_status": "PARTIALLY_EXECUTED_MEASURED_NO_PROMOTION",
+  "d63_status": "PARTIALLY_EXECUTED_MEASURED_NO_PROMOTION",
+  "evidence": {
+    "d59": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_FINAL_STATUS.json",
+    "d60": "outputs/D60_SYSTEM_LEVEL_CLOSURE/D60_FINAL_STATUS.json",
+    "d61": "outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/D61_FINAL_STATUS.json",
+    "d62": "outputs/D62_CONTINUOUS_CERTIFICATE_SHADOW/D62_FINAL_STATUS.json",
+    "d63": "outputs/D63_FINAL_SYSTEM_VALIDATION/D63_FINAL_STATUS.json",
+    "frozen_artifact_manifest": "outputs/D64_PROJECT_FREEZE/D64_FROZEN_ARTIFACT_MANIFEST.json",
+    "protected_status_command": "git status --short --untracked-files=all -- <explicit frozen-artifact paths>"
+  },
+  "freeze_authority": "D59/D60/D61/D62/D63 measured software evidence and explicit unavailable domains",
+  "frozen_measured_claims": [
+    "native trajectory motion/continuity/velocity/acceleration and Profile.j evidence",
+    "model-only Pinocchio dynamics and bounded robustness evidence",
+    "deterministic replay and reproducibility evidence",
+    "FCL rigid endpoint sweep and MoveIt robot-world segment cross-checks",
+    "D62 full interval evaluation with sound triangle-preserving BVH/OBB coarse certification"
+  ],
+  "frozen_nonclaims": [
+    "D59/D60 zero-collision observations are scoped conservative-model observations, not exact articulated FK(q(t)) continuous self-CCD",
+    "D62 unresolved intervals are not continuous-certificate PASS",
+    "no exact external nonlinear articulated CCD backend is claimed",
+    "minimum physical clearance is unavailable; projection gap is not clearance",
+    "no hardware torque/current/thermal/calibration/tracking safety claim"
+  ],
+  "lineage": {
+    "D59": {
+      "exact_external_articulated_fk_qt_ccd": "UNAVAILABLE_UNVERIFIED",
+      "historical_observation": {
+        "candidate_count": 2,
+        "collision_regions": 0,
+        "unresolved_regions": 0
+      },
+      "scope": "two correctly routed finalists under the accepted conservative FK-aware software model",
+      "source_task_status": "PASS_FOR_MEASURED_OFFLINE_DOMAINS_NO_PROMOTION",
+      "state": "HISTORICAL_SCOPED_SUPERSEDED_AS_CURRENT_CONTINUOUS_CCD_AUTHORITY",
+      "superseded_by": [
+        "D61",
+        "D62",
+        "D63",
+        "D64"
+      ]
+    },
+    "D60": {
+      "exact_external_articulated_fk_qt_ccd": "UNAVAILABLE_UNVERIFIED",
+      "scope": "D60 conservative FK(q(t)) model and endpoint-FCL cross-check; not exact external articulated CCD",
+      "source_task_status": "PASS_FOR_MEASURED_OFFLINE_DOMAINS_NO_PROMOTION_REMAINING_ALGORITHMIC_GAPS",
+      "state": "HISTORICAL_SCOPED_MODEL_RESULT_SUPERSEDED_BY_LATER_COVERAGE_ACCOUNTING"
+    },
+    "D61": {
+      "exact_external_articulated_fk_qt_ccd": "UNAVAILABLE_UNVERIFIED",
+      "scope": "explicit FK(q(t)) interval certificate windows only",
+      "source_task_status": "PARTIALLY_EXECUTED_MEASURED_NO_PROMOTION",
+      "state": "SHADOW_PARTIAL_COVERAGE_UNRESOLVED"
+    },
+    "D62": {
+      "cases": {
+        "auto0": {
+          "certified_intervals": 3567,
+          "collision_intervals": 0,
+          "requested_intervals": 7004,
+          "resource_limit_reached": false,
+          "status": "UNRESOLVED",
+          "unresolved_intervals": 3437
+        },
+        "auto1": {
+          "certified_intervals": 3628,
+          "collision_intervals": 0,
+          "requested_intervals": 7029,
+          "resource_limit_reached": false,
+          "status": "UNRESOLVED",
+          "unresolved_intervals": 3401
+        }
+      },
+      "scope": "full native interval evaluation with sound triangle-preserving BVH/OBB coarse enclosure",
+      "source_task_status": "PARTIALLY_EXECUTED_MEASURED_NO_PROMOTION",
+      "state": "CURRENT_MEASURED_SHADOW_UNRESOLVED"
+    },
+    "D63": {
+      "safety_status": "UNRESOLVED",
+      "scope": "software evidence-chain validation only",
+      "source_status": "PARTIALLY_EXECUTED_MEASURED_NO_PROMOTION",
+      "state": "SYSTEM_VALIDATION_PARTIAL_SAFETY_UNRESOLVED"
+    },
+    "D64": {
+      "promotion": "NO_PROMOTION",
+      "scope": "measured software evidence and explicit nonclaims",
+      "state": "FROZEN_WITH_EXPLICIT_P0_BOUNDARY"
+    },
+    "current_authority": "D64_PROJECT_FREEZE",
+    "reader_guard": "D59 zero-collision/zero-unresolved observations are historical and scoped to its conservative model; they are not the current complete exact articulated self-CCD proof."
+  },
+  "post_freeze_policy": "stop optimization; proceed only with paper organization, reproduction, or a separately authorized Stage 4B/backend implementation that cannot rewrite this frozen evidence",
+  "promotion": "NO_PROMOTION",
+  "protected_artifacts_verified": "PASS",
+  "protected_floor": "c4_clearance_adversarial0101_amp005_consistent_0025",
+  "protected_paths_clean": false,
+  "protected_paths_git_status": {
+    "available": true,
+    "clean": false,
+    "ignored_paths": [],
+    "status_lines": [
+      "?? DECISION_LEDGER.md",
+      "?? ROOT_GOAL.md",
+      "?? VERIFIED_FACTS.md",
+      "?? outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3/PROMOTION_RECORD.json",
+      "?? outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3/method.json",
+      "?? outputs/D56_STAGE4B_SOFTWARE_CLOSURE/D56_FINAL_REPORT.md",
+      "?? outputs/D56_STAGE4B_SOFTWARE_CLOSURE/D56_FINAL_STATUS.json",
+      "?? outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_FINAL_REPORT.md",
+      "?? outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_FINAL_STATUS.json",
+      "?? outputs/D60_SYSTEM_LEVEL_CLOSURE/D60_FINAL_REPORT.md",
+      "?? outputs/D60_SYSTEM_LEVEL_CLOSURE/D60_FINAL_STATUS.json",
+      "?? outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/D61_FINAL_REPORT.md",
+      "?? outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/D61_FINAL_STATUS.json",
+      "?? outputs/D62_CONTINUOUS_CERTIFICATE_SHADOW/D62_FINAL_REPORT.md",
+      "?? outputs/D62_CONTINUOUS_CERTIFICATE_SHADOW/D62_FINAL_STATUS.json",
+      "?? outputs/D63_FINAL_SYSTEM_VALIDATION/D63_FINAL_STATUS.json",
+      "?? outputs/D64_PROJECT_FREEZE/D64_FREEZE_REPORT.md",
+      "?? outputs/D64_PROJECT_FREEZE/D64_FREEZE_STATUS.json",
+      "?? tools/d64_freeze_project.py"
+    ]
+  },
+  "remaining_p0": [
+    "interval FK enclosure inflation leaves thousands of forearm_link|wrist2_link regions unresolved",
+    "bounded adaptive refinement is too expensive in the Python reference implementation for full unresolved sets",
+    "exact external nonlinear articulated CCD backend is unavailable",
+    "physical clearance and hardware safety thresholds remain unavailable"
+  ],
+  "schema_version": "d64-project-freeze-v2",
+  "stage3_and_canonical_mutated": false
+}

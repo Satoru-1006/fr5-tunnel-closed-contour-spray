@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fairino5_v6_spray_tcp">
+  <xacro:arg name="initial_positions_file" default="$(find fairino5_v6_moveit2_config)/config/initial_positions.yaml" />
+  <xacro:arg name="tool_tcp_xyz" default="0 0 0.150" />
+  <xacro:arg name="tool_tcp_rpy" default="0 0 0" />
+
+  <!-- Stage 5A model is the D65 FR5 V6 geometry.  The only control backend
+       admitted here is ros2_control mock_components/GenericSystem. -->
+  <xacro:include filename="$(find fairino_description)/urdf/fairino5_v6.urdf" />
+  <xacro:include filename="$(find fairino5_v6_moveit2_config)/config/fairino5_v6_robot.ros2_control.xacro" />
+  <xacro:fairino5_v6_robot_ros2_control name="Stage5AMockSystem" initial_positions_file="$(arg initial_positions_file)" />
+
+  <!-- D65 currently has a model TCP assumption, not a calibrated hardware
+       TCP.  The transform is explicit and must be replaced by measured data
+       before any physical claim. -->
+  <link name="spray_tcp_link" />
+  <joint name="spray_tcp_fixed_joint" type="fixed">
+    <parent link="wrist3_link" />
+    <child link="spray_tcp_link" />
+    <origin xyz="$(arg tool_tcp_xyz)" rpy="$(arg tool_tcp_rpy)" />
+  </joint>
+</robot>

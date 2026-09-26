@@ -1,0 +1,124 @@
+{
+  "artifact_count": 19,
+  "artifacts": [
+    {
+      "path": "outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3/PROMOTION_RECORD.json",
+      "role": "canonical_identity",
+      "sha256": "a462b836ff7facab3ea70b2ccd237c7c1a1b0d1937d0d99e39606702f1ceb3d6",
+      "size_bytes": 170
+    },
+    {
+      "path": "outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3/method.json",
+      "role": "canonical_method",
+      "sha256": "1372f808028cb27fd87d8eea9a1a68c915c1052108963913ebf37382cc85dcd9",
+      "size_bytes": 181
+    },
+    {
+      "path": "outputs/D56_STAGE4B_SOFTWARE_CLOSURE/D56_FINAL_STATUS.json",
+      "role": "protected_floor_status",
+      "sha256": "583131550772f9e6c0206ecba625f7a02cc23fcd5568f839cd80b0896f223650",
+      "size_bytes": 4810
+    },
+    {
+      "path": "outputs/D56_STAGE4B_SOFTWARE_CLOSURE/D56_FINAL_REPORT.md",
+      "role": "protected_floor_report",
+      "sha256": "5c6089f78edc77ff28c2a8f3102c758304e7880941191245321997e8ad4519b8",
+      "size_bytes": 6148
+    },
+    {
+      "path": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_FINAL_STATUS.json",
+      "role": "d59_status",
+      "sha256": "8a18c441961ea6f871582a8edbb3a7d06860dd84065f52725c1b5248b84b2205",
+      "size_bytes": 20576
+    },
+    {
+      "path": "outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_FINAL_REPORT.md",
+      "role": "d59_report",
+      "sha256": "3b0a6c37149f48daffd162a59528eccdf87891943bb0e399c2e02c529eab8d2c",
+      "size_bytes": 4729
+    },
+    {
+      "path": "outputs/D60_SYSTEM_LEVEL_CLOSURE/D60_FINAL_STATUS.json",
+      "role": "d60_status",
+      "sha256": "feba36c427581eb65e317b83cc90363cd630dc0e5d2b25f3e4cbcfdbafdad264",
+      "size_bytes": 5341
+    },
+    {
+      "path": "outputs/D60_SYSTEM_LEVEL_CLOSURE/D60_FINAL_REPORT.md",
+      "role": "d60_report",
+      "sha256": "23de6127252e44577818b96e62856a9860ee85d080a0d0c56273fe5610089fb9",
+      "size_bytes": 8582
+    },
+    {
+      "path": "outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/D61_FINAL_STATUS.json",
+      "role": "d61_status",
+      "sha256": "2f2042583244982c405717d5952b43626e6a5e52e7a79f3844425cef7d6245ed",
+      "size_bytes": 2507
+    },
+    {
+      "path": "outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/D61_FINAL_REPORT.md",
+      "role": "d61_report",
+      "sha256": "8a0b0d7c8f7b8ca20dd8c732af486fa6ddf6e9a2ab1030ae54a353c9f442d5ad",
+      "size_bytes": 3983
+    },
+    {
+      "path": "outputs/D62_CONTINUOUS_CERTIFICATE_SHADOW/D62_FINAL_STATUS.json",
+      "role": "d62_status",
+      "sha256": "1d7846da86adfa64d562dabe056d7d274f509976009d27d2a18c8fc46d551c4c",
+      "size_bytes": 3768
+    },
+    {
+      "path": "outputs/D62_CONTINUOUS_CERTIFICATE_SHADOW/D62_FINAL_REPORT.md",
+      "role": "d62_report",
+      "sha256": "27bc6d85480e6c3c677da0b2adb4f5b4410653747ecf1679c5b63eda71a09835",
+      "size_bytes": 2411
+    },
+    {
+      "path": "outputs/D63_FINAL_SYSTEM_VALIDATION/D63_FINAL_STATUS.json",
+      "role": "d63_status",
+      "sha256": "ca77e9f92010ac042094c23b90052b604b67e4df13b1eb2992eb118d1a383e43",
+      "size_bytes": 3978
+    },
+    {
+      "path": "outputs/D64_PROJECT_FREEZE/D64_FREEZE_STATUS.json",
+      "role": "d64_status",
+      "sha256": "1c7d9930d58c218a5fc783111f13948a633c31356490671202f04a31f8374b64",
+      "size_bytes": 7781
+    },
+    {
+      "path": "outputs/D64_PROJECT_FREEZE/D64_FREEZE_REPORT.md",
+      "role": "d64_report",
+      "sha256": "18a91cf3a66eab2c1bd8fa2c17069eb2f3144275cfab1154633894313ecc7483",
+      "size_bytes": 2959
+    },
+    {
+      "path": "ROOT_GOAL.md",
+      "role": "current_goal_claim_fence",
+      "sha256": "8c4952cdb9b7b1ed666cc2a03a8e0902faec4ea56b7362564a41d0ade48b6a92",
+      "size_bytes": 3344
+    },
+    {
+      "path": "VERIFIED_FACTS.md",
+      "role": "verified_facts_claim_fence",
+      "sha256": "0835c2f793d464d5402c371162b432caa299356b0afc46fc4a67be45536f726d",
+      "size_bytes": 3790
+    },
+    {
+      "path": "DECISION_LEDGER.md",
+      "role": "decision_ledger_claim_fence",
+      "sha256": "7474d21283565dddf3e58a1a130b20cadbe73e626c623eb6d6206e80ee954500",
+      "size_bytes": 5241
+    },
+    {
+      "path": "tools/d64_freeze_project.py",
+      "role": "freeze_checker",
+      "sha256": "5584d6dd5fe14e190407a7be68482e0775469934c93b1de7d162838c9da5e615",
+      "size_bytes": 26086
+    }
+  ],
+  "digest_algorithm": "sha256",
+  "manifest_path": "outputs/D64_PROJECT_FREEZE/D64_FROZEN_ARTIFACT_MANIFEST.json",
+  "schema_version": "d64-frozen-artifact-manifest-v1",
+  "scope": "explicit authority files only; no recursive repository or output-tree hashing",
+  "self_excluded": true
+}

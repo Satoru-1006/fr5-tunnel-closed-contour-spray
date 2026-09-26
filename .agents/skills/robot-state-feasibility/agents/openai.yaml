@@ -1,0 +1,4 @@
+interface:
+  display_name: "Robot State Feasibility"
+  short_description: "Audit waypoint IK/FK feasibility and retention"
+  default_prompt: "Use robot-state-feasibility for waypoint recovery, exact FK, official bounds, collision-state gating, 240-point validity, and old-valid retention."

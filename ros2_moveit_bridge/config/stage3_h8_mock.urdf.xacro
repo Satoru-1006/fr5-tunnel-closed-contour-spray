@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fairino5_v6_h8_mock">
+  <!-- H8-R is software-only.  This file intentionally does not include a
+       vendor hardware xacro or a physical-driver alias. -->
+  <xacro:include filename="$(find fairino_description)/urdf/fairino5_v6.urdf" />
+
+  <ros2_control name="H8MockSystem" type="system">
+    <hardware>
+      <plugin>mock_components/GenericSystem</plugin>
+      <!-- Keep the mock state deterministic; H7 dynamics/FK/post-Ruckig checks remain authoritative. -->
+      <param name="calculate_dynamics">false</param>
+    </hardware>
+    <joint name="j1">
+      <command_interface name="position" />
+      <!-- Match only the immutable H7 trajectory's first sample. -->
+      <state_interface name="position"><param name="initial_value">2.6561851822369715</param></state_interface>
+      <state_interface name="velocity"><param name="initial_value">-1.7383370193333626e-06</param></state_interface>
+      <state_interface name="acceleration"><param name="initial_value">-0.0009301121610280756</param></state_interface>
+    </joint>
+    <joint name="j2">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">-1.2525974320653455</param></state_interface>
+      <state_interface name="velocity"><param name="initial_value">4.579226256272062e-05</param></state_interface>
+      <state_interface name="acceleration"><param name="initial_value">0.024501543611440066</param></state_interface>
+    </joint>
+    <joint name="j3">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">-1.7595540543796746</param></state_interface>
+      <state_interface name="velocity"><param name="initial_value">-5.618115234375e-05</param></state_interface>
+      <state_interface name="acceleration"><param name="initial_value">-0.03006020836830139</param></state_interface>
+    </joint>
+    <joint name="j4">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">-1.621388532538325</param></state_interface>
+      <state_interface name="velocity"><param name="initial_value">5.528807017954835e-05</param></state_interface>
+      <state_interface name="acceleration"><param name="initial_value">0.029582357081420447</param></state_interface>
+    </joint>
+    <joint name="j5">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">2.903425484884366</param></state_interface>
+      <state_interface name="velocity"><param name="initial_value">-1.8395342549690752e-06</param></state_interface>
+      <state_interface name="acceleration"><param name="initial_value">-0.0009842586116187073</param></state_interface>
+    </joint>
+    <joint name="j6">
+      <command_interface name="position" />
+      <state_interface name="position"><param name="initial_value">1.7177362623870829</param></state_interface>
+      <state_interface name="velocity"><param name="initial_value">4.321613312519248e-05</param></state_interface>
+      <state_interface name="acceleration"><param name="initial_value">0.02312316341727828</param></state_interface>
+    </joint>
+  </ros2_control>
+</robot>

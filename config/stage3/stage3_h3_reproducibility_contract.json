@@ -1,0 +1,37 @@
+{
+  "schema_version": "stage3-h3-reproducibility-contract-v1",
+  "status": "FROZEN_FOR_H3",
+  "identity_inputs": [
+    "H2 geometry source bytes and source hash",
+    "H2 geometry hash",
+    "H2 manifest hash",
+    "H2 preprocessing version and processing parameters",
+    "H2 coordinate frame and transform provenance",
+    "H3 configuration hash",
+    "random seed",
+    "explicit software/schema versions"
+  ],
+  "replay_runs": 3,
+  "exact_identity_fields": [
+    "task sample identity",
+    "surface sample ordering",
+    "surface XYZ",
+    "surface normal",
+    "spray direction",
+    "TCP target pose",
+    "footprint assignment",
+    "coverage metric arrays",
+    "gate decisions",
+    "semantic output hash"
+  ],
+  "comparison_policy": {
+    "declared_before_comparison": true,
+    "exact_fields": true,
+    "floating_point_tolerance": "none for serialized semantic output; mathematical unit/reconstruction assertions use explicitly declared 1e-9 or 1e-12 checks",
+    "filesystem_iteration_order": "not an input to ordering"
+  },
+  "hashing": {
+    "algorithm": "SHA-256",
+    "canonical_json": "sorted object keys, deterministic list order, finite numeric values only"
+  }
+}

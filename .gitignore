@@ -26,12 +26,12 @@ outputs/*
 !outputs/quality_report.csv
 !outputs/ik_waypoints.csv
 !outputs/final_quality_report.csv
+!outputs/moveit_joint_step_report.csv
+!outputs/moveit_waypoint_joint_trajectory.csv
+!outputs/moveit_waypoint_joint_step_report.csv
 
 # Nested output snapshots stay local
 outputs/timing_check/
-
-# Local generated report draft with broken encoding in this workspace
-PROJECT_REPORT_README.md
 
 # OS/editor
 .DS_Store
@@ -45,3 +45,62 @@ Thumbs.db
 *.db3
 *.mcap
 *.log
+
+# xiaohongshu-mcp: credentials / session / runtime data (never commit)
+tools/xiaohongshu-mcp/cookies.json
+tools/xiaohongshu-mcp/*.db
+tools/xiaohongshu-mcp/data/
+tools/xiaohongshu-mcp/qrcode*.png
+
+# D64 freeze authority: expose only the small, explicitly sealed surface.
+# The rest of every output tree remains disposable/local and ignored.
+!outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/
+outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/*
+!outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/
+outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/*
+!outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3/
+outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3/*
+!outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3/PROMOTION_RECORD.json
+!outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3/method.json
+
+!outputs/D56_STAGE4B_SOFTWARE_CLOSURE/
+outputs/D56_STAGE4B_SOFTWARE_CLOSURE/*
+!outputs/D56_STAGE4B_SOFTWARE_CLOSURE/D56_FINAL_STATUS.json
+!outputs/D56_STAGE4B_SOFTWARE_CLOSURE/D56_FINAL_REPORT.md
+!outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/
+outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/*
+!outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_FINAL_STATUS.json
+!outputs/D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE/D59_FINAL_REPORT.md
+!outputs/D60_SYSTEM_LEVEL_CLOSURE/
+outputs/D60_SYSTEM_LEVEL_CLOSURE/*
+!outputs/D60_SYSTEM_LEVEL_CLOSURE/D60_FINAL_STATUS.json
+!outputs/D60_SYSTEM_LEVEL_CLOSURE/D60_FINAL_REPORT.md
+!outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/
+outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/*
+!outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/D61_FINAL_STATUS.json
+!outputs/D61_CONTINUOUS_CERTIFICATE_SHADOW/D61_FINAL_REPORT.md
+!outputs/D62_CONTINUOUS_CERTIFICATE_SHADOW/
+outputs/D62_CONTINUOUS_CERTIFICATE_SHADOW/*
+!outputs/D62_CONTINUOUS_CERTIFICATE_SHADOW/D62_FINAL_STATUS.json
+!outputs/D62_CONTINUOUS_CERTIFICATE_SHADOW/D62_FINAL_REPORT.md
+!outputs/D63_FINAL_SYSTEM_VALIDATION/
+outputs/D63_FINAL_SYSTEM_VALIDATION/*
+!outputs/D63_FINAL_SYSTEM_VALIDATION/D63_FINAL_STATUS.json
+!outputs/D64_PROJECT_FREEZE/
+outputs/D64_PROJECT_FREEZE/*
+!outputs/D64_PROJECT_FREEZE/D64_FREEZE_STATUS.json
+!outputs/D64_PROJECT_FREEZE/D64_FREEZE_REPORT.md
+!outputs/D64_PROJECT_FREEZE/D64_FROZEN_ARTIFACT_MANIFEST.json
+
+# D65 closure: expose only the compact authoritative certificates and ledger;
+# raw logs and intermediate backend payloads remain disposable/local.
+!outputs/D65_FINAL_CLOSURE/
+outputs/D65_FINAL_CLOSURE/*
+!outputs/D65_FINAL_CLOSURE/D65_HYBRID_AUTO0.json
+!outputs/D65_FINAL_CLOSURE/D65_HYBRID_AUTO1.json
+!outputs/D65_FINAL_CLOSURE/continuous_certificate_auto0/
+outputs/D65_FINAL_CLOSURE/continuous_certificate_auto0/*
+!outputs/D65_FINAL_CLOSURE/continuous_certificate_auto0/D65_VALIDATED_FK_LIPSCHITZ_CERTIFICATE.json
+!outputs/D65_FINAL_CLOSURE/continuous_certificate_auto1/
+outputs/D65_FINAL_CLOSURE/continuous_certificate_auto1/*
+!outputs/D65_FINAL_CLOSURE/continuous_certificate_auto1/D65_VALIDATED_FK_LIPSCHITZ_CERTIFICATE.json

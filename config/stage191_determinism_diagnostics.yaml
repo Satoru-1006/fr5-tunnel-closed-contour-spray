@@ -1,0 +1,60 @@
+schema_version: "1.0"
+
+stage:
+  stage_id: "stage_1_9_1"
+  goal: "first_nondeterministic_layer_isolation"
+
+inputs:
+  tcp_pose_csv: "outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv"
+  seed_joint_csv: "outputs/internal_wiper_moveit_inputs/open_arch_seed_joints.csv"
+  stage17_config: "config/stage17_pose_repair.yaml"
+  stage19_config: "config/stage19_deterministic_ik.yaml"
+
+robot:
+  group_name: "fairino5_v6_group"
+  ee_link: "spray_tcp_link"
+  tool_tcp_offset_m: 0.150
+  tool_tcp_source: "assumed_150mm_placeholder"
+
+ik_replay:
+  same_process_repeat_count: 20
+  independent_process_count: 3
+  new_robot_state_per_call: true
+  requested_timeout_s: 0.0
+  expected_actual_attempt_count: 1
+  forbid_dynamic_seed_feedback: true
+
+diagnostic_waypoints:
+  ordinary: [20, 120]
+  branch_cut: [66, 67, 68, 69]
+  pose_difficulty: [87, 88, 90, 94]
+  repaired_pose_examples: [67, 87, 94]
+
+numeric:
+  ik_dedup_tolerance_rad: 1.0e-5
+  joint_hash_quantization_rad: 1.0e-7
+  cost_comparison_tolerance: 1.0e-9
+  replay_joint_match_tolerance_rad: 1.0e-7
+  replay_fk_position_tolerance_m: 1.0e-9
+  replay_fk_orientation_tolerance_rad: 1.0e-9
+
+dp_replay:
+  repeat_count: 100
+  ros2_disabled: true
+  moveit_disabled: true
+  collision_recheck_disabled: true
+
+ruckig_replay:
+  repeat_count: 20
+  fail_fast_on_invalid_input: false
+  dump_first_invalid_segment: true
+
+post_validation_replay:
+  repeat_count: 10
+  collision_method: "adaptive_discrete_interpolation"
+  interpolation_step_deg: 0.5
+  ccd_status: "not_available"
+  clearance_status: "not_available"
+
+outputs:
+  directory: "outputs/ik_graph_stage191"

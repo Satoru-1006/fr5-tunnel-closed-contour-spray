@@ -1,0 +1,35 @@
+metric,value
+fk_normal_error_mean_deg,0.4043738343471144
+fk_normal_error_max_deg,1.0068129181254613
+fk_standoff_error_max_abs_mm,0.10550011330623388
+fk_path_deviation_p95_mm,0.028219554641211297
+fk_path_deviation_max_mm,0.14126918172561212
+fk_tcp_speed_mean_m_s,0.003005357453672808
+fk_tcp_speed_p05_m_s,0.002999999999609825
+fk_tcp_speed_p95_m_s,0.003000000000432492
+fk_tcp_speed_p05_p95_fluctuation,2.7373350225124123e-10
+moveit_ruckig_smoothing_used,true
+moveit_time_parameterization,tcp_arclength
+moveit_ee_link,spray_tcp_link
+stand_off_m,0.26
+tcp_points_to_wall,true
+max_joint_step_deg,14.991790333724396
+max_joint_step_from_index,15
+max_joint_step_to_index,16
+max_joint_step_joint,j6
+max_joint_step_from_deg,13.900000053825035
+max_joint_step_to_deg,-1.0917902798993615
+max_joint_step_raw_deg,14.991790333724397
+max_joint_step_raw_joint,j6
+max_joint_step_raw_from_index,15
+max_joint_step_raw_to_index,16
+max_ik_joint_step_deg,20.0
+production_joint_step_limit_deg,20.0
+joint_continuity_status,pass
+tool_tcp_xyz,0.000 0.000 0.150
+tool_tcp_rpy,0 0 0
+tool_tcp_source,assumed_150mm_placeholder
+tool_tcp_measured_by,simulation
+tool_tcp_measured_date,not_applicable_offline
+tool_tcp_calibration_method,virtual_design_parameter
+status,pass

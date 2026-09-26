@@ -1,0 +1,44 @@
+{
+  "schema_version": "stage3-experiment-identity-provenance-contract-v1",
+  "contract_id": "stage3-provenance-20260808",
+  "status": "FROZEN_FOR_H2",
+  "identity_fields": [
+    "experiment_id",
+    "timestamp_utc",
+    "git_commit_or_source_hash",
+    "config_hash",
+    "dataset_hash",
+    "geometry_hash",
+    "model_hash",
+    "robot_model_hash",
+    "urdf_hash",
+    "srdf_hash",
+    "moveit_config_hash",
+    "random_seed",
+    "environment",
+    "ros_distribution",
+    "moveit_version",
+    "python_version",
+    "dependency_versions",
+    "input_hashes",
+    "output_hashes"
+  ],
+  "identity_rules": {
+    "experiment_id": "Stable content-addressed or UUID-like ID recorded before execution; it must include or reference the frozen config/dataset identity.",
+    "same_id_overwrite": "forbidden",
+    "output_namespace": "outputs/stage3_experiments/<experiment_id>/ for future experiments; H1 qualification outputs use outputs/stage3_h1_* and are separate.",
+    "artifact_immutability": "After finalization, artifacts are read-only by policy; revisions receive a new experiment_id or contract version.",
+    "hash_algorithm": "SHA256",
+    "timestamps": "UTC ISO-8601 with timezone; monotonic timers are separately recorded for phase timing"
+  },
+  "required_environment_fields": ["os", "architecture", "ros_distribution", "moveit_version", "python_version", "compiler", "cpu", "gpu_or_none", "dependency_versions"],
+  "required_lineage": ["parent_contract_ids", "input_artifact_hashes", "source_paths", "tool_versions", "operator_or_automation_identity"],
+  "h1_identity": {
+    "experiment_id": "stage3-h1-capability-qualification",
+    "purpose": "contract freeze and offline capability qualification",
+    "real_robot_motion": false,
+    "fjt_goal_sent": false,
+    "formal_ml_started": false
+  },
+  "provenance": ["attached Stage 3 H1 request: immutable experiment identity/provenance", "outputs/stage3_h0_entry_authorization_20260807T161253Z/stage3_h0_stage2_immutable_baseline_manifest.json"]
+}

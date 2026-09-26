@@ -1,0 +1,17 @@
+{
+  "D39_retention": "LOCKED",
+  "D40_candidate": "routeA_DLS_position_dominant_v4",
+  "D40_retention": "LOCKED",
+  "H1_champion": "update_480",
+  "future_joint_reads": 0,
+  "inputs": {
+    "outputs\\internal_wiper_moveit_inputs\\open_arch_seed_joints.csv": "c568a6f49d6bfe170049774283b03b6576b950646dd79c449fb2e61c83034cba",
+    "outputs\\internal_wiper_moveit_inputs\\open_arch_tcp_poses_base_link.csv": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7",
+    "outputs\\stage3_h13_d39_causal_task_space_recovery\\shadow_candidates\\stable_velocity_residual_update.csv": "a144c40bb950814797b029cb1ffd80bed5de62435ae43096d8d0732811f81712",
+    "outputs\\stage3_h13_d40_task_space_geometry_locked_causal_cartesian_recovery_execution\\D40_SUMMARY.json": "e916fa6362a3990a3e6c1a2f80498e28f0aa989df94534280dec9189e31923e4",
+    "outputs\\stage3_h13_d40_task_space_geometry_locked_causal_cartesian_recovery_execution\\routeA_DLS_position_dominant_v4\\final_acceptance_summary.json": "2001e3fa2e5d0a1a4a8f5e0140960760e078bf47a963da65a5ef8ed3a0341fdd"
+  },
+  "point_count": 181,
+  "schema_version": "d41-authoritative-identity-v1",
+  "scope": "Stage 0/1 ON-state open-arch only"
+}

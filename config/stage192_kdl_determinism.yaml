@@ -1,0 +1,64 @@
+schema_version: "1.0"
+
+stage:
+  stage_id: "stage_1_9_2"
+  goal: "kdl_single_ik_call_determinism_fix"
+
+inputs:
+  stage191_minimal_case: "outputs/ik_graph_stage191/minimal_reproduction_case.json"
+  stage191_frozen_corpus: "outputs/ik_graph_stage191/frozen_ik_call_corpus.parquet"
+  target_call_id: "call:00000182"
+
+robot:
+  group_name: "fairino5_v6_group"
+  base_frame: "base_link"
+  tip_link: "spray_tcp_link"
+  tool_tcp_offset_m: 0.150
+  tool_tcp_source: "assumed_150mm_placeholder"
+
+runtime:
+  ros_distribution: "jazzy"
+  executor_mode: "single_threaded"
+  disable_unrelated_callbacks: true
+  omp_num_threads: 1
+  openblas_num_threads: 1
+  mkl_num_threads: 1
+
+moveitpy_replay:
+  same_solver_instance_repeat_count: 100
+  new_solver_instance_repeat_count: 50
+  independent_process_count: 20
+  new_robot_state_per_call: true
+
+cpp_moveit_plugin_replay:
+  same_plugin_instance_repeat_count: 100
+  new_plugin_instance_repeat_count: 50
+  independent_process_count: 20
+
+direct_orocos_kdl_replay:
+  repeat_count: 100
+  independent_process_count: 20
+
+numeric:
+  raw_input_requires_bytewise_match: true
+  joint_comparison_tolerance_rad: 1.0e-7
+  fk_position_tolerance_m: 1.0e-9
+  fk_orientation_tolerance_rad: 1.0e-9
+  quantization_rad: 1.0e-7
+
+diagnostics:
+  enable_binary_input_snapshot: true
+  enable_solver_instance_tracking: true
+  enable_floating_point_environment_capture: true
+  enable_sanitizers_if_cpp_reproduces: true
+
+alternative_solvers:
+  custom_deterministic_numeric_ik:
+    enabled_only_if_kdl_fix_fails: true
+  ikfast:
+    enabled_only_if_kdl_fix_fails: true
+  trac_ik:
+    use_as_determinism_baseline: false
+
+outputs:
+  directory: "outputs/ik_graph_stage192"

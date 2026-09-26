@@ -1,0 +1,4 @@
+interface:
+  display_name: "Robot Collision Safety"
+  short_description: "Run fail-closed robot collision checks"
+  default_prompt: "Use robot-collision-safety for PlanningScene, self/environment/tool collision, FCL, CCD, clearance, and fail-closed status interpretation."

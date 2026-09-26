@@ -1,0 +1,4 @@
+interface:
+  display_name: "Trajectory Continuity Optimizer"
+  short_description: "Repair IK branch jumps across waypoints"
+  default_prompt: "Use trajectory-continuity-optimizer for multi-solution branch selection, joint jumps, graph costs, and whole-path continuity."

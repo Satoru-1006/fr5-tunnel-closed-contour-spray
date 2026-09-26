@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.22)
+project(stage4e_continuous_clearance)
+
+find_package(ament_cmake REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(ruckig REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(moveit_core REQUIRED)
+find_package(moveit_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(shape_msgs REQUIRED)
+
+add_executable(stage4e_continuous_clearance stage4e_continuous_clearance.cpp)
+target_compile_features(stage4e_continuous_clearance PRIVATE cxx_std_17)
+target_link_libraries(stage4e_continuous_clearance Eigen3::Eigen)
+ament_target_dependencies(stage4e_continuous_clearance geometry_msgs moveit_core moveit_msgs rclcpp shape_msgs)
+target_link_libraries(stage4e_continuous_clearance moveit_core::moveit_collision_detection_fcl)
+target_link_libraries(stage4e_continuous_clearance ruckig::ruckig)
+
+install(TARGETS stage4e_continuous_clearance DESTINATION lib/${PROJECT_NAME})
+ament_package()

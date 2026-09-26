@@ -1,174 +1,144 @@
-# FR5 Tunnel Closed-Contour Spray Planner
+# FR5 隧道闭合轮廓喷涂 MoveIt2 验证
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
-![ROS2](https://img.shields.io/badge/ROS2%20%2B%20MoveIt2-ready-22314E)
-![Ruckig](https://img.shields.io/badge/Ruckig-jerk--limited-00A676)
-![Tests](https://img.shields.io/badge/tests-pytest-brightgreen)
-![Status](https://img.shields.io/badge/strict%20validation-pass-success)
+本项目用于验证 FAIRINO FR5 V6 机器人在隧道马蹄形截面内执行闭合轮廓喷涂/涂覆轨迹的可行性。验证链覆盖离线路径生成、TCP 姿态、MoveIt2 IK、Ruckig 平滑、FK 质量门、关节动力学门和碰撞门。
 
-面向 FAIRINO FR5 V6 的隧道内壁闭合马蹄形轮廓喷涂/涂抹轨迹验证项目。它不是只画一条好看的路径，而是从路径生成、TCP 姿态、连续 IK、jerk-limited 时间参数化，一路验证到 ROS2 + MoveIt2 + Ruckig 的生产前质量门。
+本项目固定使用沿法兰工具 +Z 方向伸出 `150 mm` 的虚拟 TCP（`spray_tcp_link`）。它是项目建模条件，不要求实测，也不使用 `wrist3_link` 代替。项目在指定停靠点关闭喷涂、停止并平滑调整姿态；当前 MoveIt2 桥接节点默认把这套分段轨迹作为实际执行轨迹，同时保留原始未分段轨迹用于对照审计。生产使用前仍必须替换为实测 TCP 和真实工位模型。
 
-核心目标是让 FR5 在固定纵向截面 `y = y0` 上重复跟踪同一条闭合轮廓：
+当前推荐的标准马蹄形主方案是内部雨刮式开口拱形扫描：从左侧下部起扫，连续经过上拱，在右侧下部结束；不沿底部闭合回转，也不依赖腕部 360° 旋转。旧的 `closed_horseshoe` 路径仅保留作对照诊断。
+
+推荐演示命令：
+
+```powershell
+python examples/run_fr5_tunnel_spray.py --path-mode internal_wiper --base-y 0.45 --station-y 0.55 --length 0.90 --wiper-samples 181
+```
+
+## 当前状态
+
+主要报告位于：
 
 ```text
-left wall -> top arch -> right wall -> bottom closure -> back to start
+outputs/final_quality_report.csv
+outputs/audit_goal_requirements_strict.json
+outputs/moveit_collision_report.csv
+outputs/moveit_quality_report.csv
+outputs/moveit_joint_step_report.csv
+outputs/ik_continuity_segments_summary.json
+outputs/ik_root_cause_matrix.json
+outputs/validation_handoff_manifest.json
 ```
 
-最终严格验证结果来自 MoveIt2 runtime，而不是离线 Python 演示：
+当前正式报告的关键结果：
 
 ```text
-overall_status = pass
-result_source  = moveit2_strict_runtime
-ee_link        = spray_tcp_link
-collision      = pass
+status = pass
+collision_status = pass
+tcp_speed_production_status = pass
+tool_tcp_acceptance_status = waived
+joint_continuity_status = pass
+max_joint_step_deg = 145.8486084788797
+process_max_joint_step_deg = 3.613547166284726
+reorientation_transition_max_interpolated_step_deg = 4.979829912673047
+tool_tcp_source = assumed_150mm_placeholder
 ```
 
-## Highlights
-
-- Closed horseshoe contour generation with wall normals, TCP stand-off, bottom fillets, and multi-loop repeatability.
-- Spray and contact tool models with full TCP pose export (`position + quaternion + wall normal`).
-- Continuous FR5 IK with explicit tool-axis orientation constraints.
-- Ruckig-based jerk-limited timing, plus offline fallback for algorithm demos.
-- FK-based quality reports for real TCP speed, stand-off error, normal angle error, and path deviation.
-- ROS2 / MoveIt2 bridge using `spray_tcp_link` as the planning tip, native TOTG, native Ruckig smoothing, collision checks, and strict runtime audit scripts.
-- Reproducible tests for geometry, timing, FK speed, MoveIt bridge wiring, strict audit behavior, and final report publishing.
-
-## Results Preview
-
-| Path | Coverage | Dynamics |
-| --- | --- | --- |
-| ![3D path](outputs/path_3d.png) | ![coverage heatmap](outputs/coverage_heatmap.png) | ![joint dynamics](outputs/final_moveit_dynamics_main.png) |
-
-More visual outputs are in `outputs/`, including `closed_contour_section.png`, `dynamics_jerk.png`, and `animation_moveit.gif`.
-
-## Repository Layout
+`145.85 deg` 是相邻工艺段端点之间的总换姿量，不作为一次关节突跳执行。当前将其放在停喷区间内，以五次 smoothstep 轨迹拆分；停靠点速度和加速度均为零。
 
 ```text
-src/                         Offline geometry, IK, timing, metrics, and plotting
-examples/run_fr5_tunnel_spray.py
-                             Main offline simulation entry point
-ros2_moveit_bridge/           ROS2 package for MoveIt2 planning and validation
-scripts/                      WSL/ROS2 setup and strict validation helpers
-tools/                        Audit and final report publishing tools
-tests/                        Pytest coverage for planner and bridge behavior
-outputs/                      Lightweight example reports and preview images
+process_joint_continuity_status = pass
+process_collision_status = pass
+process_dynamics_status = pass
+spray_off_transition_status = pass
+reorientation_transition_collision_status = pass
+reorientation_transition_dynamics_status = pass
+stop_boundary_zero_velocity_acceleration_status = pass
+next_segment_entry_status = pass
+no_gap_or_overlap_status = pass
 ```
 
-Large generated CSV trajectories, ROS build products, logs, and external vendor mirrors are intentionally ignored by Git.
+## 已解决的问题
 
-## Install
+- 最初 `150 mm` 假设 TCP 下的 `145/145` 抽检状态全部碰撞，已经在当前简化碰撞模型中修正为 `collision_count=0`、`first_collision_index=-1`、`status=pass`。
+- `150 mm` TCP 已按项目要求定义为虚拟建模参数，不再作为实测 TCP 缺失问题。
+- TCP 速度已从约 `0.5 mm/s` 的安全诊断速度提升到当前正式报告约 `0.003096 m/s`，并通过 `0.003 m/s` 生产下限。
+- 执行链增加硬门禁：`execute_trajectory:=true` 时，FK 质量报告不是 `pass` 就不会调用 `moveit.execute`。
+- 大 IK 分支变化已转换为 12 个显式停喷换姿段；换姿使用五次 smoothstep，端点速度和加速度为零。
+- 验收增加工艺段连续性/碰撞/动力学、停喷状态、换姿碰撞/动力学、下一段精确接续和无缺口/重叠硬门。
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+## 当前验收边界
+
+- 工艺段必须连续、无碰撞且动力学合格。
+- phase 110、210、232、237 等指定停靠点允许关闭喷涂并换姿。
+- 换姿轨迹必须无碰撞、无速度/加速度/jerk 超限，且停靠端速度和加速度为零。
+- 换姿终点必须与下一工艺段起点一致，禁止索引缺口、重叠喷涂和实际关节突跳。
+- 当前碰撞结论只适用于项目提供的简化隧道模型；若未来用于实体工位，必须另做真实工位验证。
+
+## 本地验证
+
+推荐先运行一条本地收口命令：
+
+```powershell
+python scripts/verify_current_goal_state.py
 ```
 
-Optional packages for higher-fidelity local experiments:
-
-```bash
-pip install roboticstoolbox-python spatialmath-python toppra pyvista
-```
-
-## Quick Start
-
-Run the default closed-contour spray simulation:
-
-```bash
-python examples/run_fr5_tunnel_spray.py --robot-model placeholder --no-animation
-```
-
-Run with the official FAIRINO model after preparing vendor assets:
-
-```bash
-python examples/run_fr5_tunnel_spray.py --robot-model official --no-animation
-```
-
-Typical tuned parameters:
-
-```bash
-python examples/run_fr5_tunnel_spray.py ^
-  --path-mode closed_horseshoe ^
-  --width 1.20 ^
-  --height 1.10 ^
-  --spray-distance 0.18 ^
-  --fillet-radius 0.20 ^
-  --loops 3 ^
-  --no-animation
-```
-
-## Official FR5 Assets
-
-The production-style path expects FAIRINO official ROS2 assets, usually arranged like this:
+它会刷新 action plan、production readiness、handoff manifest、commit plan、goal audit，并运行 `pytest`。当前预期结果不是生产通过，而是：
 
 ```text
-external/frcobot_ros2/fairino_description/urdf/fairino5_v6.urdf
-external/frcobot_ros2/fairino5_v6_moveit2_config/
+overall_goal_status = active
+production_readiness_status = fail
+pytest_status = pass
 ```
 
-Those external assets are not committed here because they are vendor code and can be large. If they are missing, `--robot-model official` fails loudly instead of silently falling back to a placeholder model.
+单独快速回归：
 
-Use the placeholder model only for algorithm demonstrations:
+```powershell
+python -m pytest
+```
+
+最终生产验收时可使用严格返回码模式；当前 placeholder TCP 状态下该命令应失败：
+
+```powershell
+python scripts/verify_current_goal_state.py --require-production-ready
+```
+
+在 WSL/ROS2 Jazzy 环境中运行严格链：
 
 ```bash
-python examples/run_fr5_tunnel_spray.py --robot-model placeholder
+bash scripts/run_moveit_strict_validation.sh
 ```
 
-## ROS2 / MoveIt2 Strict Validation
+脚本会生成 MoveIt2 运行报告、严格审计 JSON、最终汇总和 handoff manifest。即使审计失败，最终报告仍会发布，以便保留失败证据。
+# P1 — Process-Aware Stress Model
 
-The bridge package in `ros2_moveit_bridge/` does the production-facing validation chain:
+`src/process_aware_stress.py` provides deterministic base-frame, TCP, surface,
+joint-state, and timing stress operators; optional trajectory fields remain
+unknown when absent. Point, transition, and trajectory validity are reported
+separately, and unavailable required capabilities cannot produce `PASS`.
+`map_legacy_d46_case` describes the six existing D46 families without changing
+case generation or stored measurements. The native D46 capability profile
+keeps `adaptive_discrete_interpolation`, the native robot-world collision API, FCL
+distance, and unavailable continuous self-collision distinct. This is P1
+formalization only; robustness-margin search and physical/hardware validation
+are not implemented or claimed.
 
-1. Adds `spray_tcp_link` as a fixed tool TCP.
-2. Uses `spray_tcp_link`, not `wrist3_link`, as the MoveIt planning tip.
-3. Reads `outputs/tcp_poses.csv` or `outputs/tcp_poses_base_link.csv`.
-4. Validates quaternion-vs-wall-normal alignment.
-5. Builds a MoveIt trajectory, applies TOTG, then applies native Ruckig smoothing.
-6. Recomputes FK for TCP speed, stand-off, normal angle, path deviation, and joint dynamics.
-7. Builds tunnel collision geometry and rejects unsafe execution.
-8. Keeps `execute_trajectory:=false` by default.
+## P2-A — Axis-wise robustness margins
 
-Example:
+`src/p2a_axiswise_robustness.py` performs deterministic signed one-axis scans
+and refines only adjacent PASS-to-FAIL brackets, using the frozen D41 181-point
+open-arch path with the existing MoveIt2/FCL and FK evaluators. Its nominal
+geometry reference is fresh MoveIt2 FK of the frozen D41 post-Ruckig joint
+trajectory, and its fixed process normals come from the matching D41
+strict-replay FK trace. The authenticated Stage 0/1 pose pair remains upstream
+identity evidence; it is not treated as a pairwise reference for the changed
+post-Ruckig path. Process orientation is evaluated by the spray TCP +Z
+direction against the D41 wall normal; TCP rotation perturbations compare the
+perturbed target +Z to that same normal. Full-quaternion difference is
+diagnostic-only, so tool-axis roll does not create a false spray-normal failure.
+The machine-readable result is
+`outputs/p2a_axiswise_robustness_margin.json`. Base transforms, stand-off and
+surface-offset propagation, strict self-collision CCD, calibrated uncertainty,
+torque, coating physics, hardware validation, and global robustness remain
+unavailable or uncertified.
 
-```bash
-colcon build --packages-select fairino_description fairino5_v6_moveit2_config fr5_tunnel_moveit_bridge
-source install/setup.bash
+## GitHub project scope
 
-REPO_ROOT=/absolute/path/to/repo \
-ROS_WS=/absolute/path/to/ros2_ws \
-TOOL_TCP_XYZ="0.000 0.000 0.150" \
-bash /absolute/path/to/repo/scripts/run_moveit_strict_validation.sh
-```
-
-## Quality Gates
-
-The strict runtime summary in `outputs/final_acceptance_summary.json` records:
-
-```text
-max normal error     ~= 2.49 deg
-max stand-off error  ~= 1.28 mm
-max FK path error    ~= 1.85 mm
-TCP speed p05/p95    ~= 3.6e-10 fluctuation
-max velocity ratio   ~= 0.168
-max acceleration     ~= 0.594
-max jerk ratio       ~= 0.187
-collision count      = 0
-```
-
-These numbers are example validation artifacts for the committed sample outputs. Real deployments must recalibrate the physical tool TCP and rerun the full MoveIt2 chain.
-
-## Test
-
-```bash
-python -m pytest -q
-python -m compileall src examples ros2_moveit_bridge tests
-python ros2_moveit_bridge/validate_bridge_inputs.py --tcp-path-csv outputs/tcp_poses.csv --samples-per-loop 240
-python tools/audit_goal_requirements.py --json-report outputs/audit_goal_requirements.json
-```
-
-## Safety Notes
-
-This repository is a planning and validation prototype. Before using a real robot, calibrate the spray/contact TCP, verify the controller interface, confirm emergency stop and workspace safeguards, rebuild collision geometry from the actual workcell, and run the strict ROS2 + MoveIt2 validation chain with execution disabled first.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+The FR5-only source, evidence scope, reproduction boundary, and P2-A provenance note are documented in [docs/GITHUB_PROJECT_SCOPE.md](docs/GITHUB_PROJECT_SCOPE.md).

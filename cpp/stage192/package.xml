@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>stage192_cpp</name>
+  <version>0.1.0</version>
+  <description>Isolated Stage 1.9.2 KDL determinism diagnostics.</description>
+  <maintainer email="stage192@example.com">stage192</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>geometry_msgs</depend>
+  <depend>kdl_parser</depend>
+  <depend>moveit_core</depend>
+  <depend>moveit_kinematics</depend>
+  <depend>moveit_msgs</depend>
+  <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
+  <depend>srdfdom</depend>
+  <depend>urdf</depend>
+</package>

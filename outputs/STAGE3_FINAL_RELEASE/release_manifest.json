@@ -1,0 +1,48 @@
+{
+  "artifacts": [
+    "outputs/STAGE3_FINAL_RELEASE/PRE_D45_STAGE3_GOLDEN_BASELINE.json",
+    "outputs/STAGE3_FINAL_RELEASE/canonical_metrics_h1_h32.json",
+    "outputs/STAGE3_FINAL_RELEASE/authoritative_model_definition.json",
+    "outputs/STAGE3_FINAL_RELEASE/robot_validation_status.json",
+    "outputs/STAGE3_FINAL_RELEASE/adversarial_checks.json",
+    "outputs/STAGE3_FINAL_RELEASE/release_manifest.json",
+    "outputs/STAGE3_FINAL_RELEASE/STAGE3_CLOSURE_REPORT.md",
+    "outputs/STAGE3_FINAL_RELEASE/OPEN_TECHNICAL_DEBT.md",
+    "outputs/STAGE3_FINAL_RELEASE/STAGE4_INPUT_CONTRACT.md",
+    "outputs/STAGE3_FINAL_RELEASE/README.md"
+  ],
+  "authoritative_entrypoint": "scripts/run_stage3_final_release.py",
+  "authoritative_input_root": "outputs/internal_wiper_moveit_inputs",
+  "canonical_checkpoint": "outputs/stage3_h13_d35_permanent_champion/checkpoints/committed_update_480.pt",
+  "canonical_checkpoint_sha256": "37645eea5aef8ce2fe7084c83f35429a7a13fbe3e9612eb84417ccce6cba9742",
+  "canonical_update": 480,
+  "ccd": "not_available",
+  "clearance": null,
+  "collision_method": "adaptive_discrete_interpolation",
+  "compact_regression_suite": [
+    "tests/test_stage3_h13_d35_champion_manager.py",
+    "tests/test_stage3_h13_d36_system_evaluation.py",
+    "tests/test_stage3_h13_d37_robot_smoke.py",
+    "tests/test_stage3_h13_d38.py",
+    "tests/test_stage3_h13_d39.py",
+    "tests/test_stage3_h13_d40.py",
+    "tests/test_stage3_h13_d41.py",
+    "tests/test_stage3_h13_d43_constrained_breakthrough_campaign.py",
+    "tests/test_stage3_h13_d44_realized_response_campaign.py",
+    "tests/test_stage3_d45_release.py"
+  ],
+  "evaluation_path": "tools.stage3_d45_finalize_release.py -> d42.evaluate -> D17 compact causal evaluator",
+  "full_fresh_robot_command": "python scripts/run_stage3_final_release.py --replay --run-robot",
+  "historical_policy": {
+    "D43_D44": "research_asset_noncanonical",
+    "legacy_720_point": "excluded",
+    "stage4_execution": "not_run"
+  },
+  "preprocessing_path": "tools.stage3_h13_post_d16_d17_full_pipeline_multi_horizon_rollout_causal_screen_replay.preflight_runtime via authenticated H10/H11 TRAIN statistics",
+  "protected_baseline": "outputs/STAGE3_FINAL_RELEASE/PRE_D45_STAGE3_GOLDEN_BASELINE.json",
+  "release_name": "STAGE3_FINAL_RELEASE",
+  "release_status": "FROZEN_AND_CLOSED",
+  "robot_motion_path": "D39 retained stable prior -> D40 routeA_DLS_position_dominant_v4 -> D41 native offline replay",
+  "schema_version": "stage3_final_release_manifest_v1",
+  "standard_command": "python scripts/run_stage3_final_release.py --replay"
+}

@@ -1,0 +1,15 @@
+metric,value,unit,scope,source
+minimum_jacobian_sigma,6.078443090310153e-11,SI singular-value units,nominal+shadow,native SVD
+maximum_jacobian_condition_number,30576767824.35914,ratio,nominal+shadow,native SVD
+most_singular_nominal_waypoint,90,waypoint index,nominal,native SVD
+maximum_effective_damping,0.01,DLS lambda,shadow,instrumented D40 DLS
+median_effective_damping,0.01,DLS lambda,shadow,instrumented D40 DLS
+trust_region_clip_count,39,events,shadow,instrumented D40 DLS
+maximum_unclipped_delta_norm,0.6880037228382276,rad,shadow,instrumented D40 DLS
+minimum_joint_limit_margin,0.00010000000000021103,rad,nominal+shadow,authoritative URDF position limits
+most_constrained_joint,j6,joint,nominal+shadow,authoritative URDF position limits
+maximum_velocity_utilization,0.016421107188169345,ratio,locked D40/replay,native dynamics
+maximum_acceleration_utilization,0.009579396534353725,ratio,locked D40/replay,native dynamics
+maximum_jerk_utilization,0.00023042942821655058,ratio,locked D40/replay,native dynamics
+minimum_robot_world_clearance,0.08857717027025891,m,nominal,native Bullet distanceRobot
+minimum_self_clearance,0.016623586819851727,m,nominal,native Bullet distanceSelf

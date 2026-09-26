@@ -1,0 +1,80 @@
+{
+  "schema_version": "stage3-adaptive-discrete-collision-contract-v1",
+  "contract_id": "stage3-adaptive-discrete-interpolation-20260808",
+  "status": "FROZEN_FROM_SOURCE",
+  "method_id": "adaptive_discrete_interpolation",
+  "interpretation": "Finite discrete state sampling only. It is not strict continuous collision detection and does not certify the swept volume between samples.",
+  "authoritative_stage2_scope": {
+    "input": "181-point open-arch internal-wiper ON-state graph",
+    "collision_backend": "MoveIt2 PlanningScene/CollisionEnv",
+    "historical_stage2_ccd": "not_available",
+    "historical_stage2_clearance": null
+  },
+  "implementations": [
+    {
+      "implementation_id": "stage01_graph_transition",
+      "source_path": "src/task_pose_repair.py",
+      "source_sha256": "4454147A2C7F277A57579FE57C3AFF971B7451E51192A7870EEDBE3DBAFC5483",
+      "entrypoint": "evaluate_transition",
+      "joint_interpolation_criterion": "delta = nearest_equivalent_joint_positions(q_target, q_source) - q_source; max_step_deg = rad2deg(max(abs(delta))); reject before collision checks if max_step_deg > max_joint_step_deg + 1e-9.",
+      "cartesian_tcp_interpolation_criterion": "none; only joint vectors are interpolated and passed to the collision callback.",
+      "segment_sample_count": "max(2, ceil(max_step_deg / interpolation_step_deg) + 1)",
+      "sample_parameterization": "np.linspace(0.0, 1.0, count); q(alpha) = q0 + alpha * delta",
+      "recursive_subdivision_criterion": "none",
+      "maximum_recursion_depth": null,
+      "minimum_segment_length": null,
+      "collision_refinement_rule": "stop at the first sampled colliding state; record first_collision_alpha and callback summary",
+      "termination_condition": "all finite samples pass, or first collision, or the transition is rejected by node/formal/joint-step gate",
+      "numerical_tolerance": {"joint_step_gate_rad_equivalent": "1e-9 deg comparison after conversion", "dedup_rad": 0.00001},
+      "stage3_claim": "This implementation is the graph transition semantics; it is not a continuous collision checker."
+    },
+    {
+      "implementation_id": "stage2_post_ruckig_trajectory",
+      "source_path": "ros2_moveit_bridge/plan_closed_contour_moveit.py",
+      "source_sha256": "E1AE2FA7E30642C5B8E050D9B0EF01DC38F5C0543C5B6F45242D3D7F0171910A",
+      "entrypoint": "validate_trajectory_collision",
+      "joint_interpolation_criterion": "For each selected trajectory-point pair, segment_steps = max(1, ceil(max(abs(end_positions - start_positions)) / max_step_rad)).",
+      "cartesian_tcp_interpolation_criterion": "none; no TCP/Cartesian subdivision criterion is implemented in this collision function.",
+      "segment_sample_count": "segment_steps start-inclusive samples per pair plus one final trajectory endpoint; adjacent pairs share endpoint states.",
+      "sample_parameterization": "q(alpha) = start + alpha * (end-start), alpha = local_index / segment_steps for local_index in [0, segment_steps-1]; final endpoint appended explicitly",
+      "recursive_subdivision_criterion": "none",
+      "maximum_recursion_depth": null,
+      "minimum_segment_length": null,
+      "collision_refinement_rule": "No recursive refinement; collision is recorded for any sampled state and validation raises on the first failing set after the scan.",
+      "termination_condition": "all generated samples checked, or the function raises after the collision scan if any collision was recorded",
+      "numerical_tolerance": {"minimum_interpolation_step_deg": 0.001, "parameter_floor": "max(interpolation_step_deg, 1e-3)"},
+      "stage3_claim": "This is the historical post-Ruckig validator semantics and remains discrete."
+    },
+    {
+      "implementation_id": "stage24_native_formal_probe",
+      "source_path": "cpp/stage24/stage24_formal_probe.cpp",
+      "source_sha256": "277682661F3A830BA05A077233DCD0A9B5557837F4DB8C6545C2A72611CF31BA",
+      "entrypoint": "native edge validation loop",
+      "joint_interpolation_criterion": "segment_steps = max(1, ceil(abs(q1_j-q0_j)/max_step_rad)) over all joints.",
+      "cartesian_tcp_interpolation_criterion": "none in the native collision edge loop.",
+      "segment_sample_count": "segment_steps + 1 including both endpoints",
+      "sample_parameterization": "q(alpha) = q0 + (sample/segment_steps) * (q1-q0)",
+      "recursive_subdivision_criterion": "none",
+      "maximum_recursion_depth": null,
+      "minimum_segment_length": null,
+      "collision_refinement_rule": "none beyond the finite sample set; collision samples are retained in the native audit output",
+      "termination_condition": "all samples in the finite edge set are checked",
+      "numerical_tolerance": {"step_floor": "max_step_rad is derived from configured interpolation_step_deg; no recursive geometric tolerance"},
+      "stage3_claim": "This source is retained as a native Stage 2 evidence implementation and is not silently upgraded to CCD."
+    }
+  ],
+  "frozen_parameters": {
+    "stage0_1_interpolation_step_deg": 0.5,
+    "stage0_1_max_joint_step_deg": 20.0,
+    "collision_engine_result_label": "adaptive_discrete_interpolation",
+    "bullet_ccd": "not_available_in_stage2_history",
+    "clearance": null
+  },
+  "forbidden_claims": [
+    "strict continuous collision detection",
+    "full trajectory CCD",
+    "minimum clearance certified from collision-free states",
+    "Cartesian/TCP swept-volume guarantee"
+  ],
+  "provenance_policy": "Source SHA256 values are checked by the H1 gate at run time. Any source change requires a new contract review and gate run."
+}

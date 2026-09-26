@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import argparse
+import datetime as dt
 import json
 from dataclasses import asdict
 from dataclasses import dataclass
@@ -11,6 +12,8 @@ import numpy as np
 
 
 ROOT = Path(__file__).resolve().parents[1]
+PRODUCTION_MIN_TCP_SPEED_M_S = 0.003
+SEGMENTED_PROCESS_SUMMARY = ROOT / "outputs/segmented_process_summary.json"
 
 
 @dataclass(frozen=True)
@@ -31,6 +34,26 @@ def _metric_map(path: Path) -> dict[str, str]:
         return {row["metric"]: row["value"] for row in csv.DictReader(f)}
 
 
+def _load_json(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+def _segmented_process_ok(summary: dict) -> bool:
+    return (
+        summary.get("overall_status") == "pass"
+        and summary.get("execution_mode") == "segmented_process_with_smooth_reorientation_stops"
+        and summary.get("process_joint_continuity_status") == "pass"
+        and summary.get("reorientation_transition_status") == "pass"
+        and summary.get("spray_off_transition_status") in {"pass", "not_required"}
+    )
+
+
+def _tool_tcp_waived(quality: dict[str, str]) -> bool:
+    return quality.get("tool_tcp_source", "").strip().lower() == "assumed_150mm_placeholder"
+
+
 def _moveit_runtime_report_status(
     quality_path: Path,
     dynamics_path: Path,
@@ -41,25 +64,80 @@ def _moveit_runtime_report_status(
         return (
             "warn",
             "No local ROS2/MoveIt2 runtime reports were found; this Windows run can only prove static bridge wiring and generated inputs",
-        )
+    )
     quality = _metric_map(quality_path)
-    if quality.get("status") != "pass":
-        return ("fail", f"MoveIt FK quality report status is {quality.get('status', 'missing')!r}")
+    segmented_process = _load_json(SEGMENTED_PROCESS_SUMMARY)
+    segmented_joint_ok = _segmented_process_ok(segmented_process)
     required_quality = [
         "fk_normal_error_max_deg",
         "fk_standoff_error_max_abs_mm",
         "fk_path_deviation_max_mm",
+        "fk_tcp_speed_mean_m_s",
         "fk_tcp_speed_p05_p95_fluctuation",
         "moveit_ruckig_smoothing_used",
         "moveit_ee_link",
+        "max_joint_step_deg",
+        "production_joint_step_limit_deg",
+        "joint_continuity_status",
+        "tool_tcp_xyz",
+        "tool_tcp_rpy",
+        "tool_tcp_source",
     ]
     missing_quality = [key for key in required_quality if key not in quality]
     if missing_quality:
         return ("fail", "MoveIt FK quality report is missing: " + ", ".join(missing_quality))
+    gate_failures: list[str] = []
+    if quality.get("status") != "pass" and not (
+        quality.get("joint_continuity_status") == "fail" and segmented_joint_ok
+    ):
+        gate_failures.append(f"MoveIt FK quality report status is {quality.get('status', 'missing')!r}")
     if quality.get("moveit_ruckig_smoothing_used", "").strip().lower() != "true":
         return ("fail", "MoveIt FK quality report does not prove native Ruckig smoothing was used")
     if quality.get("moveit_ee_link", "").strip() != "spray_tcp_link":
         return ("fail", f"MoveIt FK quality report used unexpected ee_link={quality.get('moveit_ee_link', 'missing')!r}")
+    tool_tcp_source = quality.get("tool_tcp_source", "").strip().lower()
+    if _tool_tcp_waived(quality):
+        pass
+    elif not tool_tcp_source or "assumed" in tool_tcp_source or "placeholder" in tool_tcp_source:
+        gate_failures.append(
+            "MoveIt quality report uses a non-production TCP source: "
+            f"tool_tcp_source={quality.get('tool_tcp_source', 'missing')!r}, "
+            f"tool_tcp_xyz={quality.get('tool_tcp_xyz', 'missing')!r}, "
+            f"tool_tcp_rpy={quality.get('tool_tcp_rpy', 'missing')!r}"
+        )
+    else:
+        metadata_missing = [
+            key
+            for key in ("tool_tcp_measured_by", "tool_tcp_measured_date", "tool_tcp_calibration_method")
+            if not quality.get(key, "").strip()
+        ]
+        if metadata_missing:
+            gate_failures.append("MoveIt quality report is missing measured TCP metadata: " + ", ".join(metadata_missing))
+        else:
+            try:
+                dt.date.fromisoformat(quality["tool_tcp_measured_date"].strip())
+            except ValueError:
+                gate_failures.append("MoveIt quality report has invalid tool_tcp_measured_date; expected YYYY-MM-DD")
+    tcp_speed_mean = float(quality["fk_tcp_speed_mean_m_s"])
+    if tcp_speed_mean < PRODUCTION_MIN_TCP_SPEED_M_S:
+        gate_failures.append(
+            "MoveIt TCP speed is diagnostic-only: "
+            f"fk_tcp_speed_mean_m_s={tcp_speed_mean:.6g}, "
+            f"production_min_tcp_speed_m_s={PRODUCTION_MIN_TCP_SPEED_M_S:.6g}"
+        )
+    if quality.get("joint_continuity_status") != "pass" and not segmented_joint_ok:
+        raw_suffix = ""
+        if quality.get("max_joint_step_raw_deg"):
+            raw_suffix = (
+                f", raw_max={quality.get('max_joint_step_raw_deg')}, "
+                f"raw_joint={quality.get('max_joint_step_raw_joint', 'missing')}"
+            )
+        gate_failures.append(
+            "MoveIt joint continuity gate failed: "
+            f"max_joint_step_deg={quality.get('max_joint_step_deg', 'missing')}, "
+            f"limit={quality.get('production_joint_step_limit_deg', 'missing')}"
+            f"{raw_suffix}",
+        )
 
     required_trace = {
         "t",
@@ -126,16 +204,42 @@ def _moveit_runtime_report_status(
     if collision_path is not None and collision_path.exists():
         collision = _metric_map(collision_path)
         if collision.get("status") != "pass":
-            return ("fail", f"MoveIt collision report status is {collision.get('status', 'missing')!r}")
+            gate_failures.append(
+                f"MoveIt collision report status is {collision.get('status', 'missing')!r}; "
+                f"collision_count={collision.get('collision_count', 'missing')}, "
+                f"checked_states={collision.get('collision_checked_state_count', 'missing')}, "
+                f"first_collision_index={collision.get('first_collision_index', 'missing')}, "
+                f"first_collision_contact_count={collision.get('first_collision_contact_count', 'missing')}"
+            )
         if float(collision.get("collision_count", "nan")) != 0.0:
-            return ("fail", f"MoveIt collision report found collision_count={collision.get('collision_count')}")
+            gate_failures.append(f"MoveIt collision report found collision_count={collision.get('collision_count')}")
+        open_path_collision = collision.get("open_path", "").strip().lower() == "true"
+        bottom_closure = collision.get("include_bottom_closure_collision", "").strip().lower()
+        if not open_path_collision and bottom_closure != "true":
+            gate_failures.append(
+                "MoveIt collision environment omits the bottom closure "
+                f"(include_bottom_closure_collision={collision.get('include_bottom_closure_collision', 'missing')})"
+            )
         collision_states = int(float(collision.get("collision_checked_state_count", "0")))
         collision_objects = int(float(collision.get("collision_environment_object_count", "0")))
         collision_suffix = f", collision states={collision_states}, environment objects={collision_objects}"
+    if gate_failures:
+        return ("fail", "; ".join(gate_failures))
+    waiver_suffix = ""
+    if _tool_tcp_waived(quality):
+        waiver_suffix += (
+            "; tool_tcp_source=assumed_150mm_placeholder accepted by current validation scope"
+        )
+    if quality.get("joint_continuity_status") != "pass" and segmented_joint_ok:
+        waiver_suffix += (
+            "; raw continuous joint gate is replaced by segmented spray-off reorientation evidence "
+            f"(process_max_joint_step_deg={segmented_process.get('process_max_joint_step_deg')}, "
+            f"transition_max_step_deg={segmented_process.get('reorientation_transition_max_interpolated_step_deg')})"
+        )
     return (
         "pass",
         f"MoveIt FK quality report passed, FK trace rows={trace_rows}, joint dynamics ratios are within limits; "
-        f"max_jerk_ratio={max_jerk_ratio:.4g}{collision_suffix}",
+        f"max_jerk_ratio={max_jerk_ratio:.4g}{collision_suffix}{waiver_suffix}",
     )
 
 
@@ -168,12 +272,14 @@ def audit_goal_requirements(
     moveit_dynamics_report: Path | None = None,
     moveit_fk_trace: Path | None = None,
     moveit_collision_report: Path | None = None,
+    tcp_pose_csv: Path | None = None,
 ) -> list[AuditItem]:
     items: list[AuditItem] = []
     example = _read("examples/run_fr5_tunnel_spray.py")
     metrics_source = _read("src/metrics.py")
     robot_source = _read("src/robot_model.py")
     bridge = _read("ros2_moveit_bridge/plan_closed_contour_moveit.py")
+    strict_script = _read("scripts/run_moveit_strict_validation.sh")
     srdf = _read("ros2_moveit_bridge/config/fairino5_v6_spray_tcp.srdf")
     report = _metric_map(ROOT / "outputs/quality_report.csv")
 
@@ -199,7 +305,7 @@ def audit_goal_requirements(
         )
     )
 
-    tcp_csv = ROOT / "outputs/tcp_poses.csv"
+    tcp_csv = tcp_pose_csv or (ROOT / "outputs/tcp_poses.csv")
     if tcp_csv.exists():
         max_normal_error, pose_count = _tcp_pose_normal_error(tcp_csv)
         pose_csv_ok = pose_count > 0 and max_normal_error < 0.1
@@ -218,7 +324,7 @@ def audit_goal_requirements(
         AuditItem(
             "MoveIt2 uses wall-normal TCP pose goals",
             "pass" if moveit_normal_ok and pose_csv_ok else "fail",
-            f"tcp_poses pose_count={pose_count}, quaternion-vs-normal max error={max_normal_error:.6g} deg; MoveIt goal link is spray_tcp_link"
+            f"tcp_poses path={tcp_csv}, pose_count={pose_count}, quaternion-vs-normal max error={max_normal_error:.6g} deg; MoveIt goal link is spray_tcp_link"
             if moveit_normal_ok and pose_csv_ok
             else "MoveIt bridge pose handling, SRDF TCP tip, or tcp_poses normal alignment is missing",
         )
@@ -260,6 +366,55 @@ def audit_goal_requirements(
             "bridge builds the MoveIt trajectory, applies configured time-parameterization, then native RobotTrajectory.apply_ruckig_smoothing; execution refuses use_ruckig_smoothing:=false"
             if ruckig_order_ok
             else "MoveIt2 TOTG/Ruckig order or execution guard is missing",
+        )
+    )
+
+    execute_fn = bridge[bridge.find("if execute_trajectory:") :]
+    execution_quality_guard_ok = (
+        'quality_metrics.get("status") != "pass"' in execute_fn
+        and "FK quality report status" in execute_fn
+        and "moveit.execute" in execute_fn
+        and execute_fn.index('quality_metrics.get("status") != "pass"') < execute_fn.index("moveit.execute")
+    )
+    items.append(
+        AuditItem(
+            "Controller execution is blocked unless strict quality gates pass",
+            "pass" if execution_quality_guard_ok else "fail",
+            "execute_trajectory path refuses non-pass FK quality reports before moveit.execute, including joint-continuity failures"
+            if execution_quality_guard_ok
+            else "execute_trajectory path can reach moveit.execute without checking FK quality report status",
+        )
+    )
+
+    tool_tcp_guard_ok = all(
+        needle in strict_script
+        for needle in [
+            'TOOL_TCP_CALIBRATION_YAML="${TOOL_TCP_CALIBRATION_YAML:-}"',
+            'TOOL_TCP_XYZ="${TOOL_TCP_XYZ:-0.000 0.000 0.150}"',
+            'TOOL_TCP_SOURCE="${TOOL_TCP_SOURCE:-assumed_150mm_placeholder}"',
+            'ALLOW_ZERO_TOOL_TCP="${ALLOW_ZERO_TOOL_TCP:-false}"',
+            'ALLOW_SEED_JOINT_WITH_TOOL_OFFSET="${ALLOW_SEED_JOINT_WITH_TOOL_OFFSET:-false}"',
+            'PLANNING_MODE="${PLANNING_MODE:-ik_waypoints}"',
+            "load_tool_tcp_calibration.py",
+            "Refusing strict validation with a zero tool TCP",
+            "Refusing planning_mode=seed_joint_waypoints with a non-zero tool TCP",
+            'tool_tcp_source:="$TOOL_TCP_SOURCE"',
+        ]
+    ) and all(
+        needle in bridge
+        for needle in [
+            '"tool_tcp_xyz": tool_tcp_xyz',
+            '"tool_tcp_rpy": tool_tcp_rpy',
+            '"tool_tcp_source": tool_tcp_source',
+        ]
+    )
+    items.append(
+        AuditItem(
+            "Strict validation records and guards the assumed spray TCP",
+            "pass" if tool_tcp_guard_ok else "fail",
+            "strict script defaults to a 150 mm assumed TCP, can load measured TCP calibration YAML, refuses zero TCP unless explicitly allowed, blocks seed-joint replay with non-zero TCP, and the MoveIt quality report records the TCP assumption"
+            if tool_tcp_guard_ok
+            else "Strict TCP defaults, unsafe-mode guards, or quality-report TCP evidence are missing",
         )
     )
 
@@ -311,6 +466,12 @@ def main() -> int:
         help="Path to the MoveIt collision report generated by ros2_moveit_bridge.",
     )
     parser.add_argument(
+        "--tcp-pose-csv",
+        type=Path,
+        default=ROOT / "outputs/tcp_poses.csv",
+        help="TCP pose CSV used for the MoveIt runtime under audit.",
+    )
+    parser.add_argument(
         "--json-report",
         type=Path,
         default=None,
@@ -322,6 +483,7 @@ def main() -> int:
         args.moveit_dynamics_report,
         args.moveit_fk_trace,
         args.moveit_collision_report,
+        args.tcp_pose_csv,
     )
     for item in items:
         print(f"{item.status.upper()}: {item.requirement}")

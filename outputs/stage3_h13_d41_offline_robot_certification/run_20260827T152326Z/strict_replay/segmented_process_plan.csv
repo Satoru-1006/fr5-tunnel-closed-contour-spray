@@ -1,0 +1,2 @@
+segment_id,type,spray_enabled,start_index,end_index,loop_index,phase_start,phase_end,max_joint_step_deg,status
+0,process,true,0,180,0,0,180,14.991790333724396,pass

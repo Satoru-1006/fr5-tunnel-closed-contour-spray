@@ -1,0 +1,123 @@
+{
+  "benchmark_id": "STAGE4_SYSTEM_BENCHMARK_V1",
+  "bottleneck_list_id": "STAGE4_RISK_RANKED_BOTTLENECKS_V1",
+  "bottlenecks": [
+    {
+      "affected_families": [
+        "ADVERSARIAL",
+        "BOUNDARY",
+        "COLLISION_SENSITIVE",
+        "NORMAL",
+        "PERTURBATION",
+        "REGRESSION"
+      ],
+      "category": "singularity",
+      "frequency": 237,
+      "frequency_rate": 0.237,
+      "id": "B1_NEAR_SINGULAR_JACOBIAN",
+      "likely_subsystem": "DLS/Jacobian conditioning and trajectory geometry",
+      "measurement_confidence": "high_native_moveit_svd",
+      "rank": 1,
+      "reproducibility": "repeated regression controls and authenticated D41 replay",
+      "safety_impact": "potential loss of Cartesian controllability near ill-conditioned configurations",
+      "severity": "high_diagnostic_risk",
+      "stage4b_action": "attack singularity exposure/conditioning while preserving acceptance-set collision and limit barriers",
+      "worst_magnitude": {
+        "maximum_condition_number": 11822852191.641027,
+        "minimum_sigma_min": 1.5720330432378874e-10
+      }
+    },
+    {
+      "affected_case_ids": [
+        "boundary_0001",
+        "boundary_0002",
+        "boundary_0003",
+        "boundary_0007",
+        "boundary_0008",
+        "boundary_0009",
+        "boundary_0013",
+        "boundary_0014",
+        "boundary_0015",
+        "boundary_0019",
+        "boundary_0020",
+        "boundary_0021",
+        "boundary_0025",
+        "boundary_0026",
+        "boundary_0027",
+        "boundary_0031",
+        "boundary_0032",
+        "boundary_0033",
+        "boundary_0037",
+        "boundary_0038"
+      ],
+      "affected_families": [
+        "BOUNDARY",
+        "COLLISION_SENSITIVE"
+      ],
+      "category": "geometry/collision",
+      "frequency": 296,
+      "frequency_rate": 0.296,
+      "id": "B2_COLLISION_SENSITIVE_ROBUSTNESS",
+      "likely_subsystem": "trajectory geometry and collision margin",
+      "measurement_confidence": "high_native_moveit_bullet_fcl",
+      "rank": 2,
+      "reproducibility": "native MoveIt2 PlanningScene/Bullet re-run in same benchmark process",
+      "safety_impact": "measured geometric safety failures under predeclared collision-sensitive excursions",
+      "severity": "high_for_affected_stress_cases",
+      "stage4b_action": "attack only after D46; retain all failing cases and do not relax collision gates",
+      "worst_magnitude": {
+        "max_environment_ccd_failures": 115,
+        "min_self_clearance_m": -0.08030684992908682
+      }
+    },
+    {
+      "affected_case_ids": [
+        "boundary_0001",
+        "boundary_0002",
+        "boundary_0007",
+        "boundary_0008",
+        "boundary_0013",
+        "boundary_0014",
+        "boundary_0019",
+        "boundary_0020",
+        "boundary_0025",
+        "boundary_0026",
+        "boundary_0031",
+        "boundary_0032",
+        "boundary_0037",
+        "boundary_0038",
+        "boundary_0043",
+        "boundary_0044",
+        "boundary_0049",
+        "boundary_0050",
+        "boundary_0055",
+        "boundary_0056"
+      ],
+      "affected_families": [
+        "BOUNDARY",
+        "COLLISION_SENSITIVE"
+      ],
+      "category": "geometry/clearance",
+      "frequency": 267,
+      "frequency_rate": 0.267,
+      "id": "B3_LOW_GEOMETRIC_CLEARANCE_MARGIN",
+      "likely_subsystem": "trajectory geometry, obstacle margin, and self-clearance",
+      "measurement_confidence": "high_native_moveit_fcl_distance; acceptance threshold unresolved",
+      "rank": 3,
+      "reproducibility": "native MoveIt2 clearance replay matched on equivalent waypoint rows",
+      "safety_impact": "small or negative geometric margin is diagnostic evidence; no unsupported physical clearance gate was invented",
+      "severity": "high_for_affected_cases; physical threshold unresolved",
+      "stage4b_action": "attack clearance margin using the retained low-margin cases without removing collision or clearance evidence",
+      "worst_magnitude": {
+        "minimum_environment_clearance_m": -0.5925596612628776,
+        "minimum_self_clearance_m": -0.08030684992908682
+      }
+    }
+  ],
+  "methodology": "rank uses severity \u00d7 frequency \u00d7 safety impact \u00d7 measurement confidence; deliberate control cases are retained and labelled",
+  "schema_version": "stage4-risk-ranked-bottlenecks-v1",
+  "stage4b_ready": true,
+  "top_1_bottleneck": "B1_NEAR_SINGULAR_JACOBIAN",
+  "top_2_bottleneck": "B2_COLLISION_SENSITIVE_ROBUSTNESS",
+  "top_3_bottleneck": "B3_LOW_GEOMETRIC_CLEARANCE_MARGIN"
+}

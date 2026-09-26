@@ -1,0 +1,48 @@
+{
+  "clearance": {
+    "environment": "AVAILABLE_NATIVE_FCL_DISTANCE",
+    "self": "AVAILABLE_NATIVE_FCL_DISTANCE",
+    "threshold_status": "UNRESOLVED_THRESHOLD"
+  },
+  "collision_results_label": "adaptive_discrete_interpolation",
+  "levels": [
+    {
+      "backend": "native MoveIt2 PlanningScene/Bullet",
+      "level": 1,
+      "name": "DISCRETE_ENVIRONMENT_COLLISION",
+      "result_field": "native_waypoint_environment_collision_count",
+      "status": "AVAILABLE"
+    },
+    {
+      "backend": "native MoveIt2 PlanningScene/Bullet",
+      "level": 2,
+      "name": "DISCRETE_SELF_COLLISION",
+      "result_field": "native_waypoint_self_collision_count",
+      "status": "AVAILABLE"
+    },
+    {
+      "backend": "native adaptive joint-space interpolation",
+      "level": 3,
+      "name": "DENSE_TIME_SAMPLED_COLLISION",
+      "result_field": "dense_*_collision_samples",
+      "status": "AVAILABLE"
+    },
+    {
+      "backend": "real native CollisionEnv::checkRobotCollision(state1,state2)",
+      "failure_count": 15687,
+      "level": 4,
+      "name": "ENVIRONMENT_CCD",
+      "scope_note": "environment only; collision result labels remain adaptive_discrete_interpolation",
+      "status": "AVAILABLE_NATIVE_BULLET_ROBOT_WORLD"
+    },
+    {
+      "backend": "installed MoveIt wrapper exposes no validated self two-state continuous overload",
+      "dense_discrete_substitute": false,
+      "level": 5,
+      "name": "CONTINUOUS_SELF_COLLISION",
+      "status": "NOT_AVAILABLE"
+    }
+  ],
+  "matrix_id": "STAGE4_COLLISION_COVERAGE_MATRIX_V1",
+  "schema_version": "stage4-collision-coverage-matrix-v1"
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>stage4a_fk</name>
+  <version>0.1.0</version>
+  <description>Stage 4A native MoveIt2 FK trace measurement tool.</description>
+  <maintainer email="codex@local.invalid">D46 measurement sandbox</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>moveit_core</depend>
+  <depend>rclcpp</depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

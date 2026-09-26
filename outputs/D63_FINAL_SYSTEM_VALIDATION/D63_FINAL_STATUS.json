@@ -1,0 +1,105 @@
+{
+  "claim_scope": "software evidence-chain validation only; D63 PASS subchecks do not close unresolved continuous articulated self-CCD or physical safety",
+  "lineage_boundary": {
+    "D59_D60_zero_zero_observations": "historical scoped conservative-model results",
+    "D62_current_continuous_certificate": "UNRESOLVED where unresolved intervals are nonzero",
+    "promotion": "NO_PROMOTION"
+  },
+  "completion_claim": "software evidence-chain closure only; no physical hardware safety claim",
+  "engineering": {
+    "checks": {
+      "compiled_backend_claimed": false,
+      "d62_isolated_shadow": true,
+      "d62_no_resource_limit": true,
+      "d62_reference_runtime_recorded": true,
+      "maintainability": true
+    },
+    "runtime": {
+      "auto0": {
+        "coarse_wall_time_s": 1832.652255699999,
+        "implementation": "Python reference shadow; coarse plus interval-indexed bounded refinement",
+        "refinement_wall_time_s": 0.0,
+        "wall_time_s": 1832.652255699999
+      },
+      "auto1": {
+        "coarse_wall_time_s": 1746.6515395000024,
+        "implementation": "Python reference shadow; coarse plus interval-indexed bounded refinement",
+        "refinement_wall_time_s": 0.0,
+        "wall_time_s": 1746.6515395000024
+      }
+    },
+    "status": "PASS"
+  },
+  "evidence": {
+    "d59_final_status": "D:\\robotfucker\\outputs\\D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE\\D59_FINAL_STATUS.json",
+    "d62_combined_certificate_auto0": "D:\\robotfucker\\outputs\\D62_CONTINUOUS_CERTIFICATE_SHADOW\\auto0\\D62_CERTIFICATE_combined_full.json",
+    "d62_combined_certificate_auto1": "D:\\robotfucker\\outputs\\D62_CONTINUOUS_CERTIFICATE_SHADOW\\auto1\\D62_CERTIFICATE_combined_full.json"
+  },
+  "motion": {
+    "checks": {
+      "acceleration": true,
+      "finite_continuity": true,
+      "joint_limits": true,
+      "native_execution": true,
+      "profile_j": true,
+      "velocity": true
+    },
+    "status": "PASS"
+  },
+  "protected_state": {
+    "canonical": "outputs/D47_STAGE4B_ROLLING_CHAMPION_V1/PROMOTED/B3",
+    "canonical_not_promoted_by_d63": true,
+    "promotion": "NO_PROMOTION",
+    "protected_floor": "c4_clearance_adversarial0101_amp005_consistent_0025",
+    "protected_inputs_unchanged": true
+  },
+  "remaining_boundary": [
+    "hardware calibration, encoder/backlash/compliance and tracking error are not measured",
+    "physical clearance acceptance and hardware torque/current/thermal limits remain unavailable",
+    "D62 unresolved intervals, if nonzero, remain unresolved and block theorem-level full coverage"
+  ],
+  "safety": {
+    "checks": {
+      "d62_continuous_self_collision_certificate": false,
+      "d62_unresolved_is_not_pass": false,
+      "fcl_rigid_endpoint_cross_check": true,
+      "moveit_robot_world_segment_check": true,
+      "physical_clearance_boundary_preserved": true
+    },
+    "d62": {
+      "available": true,
+      "cases": {
+        "auto0": {
+          "collision_regions": 0,
+          "coverage_complete": true,
+          "minimum_clearance_is_explicitly_unavailable": true,
+          "resource_limit_reached": false,
+          "runtime_recorded": true,
+          "status": "UNRESOLVED",
+          "unresolved_regions": 3437
+        },
+        "auto1": {
+          "collision_regions": 0,
+          "coverage_complete": true,
+          "minimum_clearance_is_explicitly_unavailable": true,
+          "resource_limit_reached": false,
+          "runtime_recorded": true,
+          "status": "UNRESOLVED",
+          "unresolved_regions": 3401
+        }
+      }
+    },
+    "status": "UNRESOLVED"
+  },
+  "schema_version": "d63-final-system-validation-v1",
+  "stability": {
+    "checks": {
+      "candidate_replays": true,
+      "finite_singularity_metrics": true,
+      "model_dynamics": true,
+      "robustness": true
+    },
+    "status": "PASS"
+  },
+  "status": "PARTIALLY_EXECUTED_MEASURED_NO_PROMOTION"
+}

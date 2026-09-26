@@ -1,0 +1,92 @@
+pose_count: 181.0
+quaternion_norm_min: 0.9999999999999999
+quaternion_norm_max: 1.0
+normal_angle_error_max_deg: 8.537736462515939e-07
+normal_angle_error_mean_deg: 2.8301888826019686e-08
+station_y_std: 4.4259637197690814e-17
+close_position_error: not_applicable_open_path
+status: pass
+pose_count: 181.0
+quaternion_norm_min: 0.9999999999999999
+quaternion_norm_max: 1.0
+normal_angle_error_max_deg: 8.537736462515939e-07
+normal_angle_error_mean_deg: 2.8301888826019686e-08
+station_y_std: 4.4259637197690814e-17
+close_position_error: not_applicable_open_path
+status: pass
+[INFO] [launch]: All log files can be found below /home/robot/.ros/log/2026-08-27-23-35-24-607450-satoru-1106
+[INFO] [launch]: Default logging verbosity is set to INFO
+warning: Using load_yaml() directly is deprecated. Use xacro.load_yaml() instead.
+[INFO] [plan_closed_contour_moveit-1]: process started with pid [1110]
+[plan_closed_contour_moveit-1] [INFO] [1787844926.003986584] [moveit_815072829.moveit.py.cpp_initializer]: Initialize rclcpp
+[plan_closed_contour_moveit-1] [INFO] [1787844926.004050476] [moveit_815072829.moveit.py.cpp_initializer]: Initialize node parameters
+[plan_closed_contour_moveit-1] [INFO] [1787844926.004074209] [moveit_815072829.moveit.py.cpp_initializer]: Initialize node and executor
+[plan_closed_contour_moveit-1] [WARN] [1787844926.004944700] [rcl.logging_rosout]: Publisher already registered for node name: 'fr5_closed_contour_moveit_planner'. If this is due to multiple nodes with the same name then all logs for the logger named 'fr5_closed_contour_moveit_planner' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[plan_closed_contour_moveit-1] [INFO] [1787844926.011508843] [moveit_815072829.moveit.py.cpp_initializer]: Spin separate thread
+[plan_closed_contour_moveit-1] [INFO] [1787844926.080228184] [moveit_815072829.moveit.ros.rdf_loader]: Loaded robot model in 0.0684572 seconds
+[plan_closed_contour_moveit-1] [INFO] [1787844926.080320328] [moveit_815072829.moveit.core.robot_model]: Loading robot model 'fairino5_v6_spray_tcp'...
+[plan_closed_contour_moveit-1] [INFO] [1787844926.080328073] [moveit_815072829.moveit.core.robot_model]: No root/virtual joint specified in SRDF. Assuming fixed joint
+[plan_closed_contour_moveit-1] [WARN] [1787844926.455608209] [kdl_parser]: The root link base_link has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[plan_closed_contour_moveit-1] [INFO] [1787844926.455732160] [moveit_815072829.moveit.kinematics.kdl_kinematics_plugin]: Joint weights for group 'fairino5_v6_group': 1 1 1 1 1 1
+[plan_closed_contour_moveit-1] [INFO] [1787844926.726674128] [moveit_815072829.moveit.ros.planning_scene_monitor]: Publishing maintained planning scene on 'monitored_planning_scene'
+[plan_closed_contour_moveit-1] [INFO] [1787844926.726812123] [moveit_815072829.moveit.ros.moveit_cpp]: Listening to 'joint_states' for joint states
+[plan_closed_contour_moveit-1] [INFO] [1787844926.727472855] [moveit_815072829.moveit.ros.current_state_monitor]: Listening to joint states on topic 'joint_states'
+[plan_closed_contour_moveit-1] [INFO] [1787844926.727860216] [moveit_815072829.moveit.ros.planning_scene_monitor]: Listening to '/attached_collision_object' for attached collision objects
+[plan_closed_contour_moveit-1] [INFO] [1787844926.727873370] [moveit_815072829.moveit.ros.planning_scene_monitor]: Stopping existing planning scene publisher.
+[plan_closed_contour_moveit-1] [INFO] [1787844926.728083293] [moveit_815072829.moveit.ros.planning_scene_monitor]: Stopped publishing maintained planning scene.
+[plan_closed_contour_moveit-1] [INFO] [1787844926.728323469] [moveit_815072829.moveit.ros.planning_scene_monitor]: Publishing maintained planning scene on 'monitored_planning_scene'
+[plan_closed_contour_moveit-1] [INFO] [1787844926.728387786] [moveit_815072829.moveit.ros.planning_scene_monitor]: Starting planning scene monitor
+[plan_closed_contour_moveit-1] [INFO] [1787844926.728669434] [moveit_815072829.moveit.ros.planning_scene_monitor]: Listening to '/planning_scene'
+[plan_closed_contour_moveit-1] [INFO] [1787844926.728679190] [moveit_815072829.moveit.ros.planning_scene_monitor]: Starting world geometry update monitor for collision objects, attached objects, octomap updates.
+[plan_closed_contour_moveit-1] [INFO] [1787844926.729181775] [moveit_815072829.moveit.ros.planning_scene_monitor]: Listening to 'collision_object'
+[plan_closed_contour_moveit-1] [INFO] [1787844926.729429730] [moveit_815072829.moveit.ros.planning_scene_monitor]: Listening to 'planning_scene_world' for planning scene world geometry
+[plan_closed_contour_moveit-1] [WARN] [1787844926.754488652] [moveit_815072829.moveit.ros.occupancy_map_monitor]: Resolution not specified for Octomap. Assuming resolution = 0.1 instead
+[plan_closed_contour_moveit-1] [ERROR] [1787844926.754574932] [moveit_815072829.moveit.ros.occupancy_map_monitor]: No 3D sensor plugin(s) defined for octomap updates
+[plan_closed_contour_moveit-1] [INFO] [1787844926.941257130] [moveit_815072829.moveit.ros.planning_pipeline]: Successfully loaded planner 'OMPL'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.053488786] [fr5_closed_contour_moveit_planner]: Try loading adapter 'default_planning_request_adapters/ResolveConstraintFrames'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.067845820] [fr5_closed_contour_moveit_planner]: Loaded adapter 'default_planning_request_adapters/ResolveConstraintFrames'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.067916044] [fr5_closed_contour_moveit_planner]: Try loading adapter 'default_planning_request_adapters/ValidateWorkspaceBounds'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.068144940] [fr5_closed_contour_moveit_planner]: Loaded adapter 'default_planning_request_adapters/ValidateWorkspaceBounds'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.068156287] [fr5_closed_contour_moveit_planner]: Try loading adapter 'default_planning_request_adapters/CheckStartStateBounds'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.068192170] [fr5_closed_contour_moveit_planner]: Loaded adapter 'default_planning_request_adapters/CheckStartStateBounds'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.068198055] [fr5_closed_contour_moveit_planner]: Try loading adapter 'default_planning_request_adapters/CheckStartStateCollision'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.068208027] [fr5_closed_contour_moveit_planner]: Loaded adapter 'default_planning_request_adapters/CheckStartStateCollision'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.196186400] [fr5_closed_contour_moveit_planner]: Try loading adapter 'default_planning_response_adapters/AddTimeOptimalParameterization'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.211011577] [fr5_closed_contour_moveit_planner]: Loaded adapter 'default_planning_response_adapters/AddTimeOptimalParameterization'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.211049455] [fr5_closed_contour_moveit_planner]: Try loading adapter 'default_planning_response_adapters/ValidateSolution'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.212557543] [fr5_closed_contour_moveit_planner]: Loaded adapter 'default_planning_response_adapters/ValidateSolution'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.212578626] [fr5_closed_contour_moveit_planner]: Try loading adapter 'default_planning_response_adapters/DisplayMotionPath'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.213061324] [fr5_closed_contour_moveit_planner]: Loaded adapter 'default_planning_response_adapters/DisplayMotionPath'
+[plan_closed_contour_moveit-1] [INFO] [1787844927.398347948] [moveit_815072829.moveit.plugins.simple_controller_manager]: Added FollowJointTrajectory controller for fairino5_controller
+[plan_closed_contour_moveit-1] [INFO] [1787844927.398600505] [moveit_815072829.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[plan_closed_contour_moveit-1] [INFO] [1787844927.398626669] [moveit_815072829.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[plan_closed_contour_moveit-1] [INFO] [1787844927.399259988] [moveit_815072829.moveit.ros.trajectory_execution_manager]: Trajectory execution is managing controllers
+[plan_closed_contour_moveit-1] [INFO] [1787844927.600365315] [fr5_closed_contour_moveit_planner]: Using native MoveIt2 FK/Jacobian normal-constrained DLS projection from the D39 causal warm start.
+[plan_closed_contour_moveit-1] [INFO] [1787844938.076768676] [fr5_closed_contour_moveit_planner]: Using executable segmented trajectory with 0 spray-off reorientation transitions.
+[plan_closed_contour_moveit-1] [WARN] [1787844938.194169988] [fr5_closed_contour_moveit_planner]: Trajectory was planned, Ruckig-smoothed, FK-validated, and exported, but not executed because execute_trajectory is false.
+[plan_closed_contour_moveit-1] [INFO] [1787844938.199681362] [fr5_closed_contour_moveit_planner]: All MoveIt2 reports were written; using fast process exit to avoid MoveItPy shutdown/destructor instability.
+[INFO] [plan_closed_contour_moveit-1]: process has finished cleanly [pid 1110]
+PASS: Real TCP speed and stand-off are recomputed from FK(q(t))
+  example FK profile uses tcp_speed_from_positions; final strict validation uses MoveIt2 FK reports for TCP speed, normal, and stand-off gates
+PASS: MoveIt2 uses wall-normal TCP pose goals
+  tcp_poses path=/mnt/d/robotfucker/outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv, pose_count=181, quaternion-vs-normal max error=8.53774e-07 deg; MoveIt goal link is spray_tcp_link
+PASS: IK includes nozzle wall-normal orientation constraints
+  IK residual includes tool-Z axis error; current FK normal_angle_error_max_deg=2.024380697964421
+PASS: Ruckig smoothing runs after MoveIt2 trajectory planning/time-parameterization
+  bridge builds the MoveIt trajectory, applies configured time-parameterization, then native RobotTrajectory.apply_ruckig_smoothing; execution refuses use_ruckig_smoothing:=false
+PASS: Controller execution is blocked unless strict quality gates pass
+  execute_trajectory path refuses non-pass FK quality reports before moveit.execute, including joint-continuity failures
+PASS: Strict validation records and guards the assumed spray TCP
+  strict script defaults to a 150 mm assumed TCP, can load measured TCP calibration YAML, refuses zero TCP unless explicitly allowed, blocks seed-joint replay with non-zero TCP, and the MoveIt quality report records the TCP assumption
+PASS: ROS2/MoveIt2 runtime execution-chain evidence
+  MoveIt FK quality report passed, FK trace rows=181, joint dynamics ratios are within limits; max_jerk_ratio=0.0002304, collision states=993, environment objects=181; tool_tcp_source=assumed_150mm_placeholder accepted by current validation scope
+Published final MoveIt2 outputs to /mnt/d/robotfucker/outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay
+Wrote production readiness check to /mnt/d/robotfucker/outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z/strict_replay/production_readiness_check.json
+overall_status=pass
+Strict MoveIt2/Ruckig validation passed.
+
+--- STDERR ---
+w s l :   �hKm0R  l o c a l h o s t   �NtM�n�FO*g\��P0R  W S L 0N A T   !j_N�v  W S L   
+N/ec  l o c a l h o s t   �Nt0
+ 
+ 

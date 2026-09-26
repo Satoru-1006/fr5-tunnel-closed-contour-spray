@@ -9,6 +9,7 @@ plan. This file is intentionally separate from the Windows/Python visual demo.
 from __future__ import annotations
 
 import csv
+import json
 import os
 import sys
 import tempfile
@@ -22,10 +23,13 @@ import yaml
 from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseStamped
+from rcl_interfaces.msg import ParameterDescriptor
 from moveit_msgs.msg import RobotTrajectory as RobotTrajectoryMsg
 from moveit_msgs.msg import CollisionObject
 from moveit.core.robot_state import RobotState
 from moveit.core.robot_trajectory import RobotTrajectory
+from moveit.core.collision_detection import CollisionRequest
+from moveit.core.collision_detection import CollisionResult
 from moveit.planning import MoveItPy
 from shape_msgs.msg import SolidPrimitive
 from trajectory_msgs.msg import JointTrajectoryPoint
@@ -161,6 +165,515 @@ def nearest_equivalent_joint_positions(positions: np.ndarray, reference: np.ndar
     return unwrapped
 
 
+def circular_joint_delta(delta: np.ndarray) -> np.ndarray:
+    """Return shortest equivalent revolute-joint deltas for continuity diagnostics."""
+
+    return (np.asarray(delta, dtype=float) + np.pi) % (2.0 * np.pi) - np.pi
+
+
+def _select_diverse_ik_beams(
+    sorted_beams: list[tuple[float, float, float, list[np.ndarray]]],
+    beam_width: int,
+    diversity_threshold: float,
+) -> list[tuple[float, float, float, list[np.ndarray]]]:
+    """Keep low-cost IK beams while avoiding premature collapse to one branch."""
+
+    if beam_width <= 0 or not sorted_beams:
+        return []
+    if diversity_threshold <= 0.0:
+        return sorted_beams[:beam_width]
+
+    selected: list[tuple[float, float, float, list[np.ndarray]]] = []
+    deferred: list[tuple[float, float, float, list[np.ndarray]]] = []
+    for beam in sorted_beams:
+        positions = beam[3][-1] if beam[3] else None
+        if positions is None:
+            selected.append(beam)
+        else:
+            too_close = False
+            for existing in selected:
+                existing_positions = existing[3][-1] if existing[3] else None
+                if existing_positions is None:
+                    continue
+                separation = float(np.max(np.abs(circular_joint_delta(positions - existing_positions))))
+                if separation < diversity_threshold:
+                    too_close = True
+                    break
+            if too_close:
+                deferred.append(beam)
+            else:
+                selected.append(beam)
+        if len(selected) >= beam_width:
+            break
+    if len(selected) < beam_width:
+        selected.extend(deferred[: beam_width - len(selected)])
+    return selected[:beam_width]
+
+
+def _ik_seed_candidates(
+    primary_seed: np.ndarray,
+    previous_positions: np.ndarray | None,
+) -> list[np.ndarray]:
+    """Generate branch seeds for collision-aware continuous IK retry."""
+
+    seeds: list[np.ndarray] = []
+
+    def add(seed: np.ndarray) -> None:
+        if not any(np.allclose(seed, existing, atol=1e-9, rtol=0.0) for existing in seeds):
+            seeds.append(seed.copy())
+
+    add(np.asarray(primary_seed, dtype=float))
+    if previous_positions is not None:
+        previous = np.asarray(previous_positions, dtype=float)
+        add(previous)
+        for joint_index in range(len(previous)):
+            for offset in (-2.0 * np.pi, -np.pi, np.pi, 2.0 * np.pi):
+                seed = previous.copy()
+                seed[joint_index] += offset
+                add(seed)
+        branch_pairs = ((0, 1), (1, 2), (2, 3), (0, 5), (3, 5), (4, 5))
+        for joint_a, joint_b in branch_pairs:
+            if joint_a >= len(previous) or joint_b >= len(previous):
+                continue
+            for offset_a in (-np.pi, np.pi):
+                for offset_b in (-np.pi, np.pi):
+                    seed = previous.copy()
+                    seed[joint_a] += offset_a
+                    seed[joint_b] += offset_b
+                    add(seed)
+    return seeds
+
+
+def _candidate_collection_seed_candidates(primary_seed: np.ndarray) -> list[np.ndarray]:
+    """Return a bounded branch-seed set for offline IK candidate collection.
+
+    The production beam search deliberately explores a much larger seed set.
+    Candidate-bank generation must be repeatable and bounded, so it starts from
+    the verified continuous seed and samples one-joint shoulder/elbow/wrist
+    branches without allowing 2*pi duplicates to dominate the solve budget.
+    """
+
+    base = np.asarray(primary_seed, dtype=float)
+    seeds: list[np.ndarray] = [base.copy()]
+    for joint_index in range(len(base)):
+        for offset in (-np.pi, np.pi):
+            candidate = base.copy()
+            candidate[joint_index] += offset
+            if not any(np.allclose(candidate, existing, atol=1e-9, rtol=0.0) for existing in seeds):
+                seeds.append(candidate)
+    return seeds
+
+
+def _write_ik_search_diagnostics(path: Path | None, records: list[dict[str, float | int | str]]) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = [
+        "index",
+        "elapsed_s",
+        "input_beam_count",
+        "candidate_failure_count",
+        "colliding_candidate_count",
+        "next_beam_count",
+        "best_bottleneck_step_deg",
+        "best_step_sum_deg",
+        "best_roll_sum_deg",
+        "status",
+        "detail",
+    ]
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(records)
+
+
+def _write_ik_candidate_bank(path: Path | None, records: list[dict[str, float | int | str]]) -> None:
+    """Export collision-aware IK candidates for the offline RL selector."""
+
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = [
+        "waypoint",
+        "candidate",
+        "valid",
+        "colliding",
+        "max_joint_step_deg",
+        "roll_deg",
+        "roll_curve_deg",
+        "roll_bias_deg",
+        "tilt_x_deg",
+        "tilt_y_deg",
+        "reparameterization_window",
+        "backtrack_depth",
+        "collision_summary",
+        "source",
+        "position_error_mm",
+        "normal_error_deg",
+        "edge_prev_valid",
+        "edge_prev_collision_free",
+        "edge_prev_max_joint_step_deg",
+        "reachable_in",
+        "can_reach_end",
+        "path_selected",
+        *[f"q{i}" for i in range(1, 7)],
+    ]
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(records)
+
+
+def _write_ik_candidate_collection_report(path: Path | None, report: dict[str, object]) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def collect_ik_candidate_bank_global_roll_backtracking(
+    moveit,
+    group_name: str,
+    ee_link: str,
+    poses: list[Pose],
+    normals: np.ndarray,
+    joint_names: list[str],
+    ik_timeout: float,
+    max_position_error: float,
+    max_normal_error_deg: float,
+    max_joint_step: float,
+    ik_candidate_bank_csv: Path,
+    ik_candidate_collection_report_json: Path | None,
+    joint_seeds: np.ndarray,
+    global_roll_step_deg: float = 5.0,
+    global_roll_bias_limit_deg: float = 45.0,
+    global_tilt_step_deg: float = 0.5,
+    global_tilt_limit_deg: float = 2.0,
+    global_max_backtracks: int = 1200,
+    global_reparameterization_window: int = 5,
+) -> dict[str, object]:
+    """Solve one complete path with global roll-curve optimization and DFS backtracking."""
+
+    if len(joint_seeds) != len(poses) or len(normals) != len(poses):
+        raise ValueError("Global roll search requires one seed and one normal for every TCP waypoint.")
+    if not poses:
+        raise ValueError("Global roll search requires at least one TCP pose.")
+
+    state = RobotState(moveit.get_robot_model())
+    psm = moveit.get_planning_scene_monitor()
+    start_time = time.monotonic()
+    reparam_window = max(1, int(global_reparameterization_window))
+    # A control-point correction is linearly ramped over this many contour
+    # samples.  The search state therefore stores a curve value, not a
+    # pointwise pose jump.
+    roll_step = np.deg2rad(max(0.25, float(global_roll_step_deg))) / reparam_window
+    roll_limit = np.deg2rad(max(float(global_roll_bias_limit_deg), np.rad2deg(roll_step)))
+    tilt_step = max(0.1, float(global_tilt_step_deg)) / reparam_window
+    tilt_limit = max(tilt_step, float(global_tilt_limit_deg))
+    max_backtracks = max(1, int(global_max_backtracks))
+    base_roll_curve = _continuous_curve_step_limit(
+        _continuous_tcp_roll_curve(poses), max(np.deg2rad(90.0), 4.0 * roll_step)
+    )
+
+    def evaluate(q: np.ndarray, target_pose: Pose, normal: np.ndarray) -> dict[str, object]:
+        positions = np.asarray(q, dtype=float).copy()
+        state.set_joint_group_positions(group_name, positions)
+        state.update()
+        transform = _transform_matrix(state.get_global_link_transform(ee_link))
+        target = np.array([target_pose.position.x, target_pose.position.y, target_pose.position.z], dtype=float)
+        position_error = float(np.linalg.norm(transform[:3, 3] - target))
+        normal_error = float(
+            np.rad2deg(np.arccos(np.clip(np.dot(transform[:3, 2], normal), -1.0, 1.0)))
+        )
+        with psm.read_only() as scene:
+            colliding, collision_summary = _state_collision_summary(scene, state, group_name)
+        return {
+            "positions": positions,
+            "position_error_mm": position_error * 1000.0,
+            "normal_error_deg": normal_error,
+            "colliding": int(colliding),
+            "collision_summary": collision_summary,
+            "node_valid": int(
+                np.all(np.isfinite(positions))
+                and position_error <= max_position_error
+                and normal_error <= max_normal_error_deg
+                and not colliding
+            ),
+        }
+
+    def check_edge(previous: np.ndarray, current: np.ndarray) -> tuple[bool, float, str]:
+        aligned = nearest_equivalent_joint_positions(np.asarray(current, dtype=float), previous)
+        delta = aligned - previous
+        max_delta = float(np.max(np.abs(delta)))
+        if max_delta > max_joint_step:
+            return False, max_delta, "joint_step_gate"
+        sample_count = max(2, int(np.ceil(max_delta / np.deg2rad(1.0))) + 1)
+        for fraction in np.linspace(0.0, 1.0, sample_count):
+            state.set_joint_group_positions(group_name, previous + fraction * delta)
+            state.update()
+            with psm.read_only() as scene:
+                colliding, _ = _state_collision_summary(scene, state, group_name)
+            if colliding:
+                return False, max_delta, "interpolated_collision"
+        return True, max_delta, "safe"
+
+    def proposals(previous: dict[str, object] | None) -> list[tuple[float, float, float]]:
+        if previous is None:
+            return [(0.0, 0.0, 0.0)]
+        previous_roll = float(previous["roll_bias_rad"])
+        previous_tx = float(previous["tilt_x_deg"])
+        previous_ty = float(previous["tilt_y_deg"])
+        roll_deltas = (0.0, -roll_step, roll_step, -2.0 * roll_step, 2.0 * roll_step)
+        tilt_deltas = ((0.0, 0.0), (-tilt_step, 0.0), (tilt_step, 0.0), (0.0, -tilt_step), (0.0, tilt_step))
+        q5_deg = abs(float(np.rad2deg(np.asarray(previous["q"], dtype=float)[4])))
+        if abs(q5_deg - 90.0) <= 8.0:
+            tilt_deltas = tilt_deltas + (
+                (-2.0 * tilt_step, 0.0),
+                (2.0 * tilt_step, 0.0),
+                (0.0, -2.0 * tilt_step),
+                (0.0, 2.0 * tilt_step),
+            )
+        result: list[tuple[float, float, float]] = []
+        for delta_roll in roll_deltas:
+            roll_bias = previous_roll + delta_roll
+            if abs(roll_bias) > roll_limit + 1e-9:
+                continue
+            for delta_x, delta_y in tilt_deltas:
+                tilt_x, tilt_y = previous_tx + delta_x, previous_ty + delta_y
+                if max(abs(tilt_x), abs(tilt_y)) > tilt_limit + 1e-9:
+                    continue
+                item = (float(roll_bias), float(tilt_x), float(tilt_y))
+                if item not in result:
+                    result.append(item)
+        # A later failure can reveal that the whole preceding section needs a
+        # different roll branch.  These are global curve control-point values,
+        # ordered from the current value outward; they are tried only after
+        # local continuation proposals fail, and are revisited by backtracking.
+        coarse_step = np.deg2rad(max(1.0, float(global_roll_step_deg)))
+        absolute_biases = np.arange(-roll_limit, roll_limit + 0.5 * coarse_step, coarse_step)
+        absolute_biases = sorted(absolute_biases.tolist(), key=lambda value: abs(float(value) - previous_roll))
+        for absolute_bias in absolute_biases:
+            for delta_x, delta_y in tilt_deltas[:1]:
+                tilt_x, tilt_y = previous_tx + delta_x, previous_ty + delta_y
+                if max(abs(tilt_x), abs(tilt_y)) > tilt_limit + 1e-9:
+                    continue
+                item = (float(absolute_bias), float(tilt_x), float(tilt_y))
+                if item not in result:
+                    result.append(item)
+        return result
+
+    def candidate_pose(index: int, roll_bias: float, tilt_x: float, tilt_y: float) -> Pose:
+        return _global_roll_reparameterized_pose(
+            poses[index], float(base_roll_curve[index]), roll_bias, tilt_x, tilt_y
+        )
+
+    path_nodes: list[dict[str, object]] = []
+    failure_counts: list[dict[str, int]] = [
+        {"ik": 0, "node": 0, "joint_step_gate": 0, "interpolated_collision": 0} for _ in poses
+    ]
+    visited_failures: set[tuple[int, tuple[float, ...], int, int, int]] = set()
+    attempts = 0
+    backtracks = 0
+    first_failure: dict[str, object] | None = None
+
+    first_eval = evaluate(np.asarray(joint_seeds[0], dtype=float), poses[0], normals[0])
+    if int(first_eval["node_valid"]):
+        path_nodes.append(
+            {
+                "q": np.asarray(joint_seeds[0], dtype=float).copy(),
+                "roll_bias_rad": 0.0,
+                "tilt_x_deg": 0.0,
+                "tilt_y_deg": 0.0,
+                "position_error_mm": float(first_eval["position_error_mm"]),
+                "normal_error_deg": float(first_eval["normal_error_deg"]),
+                "colliding": int(first_eval["colliding"]),
+                "collision_summary": str(first_eval["collision_summary"]),
+                "max_joint_step_deg": 0.0,
+                "source": "verified_seed_anchor",
+            }
+        )
+    else:
+        first_failure = {"waypoint": 0, "reason": "verified_seed_invalid", **first_eval}
+
+    index = 1
+    while path_nodes and index < len(poses) and backtracks <= max_backtracks:
+        previous = path_nodes[-1]
+        found = False
+        for proposal_index, (roll_bias, tilt_x, tilt_y) in enumerate(proposals(previous)):
+            q_previous = np.asarray(previous["q"], dtype=float)
+            key = (
+                index,
+                tuple(np.round(q_previous, 6)),
+                int(round(roll_bias * 10000.0)),
+                int(round(tilt_x * 1000.0)),
+                int(round(tilt_y * 1000.0)),
+            )
+            if key in visited_failures:
+                continue
+            visited_failures.add(key)
+            attempts += 1
+            state.set_joint_group_positions(group_name, q_previous)
+            state.update()
+            if not state.set_from_ik(
+                group_name, candidate_pose(index, roll_bias, tilt_x, tilt_y), ee_link, ik_timeout
+            ):
+                failure_counts[index]["ik"] += 1
+                continue
+            state.update()
+            q_current = nearest_equivalent_joint_positions(
+                np.asarray(state.get_joint_group_positions(group_name), dtype=float), q_previous
+            )
+            evaluated = evaluate(q_current, poses[index], normals[index])
+            if not int(evaluated["node_valid"]):
+                failure_counts[index]["node"] += 1
+                continue
+            safe, max_delta, reason = check_edge(q_previous, q_current)
+            if not safe:
+                failure_counts[index][reason] += 1
+                continue
+            path_nodes.append(
+                {
+                    "q": q_current.copy(),
+                    "roll_bias_rad": roll_bias,
+                    "tilt_x_deg": tilt_x,
+                    "tilt_y_deg": tilt_y,
+                    "position_error_mm": float(evaluated["position_error_mm"]),
+                    "normal_error_deg": float(evaluated["normal_error_deg"]),
+                    "colliding": int(evaluated["colliding"]),
+                    "collision_summary": str(evaluated["collision_summary"]),
+                    "max_joint_step_deg": float(np.rad2deg(max_delta)),
+                    "proposal_index": proposal_index,
+                    "attempt_index": attempts,
+                }
+            )
+            index += 1
+            found = True
+            break
+        if found:
+            continue
+        # The verified seed route is a safety anchor, not a larger candidate
+        # bank.  If the optimized TCP frame was referenced differently from
+        # the seed frame, retain that already validated configuration and carry
+        # its measured roll as the next curve state.  This lets the global
+        # optimizer recover its roll reference without accepting a joint jump.
+        seed_q = np.asarray(joint_seeds[index], dtype=float)
+        seed_eval = evaluate(seed_q, poses[index], normals[index])
+        if int(seed_eval["node_valid"]):
+            safe, max_delta, reason = check_edge(np.asarray(previous["q"], dtype=float), seed_q)
+            if safe:
+                path_nodes.append(
+                    {
+                        "q": nearest_equivalent_joint_positions(seed_q, np.asarray(previous["q"], dtype=float)),
+                        "roll_bias_rad": float(previous["roll_bias_rad"]),
+                        "tilt_x_deg": float(previous["tilt_x_deg"]),
+                        "tilt_y_deg": float(previous["tilt_y_deg"]),
+                        "position_error_mm": float(seed_eval["position_error_mm"]),
+                        "normal_error_deg": float(seed_eval["normal_error_deg"]),
+                        "colliding": int(seed_eval["colliding"]),
+                        "collision_summary": str(seed_eval["collision_summary"]),
+                        "max_joint_step_deg": float(np.rad2deg(max_delta)),
+                        "source": "verified_seed_curve_anchor",
+                    }
+                )
+                index += 1
+                continue
+            failure_counts[index][reason] += 1
+        failed_index = index
+        backtracks += 1
+        if len(path_nodes) <= 1:
+            first_failure = {
+                "waypoint": failed_index,
+                "reason": "no_safe_continuation_from_start",
+                "failure_counts": failure_counts[min(failed_index, len(poses) - 1)],
+            }
+            break
+        path_nodes.pop()
+        index -= 1
+        if first_failure is None:
+            first_failure = {
+                "waypoint": failed_index,
+                "reason": "backtracking",
+                "failure_counts": failure_counts[failed_index],
+            }
+
+    success = bool(path_nodes) and len(path_nodes) == len(poses)
+    if not success and first_failure is None:
+        first_failure = {
+            "waypoint": min(index, len(poses) - 1),
+            "reason": "backtrack_limit",
+            "backtrack_count": backtracks,
+        }
+    records: list[dict[str, float | int | str]] = []
+    roll_curve: list[float] = []
+    for waypoint, node in enumerate(path_nodes):
+        q = np.asarray(node["q"], dtype=float)
+        roll_deg = float(np.rad2deg(base_roll_curve[waypoint] + float(node["roll_bias_rad"])))
+        roll_curve.append(roll_deg)
+        records.append(
+            {
+                "waypoint": waypoint,
+                "candidate": 0,
+                "valid": int(success),
+                "colliding": int(node["colliding"]),
+                "max_joint_step_deg": float(node.get("max_joint_step_deg", 0.0)),
+                "roll_deg": roll_deg,
+                "roll_curve_deg": roll_deg,
+                "roll_bias_deg": float(np.rad2deg(float(node["roll_bias_rad"]))),
+                "tilt_x_deg": float(node["tilt_x_deg"]),
+                "tilt_y_deg": float(node["tilt_y_deg"]),
+                "reparameterization_window": reparam_window,
+                "backtrack_depth": 0,
+                "collision_summary": str(node["collision_summary"]),
+                "source": str(node.get("source", "global_roll_curve_backtracking")),
+                "position_error_mm": float(node["position_error_mm"]),
+                "normal_error_deg": float(node["normal_error_deg"]),
+                "edge_prev_valid": int(waypoint == 0 or "max_joint_step_deg" in node),
+                "edge_prev_collision_free": int(waypoint == 0 or "max_joint_step_deg" in node),
+                "edge_prev_max_joint_step_deg": float(node.get("max_joint_step_deg", 0.0)),
+                "reachable_in": int(success or waypoint == 0),
+                "can_reach_end": int(success),
+                "path_selected": int(success),
+                **{f"q{i}": float(value) for i, value in enumerate(q, start=1)},
+            }
+        )
+    _write_ik_candidate_bank(ik_candidate_bank_csv, records)
+    roll_steps = np.abs(np.diff(roll_curve)) if len(roll_curve) > 1 else np.zeros(0)
+    max_tilt = max(
+        (max(abs(float(node["tilt_x_deg"])), abs(float(node["tilt_y_deg"]))) for node in path_nodes),
+        default=0.0,
+    )
+    report: dict[str, object] = {
+        "status": "pass" if success else "fail:no_complete_safe_path",
+        "algorithm": "global_roll_curve_backtracking_tcp_reparameterization",
+        "waypoint_count": len(poses),
+        "solved_waypoint_count": len(path_nodes),
+        "candidate_count_min": 1 if path_nodes else 0,
+        "candidate_count_max": 1 if path_nodes else 0,
+        "complete_path_candidate_count_min": 1 if success else 0,
+        "complete_path_candidate_count_max": 1 if success else 0,
+        "global_roll_step_deg": float(global_roll_step_deg),
+        "global_roll_bias_limit_deg": float(global_roll_bias_limit_deg),
+        "global_roll_curve_max_step_deg": float(np.max(roll_steps)) if len(roll_steps) else 0.0,
+        "global_roll_curve_total_unwrapped_deg": float(roll_curve[-1] - roll_curve[0]) if roll_curve else 0.0,
+        "tcp_reparameterization_max_tilt_deg": float(max_tilt),
+        "tcp_reparameterization_window": reparam_window,
+        "backtrack_count": backtracks,
+        "max_backtracks": max_backtracks,
+        "ik_attempt_count": attempts,
+        "first_failure": first_failure,
+        "failure_counts_by_waypoint": failure_counts,
+        "candidate_bank_csv": str(ik_candidate_bank_csv),
+        "interpretation": (
+            "One globally transported roll curve is optimized with bounded TCP tangent-plane reparameterization. "
+            "Backtracking revisits prior curve decisions when a later hard MoveIt edge gate blocks continuation; "
+            "candidate count is not the recovery mechanism."
+        ),
+        "elapsed_s": time.monotonic() - start_time,
+    }
+    _write_ik_candidate_collection_report(ik_candidate_collection_report_json, report)
+    return report
+
+
 def build_ik_waypoint_trajectory(
     moveit,
     group_name: str,
@@ -172,62 +685,674 @@ def build_ik_waypoint_trajectory(
     max_position_error: float,
     max_normal_error_deg: float,
     max_joint_step: float,
+    ik_roll_sample_count: int = 1,
+    ik_beam_width: int = 1,
+    ik_candidates_per_beam: int = 8,
+    ik_beam_diversity_joint_deg: float = 0.0,
+    ik_search_diagnostics_csv: Path | None = None,
+    ik_candidate_bank_csv: Path | None = None,
+    ik_max_solve_seconds: float = 0.0,
     joint_seeds: np.ndarray | None = None,
 ):
-    """Solve every contour pose with MoveIt2 IK, seeded from the previous state."""
+    """Solve every contour pose with MoveIt2 IK, retaining optional branch beams."""
 
     state = RobotState(moveit.get_robot_model())
     result = RobotTrajectoryMsg()
     result.joint_trajectory.joint_names = joint_names
     failures: list[str] = []
-    previous_positions: np.ndarray | None = None
-    for index, pose in enumerate(poses):
-        if joint_seeds is not None:
-            state.set_joint_group_positions(group_name, joint_seeds[index])
-            state.update()
-        if not state.set_from_ik(group_name, pose, ee_link, ik_timeout):
-            normal = normals[index]
+    target_tcp = np.array([[pose.position.x, pose.position.y, pose.position.z] for pose in poses], dtype=float)
+    loop_size = _repeated_closed_loop_size(target_tcp, normals)
+    solve_poses = poses[:loop_size]
+    solve_normals = normals[:loop_size]
+    solve_joint_seeds = joint_seeds[:loop_size] if joint_seeds is not None else None
+    psm = moveit.get_planning_scene_monitor()
+    verbose_collision_emitted = False
+    beam_width = max(1, int(ik_beam_width))
+    candidates_per_beam = max(1, int(ik_candidates_per_beam))
+    beam_diversity_joint = max(0.0, np.deg2rad(float(ik_beam_diversity_joint_deg)))
+    max_solve_seconds = max(0.0, float(ik_max_solve_seconds))
+    solve_start = time.monotonic()
+    diagnostic_records: list[dict[str, float | int | str]] = []
+    candidate_records: list[dict[str, float | int | str]] = []
+    beams: list[tuple[float, float, float, list[np.ndarray]]] = [(0.0, 0.0, 0.0, [])]
+    for index, pose in enumerate(solve_poses):
+        elapsed_s = time.monotonic() - solve_start
+        if max_solve_seconds > 0.0 and elapsed_s > max_solve_seconds:
+            diagnostic_records.append(
+                {
+                    "index": index,
+                    "elapsed_s": elapsed_s,
+                    "input_beam_count": len(beams),
+                    "candidate_failure_count": 0,
+                    "colliding_candidate_count": 0,
+                    "next_beam_count": 0,
+                    "best_bottleneck_step_deg": "",
+                    "best_step_sum_deg": "",
+                    "best_roll_sum_deg": "",
+                    "status": "timeout",
+                    "detail": f"ik_max_solve_seconds={max_solve_seconds}",
+                }
+            )
+            _write_ik_search_diagnostics(ik_search_diagnostics_csv, diagnostic_records)
+            raise RuntimeError(
+                f"MoveIt2 IK exceeded ik_max_solve_seconds={max_solve_seconds:.3f} before index={index}."
+            )
+        candidate_failures: list[str] = []
+        next_beams: list[tuple[float, float, float, list[np.ndarray]]] = []
+        colliding_candidates: list[tuple[float, float, str, np.ndarray]] = []
+        candidate_rank = 0
+        input_beam_count = len(beams)
+        for beam_bottleneck_cost, beam_step_sum_cost, beam_roll_cost, beam_path in beams:
+            previous_positions = beam_path[-1] if beam_path else None
+            if solve_joint_seeds is not None:
+                primary_seed = np.asarray(solve_joint_seeds[index], dtype=float)
+            elif previous_positions is not None:
+                primary_seed = previous_positions.copy()
+            else:
+                primary_seed = np.zeros(len(joint_names), dtype=float)
+            valid_candidates: list[tuple[bool, float, float, str, np.ndarray]] = []
+            for roll, candidate_pose in _tool_axis_roll_pose_candidates(pose, ik_roll_sample_count):
+                for seed_index, seed in enumerate(_ik_seed_candidates(primary_seed, previous_positions)):
+                    state.set_joint_group_positions(group_name, seed)
+                    state.update()
+                    if not state.set_from_ik(group_name, candidate_pose, ee_link, ik_timeout):
+                        candidate_failures.append(f"roll={np.rad2deg(roll):.1f}deg,seed={seed_index}:no_ik")
+                        continue
+                    state.update()
+                    transform = _transform_matrix(state.get_global_link_transform(ee_link))
+                    target = np.array([pose.position.x, pose.position.y, pose.position.z], dtype=float)
+                    position_error = float(np.linalg.norm(transform[:3, 3] - target))
+                    tool_z = transform[:3, 2]
+                    normal_error = float(
+                        np.rad2deg(np.arccos(np.clip(np.dot(tool_z, solve_normals[index]), -1.0, 1.0)))
+                    )
+                    if position_error > max_position_error or normal_error > max_normal_error_deg:
+                        candidate_failures.append(
+                            f"roll={np.rad2deg(roll):.1f}deg,seed={seed_index}:"
+                            f"position_error={position_error * 1000.0:.3f}mm,"
+                            f"normal_error={normal_error:.3f}deg"
+                        )
+                        continue
+                    positions = np.asarray(state.get_joint_group_positions(group_name), dtype=float)
+                    if previous_positions is not None:
+                        positions = nearest_equivalent_joint_positions(positions, previous_positions)
+                        joint_delta = np.abs(positions - previous_positions)
+                        max_delta = float(np.max(joint_delta))
+                    else:
+                        max_delta = 0.0
+                    state.set_joint_group_positions(group_name, positions)
+                    state.update()
+                    with psm.read_only() as scene:
+                        colliding, collision_summary = _state_collision_summary(scene, state, group_name)
+                    if max_delta > max_joint_step:
+                        joint_index = int(np.argmax(np.abs(positions - previous_positions)))
+                        candidate_failures.append(
+                            f"roll={np.rad2deg(roll):.1f}deg,seed={seed_index}:joint={joint_names[joint_index]},"
+                            f"joint_step={np.rad2deg(max_delta):.2f}deg"
+                        )
+                        continue
+                    valid_candidates.append((colliding, max_delta, abs(float(roll)), collision_summary, positions.copy()))
+            valid_candidates.sort(key=lambda item: (item[0], item[1], item[2]))
+            for colliding, max_delta, roll_cost, collision_summary, positions in valid_candidates[:candidates_per_beam]:
+                candidate_records.append(
+                    {
+                        "waypoint": index,
+                        "candidate": candidate_rank,
+                        "valid": int(not colliding),
+                        "colliding": int(colliding),
+                        "max_joint_step_deg": float(np.rad2deg(max_delta)),
+                        "roll_deg": float(np.rad2deg(roll_cost)),
+                        "collision_summary": collision_summary,
+                        **{f"q{i}": float(value) for i, value in enumerate(positions, start=1)},
+                    }
+                )
+                candidate_rank += 1
+                if colliding:
+                    colliding_candidates.append((max_delta, roll_cost, collision_summary, positions))
+                    continue
+                next_bottleneck_cost = max(beam_bottleneck_cost, max_delta)
+                next_step_sum_cost = beam_step_sum_cost + max_delta
+                next_roll_cost = beam_roll_cost + roll_cost
+                next_beams.append(
+                    (next_bottleneck_cost, next_step_sum_cost, next_roll_cost, beam_path + [positions.copy()])
+                )
+        next_beams.sort(key=lambda item: (item[0], item[1], item[2]))
+        beams = _select_diverse_ik_beams(next_beams, beam_width, beam_diversity_joint)
+        if beams:
+            diagnostic_records.append(
+                {
+                    "index": index,
+                    "elapsed_s": time.monotonic() - solve_start,
+                    "input_beam_count": input_beam_count,
+                    "candidate_failure_count": len(candidate_failures),
+                    "colliding_candidate_count": len(colliding_candidates),
+                    "next_beam_count": len(beams),
+                    "best_bottleneck_step_deg": float(np.rad2deg(beams[0][0])),
+                    "best_step_sum_deg": float(np.rad2deg(beams[0][1])),
+                    "best_roll_sum_deg": float(np.rad2deg(beams[0][2])),
+                    "status": "ok",
+                    "detail": "",
+                }
+            )
+        if not beams:
+            normal = solve_normals[index]
+            if colliding_candidates:
+                colliding_candidates.sort(key=lambda item: (item[0], item[1]))
+                _, _, collision_summary, positions = colliding_candidates[0]
+                if not verbose_collision_emitted:
+                    state.set_joint_group_positions(group_name, positions)
+                    state.update()
+                    with psm.read_only() as scene:
+                        scene.is_state_colliding(state, group_name, True)
+                    verbose_collision_emitted = True
+                detail = f"all IK candidates are colliding, best={collision_summary}"
+                suffix = ""
+            else:
+                detail = "; ".join(candidate_failures[:4])
+                suffix = "" if len(candidate_failures) <= 4 else f"; ... {len(candidate_failures) - 4} more"
             failures.append(
                 f"index={index}, tcp=({pose.position.x:.6f},{pose.position.y:.6f},{pose.position.z:.6f}), "
-                f"normal=({normal[0]:.6f},{normal[1]:.6f},{normal[2]:.6f})"
+                f"normal=({normal[0]:.6f},{normal[1]:.6f},{normal[2]:.6f}), {detail}{suffix}"
             )
-            continue
-        state.update()
-        transform = _transform_matrix(state.get_global_link_transform(ee_link))
-        target = np.array([pose.position.x, pose.position.y, pose.position.z], dtype=float)
-        position_error = float(np.linalg.norm(transform[:3, 3] - target))
-        tool_z = transform[:3, 2]
-        normal_error = float(np.rad2deg(np.arccos(np.clip(np.dot(tool_z, normals[index]), -1.0, 1.0))))
-        if position_error > max_position_error or normal_error > max_normal_error_deg:
+            diagnostic_records.append(
+                {
+                    "index": index,
+                    "elapsed_s": time.monotonic() - solve_start,
+                    "input_beam_count": input_beam_count,
+                    "candidate_failure_count": len(candidate_failures),
+                    "colliding_candidate_count": len(colliding_candidates),
+                    "next_beam_count": 0,
+                    "best_bottleneck_step_deg": "",
+                    "best_step_sum_deg": "",
+                    "best_roll_sum_deg": "",
+                    "status": "fail",
+                    "detail": detail,
+                }
+            )
+            break
+    if not failures:
+        best_path = beams[0][3]
+        for positions in best_path:
+            point = JointTrajectoryPoint()
+            point.positions = [float(value) for value in positions]
+            point.time_from_start = _duration_from_seconds(0.0)
+            result.joint_trajectory.points.append(point)
+    if loop_size < len(poses) and not failures:
+        first_loop_positions = [
+            np.asarray(point.positions, dtype=float)
+            for point in result.joint_trajectory.points
+        ]
+        next_start = nearest_equivalent_joint_positions(first_loop_positions[0], first_loop_positions[-1])
+        closure_delta = np.abs(next_start - first_loop_positions[-1])
+        max_closure_delta = float(np.max(closure_delta))
+        if max_closure_delta > max_joint_step:
+            joint_index = int(np.argmax(closure_delta))
             failures.append(
-                f"index={index}, position_error={position_error * 1000.0:.3f} mm, "
-                f"normal_error={normal_error:.3f} deg"
+                f"closed_loop_reuse, joint={joint_names[joint_index]}, "
+                f"joint_step={np.rad2deg(max_closure_delta):.2f} deg"
             )
-            continue
-        positions = np.asarray(state.get_joint_group_positions(group_name), dtype=float)
-        if previous_positions is not None:
-            positions = nearest_equivalent_joint_positions(positions, previous_positions)
-            joint_delta = np.abs(positions - previous_positions)
-            max_delta = float(np.max(joint_delta))
-            if max_delta > max_joint_step:
-                joint_index = int(np.argmax(joint_delta))
-                failures.append(
-                    f"index={index}, joint={joint_names[joint_index]}, "
-                    f"joint_step={np.rad2deg(max_delta):.2f} deg"
-                )
-                continue
-        previous_positions = positions.copy()
-        point = JointTrajectoryPoint()
-        point.positions = [float(value) for value in positions]
-        point.time_from_start = _duration_from_seconds(0.0)
-        result.joint_trajectory.points.append(point)
+        else:
+            tiled_points = []
+            repeat_count = len(poses) // loop_size
+            loop_offset = np.zeros(len(joint_names), dtype=float)
+            previous_last = first_loop_positions[-1]
+            for loop_index in range(repeat_count):
+                if loop_index > 0:
+                    loop_start = nearest_equivalent_joint_positions(first_loop_positions[0], previous_last)
+                    loop_offset = loop_start - first_loop_positions[0]
+                for source_index, point in enumerate(result.joint_trajectory.points):
+                    tiled = deepcopy(point)
+                    tiled.positions = [float(value) for value in first_loop_positions[source_index] + loop_offset]
+                    tiled.time_from_start = _duration_from_seconds(0.0)
+                    tiled_points.append(tiled)
+                previous_last = first_loop_positions[-1] + loop_offset
+            result.joint_trajectory.points = tiled_points
     if failures:
+        _write_ik_search_diagnostics(ik_search_diagnostics_csv, diagnostic_records)
         preview = "; ".join(failures[:5])
         extra = "" if len(failures) <= 5 else f"; ... {len(failures) - 5} more"
         raise RuntimeError(f"MoveIt2 IK failed the closed contour gate: {preview}{extra}")
     if len(result.joint_trajectory.points) < 2:
+        _write_ik_search_diagnostics(ik_search_diagnostics_csv, diagnostic_records)
         raise RuntimeError("MoveIt2 IK produced fewer than two contour waypoints.")
+    _write_ik_search_diagnostics(ik_search_diagnostics_csv, diagnostic_records)
+    _write_ik_candidate_bank(ik_candidate_bank_csv, candidate_records)
     return result
+
+
+def collect_ik_candidate_bank(
+    moveit,
+    group_name: str,
+    ee_link: str,
+    poses: list[Pose],
+    normals: np.ndarray,
+    joint_names: list[str],
+    ik_timeout: float,
+    max_position_error: float,
+    max_normal_error_deg: float,
+    max_joint_step: float,
+    ik_roll_sample_count: int,
+    ik_candidates_per_waypoint: int,
+    ik_candidate_bank_csv: Path,
+    ik_candidate_collection_report_json: Path | None,
+    joint_seeds: np.ndarray,
+) -> dict[str, object]:
+    """Collect safe IK nodes first, then validate the candidate transition graph.
+
+    This is intentionally separate from the production single-path solver. A
+    failed branch must not abort collection of later candidates; only after all
+    waypoints are sampled do we apply the adjacent joint-step and interpolated
+    collision gates and mark candidates that belong to a complete safe path.
+    """
+
+    if len(joint_seeds) != len(poses):
+        raise ValueError("Candidate collection requires one verified seed joint row per TCP waypoint.")
+    state = RobotState(moveit.get_robot_model())
+    psm = moveit.get_planning_scene_monitor()
+    candidate_limit = max(1, int(ik_candidates_per_waypoint))
+    candidate_sets: list[list[dict[str, object]]] = []
+    failure_counts: list[int] = []
+    baseline_failures: list[dict[str, object]] = []
+    solve_start = time.monotonic()
+
+    def evaluate(positions: np.ndarray, target_pose: Pose, normal: np.ndarray) -> dict[str, object]:
+        q = np.asarray(positions, dtype=float).copy()
+        state.set_joint_group_positions(group_name, q)
+        state.update()
+        transform = _transform_matrix(state.get_global_link_transform(ee_link))
+        target = np.array([target_pose.position.x, target_pose.position.y, target_pose.position.z], dtype=float)
+        position_error = float(np.linalg.norm(transform[:3, 3] - target))
+        tool_z = transform[:3, 2]
+        normal_error = float(np.rad2deg(np.arccos(np.clip(np.dot(tool_z, normal), -1.0, 1.0))))
+        with psm.read_only() as scene:
+            colliding, collision_summary = _state_collision_summary(scene, state, group_name)
+        node_valid = (
+            np.all(np.isfinite(q))
+            and position_error <= max_position_error
+            and normal_error <= max_normal_error_deg
+            and not colliding
+        )
+        return {
+            "positions": q,
+            "position_error_mm": position_error * 1000.0,
+            "normal_error_deg": normal_error,
+            "colliding": int(colliding),
+            "collision_summary": collision_summary,
+            "node_valid": int(node_valid),
+        }
+
+    for index, pose in enumerate(poses):
+        baseline = np.asarray(joint_seeds[index], dtype=float)
+        candidates: list[dict[str, object]] = []
+        failures = 0
+
+        # The seed trajectory has already passed the complete MoveIt collision
+        # gate, so retain it as the reference candidate and never replace it
+        # with an IK solver's arbitrary equivalent branch.
+        baseline_eval = evaluate(baseline, pose, normals[index])
+        if int(baseline_eval["node_valid"]):
+            baseline_eval["source"] = "verified_seed"
+            candidates.append(baseline_eval)
+        else:
+            failures += 1
+            if len(baseline_failures) < 20:
+                baseline_failures.append(
+                    {
+                        "waypoint": index,
+                        "position_error_mm": float(baseline_eval["position_error_mm"]),
+                        "normal_error_deg": float(baseline_eval["normal_error_deg"]),
+                        "colliding": int(baseline_eval["colliding"]),
+                        "collision_summary": str(baseline_eval["collision_summary"]),
+                    }
+                )
+
+        # Reuse the previous waypoint candidates first.  The verified seed
+        # trajectory is a collision-safe reference, but it is not guaranteed
+        # to be TCP-exact at every waypoint; placing it first can make KDL
+        # repeatedly return a locally valid yet globally disconnected branch.
+        # Previous candidates therefore have priority for continuity, while
+        # the baseline and its equivalent seeds remain fallbacks.
+        previous_candidates: list[dict[str, object]] = []
+        if candidate_sets:
+            previous_candidates = list(candidate_sets[-1][: min(candidate_limit, 16)])
+            if len(candidate_sets) >= 2:
+                reference_candidates = candidate_sets[-2]
+
+                def continuity_score(item: dict[str, object]) -> float:
+                    positions = np.asarray(item["positions"], dtype=float)
+                    return min(
+                        float(np.max(np.abs(circular_joint_delta(positions - np.asarray(reference["positions"])))))
+                        for reference in reference_candidates
+                    )
+
+                previous_candidates.sort(key=continuity_score)
+        seed_requests: list[np.ndarray] = []
+        if previous_candidates:
+            for previous_candidate in previous_candidates:
+                previous_seed = np.asarray(previous_candidate["positions"], dtype=float)
+                if not any(np.allclose(previous_seed, existing, atol=1e-9, rtol=0.0) for existing in seed_requests):
+                    seed_requests.append(previous_seed)
+        for seed in _candidate_collection_seed_candidates(baseline):
+            if not any(np.allclose(seed, existing, atol=1e-9, rtol=0.0) for existing in seed_requests):
+                seed_requests.append(seed)
+
+        roll_requests: list[tuple[float, Pose]] = []
+        prioritized_rolls_by_seed: list[tuple[np.ndarray, list[float]]] = []
+        prioritized_tilt_by_seed: list[tuple[np.ndarray, list[float]]] = []
+
+        def add_roll_request(roll_value: float) -> None:
+            normalized = float((roll_value + np.pi) % (2.0 * np.pi) - np.pi)
+            if any(abs(float((normalized - existing[0] + np.pi) % (2.0 * np.pi) - np.pi)) < 1e-6 for existing in roll_requests):
+                return
+            base_matrix = _pose_to_matrix(pose)
+            c, s = float(np.cos(normalized)), float(np.sin(normalized))
+            rz = np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]], dtype=float)
+            rolled = base_matrix.copy()
+            rolled[:3, :3] = base_matrix[:3, :3] @ rz
+            roll_requests.append((normalized, _pose_from_matrix(rolled, pose)))
+
+        # Try the unmodified wall-normal pose first with the previous waypoint
+        # as the IK seed.  This is the primary continuity path: changing the
+        # tool roll is optional, but a wrist branch flip at a singular-looking
+        # section is never acceptable merely because a rolled pose solved.
+        add_roll_request(0.0)
+
+        # First follow the roll implied by the previous candidate's tool X
+        # axis, then keep a small local neighbourhood around it. This is the
+        # continuous-wrist branch that a fixed 0/20/40 degree grid can miss.
+        if candidate_sets:
+            current_matrix = _pose_to_matrix(pose)
+            current_x = current_matrix[:3, 0]
+            current_y = current_matrix[:3, 1]
+            for previous_candidate in previous_candidates:
+                previous_seed = np.asarray(previous_candidate["positions"], dtype=float).copy()
+                state.set_joint_group_positions(group_name, previous_candidate["positions"])
+                state.update()
+                previous_matrix = _transform_matrix(state.get_global_link_transform(ee_link))
+                previous_x = previous_matrix[:3, 0]
+                center = float(np.arctan2(np.dot(previous_x, current_y), np.dot(previous_x, current_x)))
+                local_rolls: list[float] = []
+                for offset_deg in (
+                    0.0,
+                    -5.0,
+                    5.0,
+                    -10.0,
+                    10.0,
+                    -15.0,
+                    15.0,
+                    -20.0,
+                    20.0,
+                    *range(-180, 181, 10),
+                ):
+                    requested = center + np.deg2rad(offset_deg)
+                    add_roll_request(requested)
+                    local_rolls.append(float((requested + np.pi) % (2.0 * np.pi) - np.pi))
+                prioritized_rolls_by_seed.append((previous_seed, local_rolls))
+                previous_q5_deg = abs(float(np.rad2deg(previous_seed[4])))
+                if index >= 140 and abs(previous_q5_deg - 90.0) <= 6.0:
+                    prioritized_tilt_by_seed.append((previous_seed, local_rolls[:9]))
+        for roll, candidate_pose in _tool_axis_roll_pose_candidates(pose, ik_roll_sample_count):
+            add_roll_request(roll)
+
+        def pose_for_roll(roll_value: float) -> tuple[float, Pose] | None:
+            for existing_roll, existing_pose in roll_requests:
+                if abs(float((roll_value - existing_roll + np.pi) % (2.0 * np.pi) - np.pi)) < 1e-6:
+                    return existing_roll, existing_pose
+            return None
+
+        def pose_with_tilt(roll_value: float, tilt_x_deg: float, tilt_y_deg: float) -> Pose:
+            base_matrix = _pose_to_matrix(pose)
+            ax = np.deg2rad(float(tilt_x_deg))
+            ay = np.deg2rad(float(tilt_y_deg))
+            ar = float(roll_value)
+            cx, sx = float(np.cos(ax)), float(np.sin(ax))
+            cy, sy = float(np.cos(ay)), float(np.sin(ay))
+            cr, sr = float(np.cos(ar)), float(np.sin(ar))
+            rx = np.array([[1.0, 0.0, 0.0], [0.0, cx, -sx], [0.0, sx, cx]], dtype=float)
+            ry = np.array([[cy, 0.0, sy], [0.0, 1.0, 0.0], [-sy, 0.0, cy]], dtype=float)
+            rz = np.array([[cr, -sr, 0.0], [sr, cr, 0.0], [0.0, 0.0, 1.0]], dtype=float)
+            tilted = base_matrix.copy()
+            tilted[:3, :3] = base_matrix[:3, :3] @ rx @ ry @ rz
+            return _pose_from_matrix(tilted, pose)
+
+        # Solve each previous branch through its own local roll neighbourhood
+        # before falling back to the Cartesian roll grid. This prevents the
+        # first branch from consuming the candidate quota and hiding a second
+        # branch that is needed to cross the upper-arch singular section.
+        ik_requests: list[tuple[np.ndarray, float, Pose, float, float]] = []
+        request_keys: set[tuple[tuple[float, ...], int, int, int]] = set()
+
+        def append_request(seed: np.ndarray, roll_value: float, tilt_x_deg: float = 0.0, tilt_y_deg: float = 0.0) -> None:
+            resolved = pose_for_roll(roll_value)
+            if resolved is None and abs(tilt_x_deg) < 1e-9 and abs(tilt_y_deg) < 1e-9:
+                return
+            actual_roll = float((roll_value + np.pi) % (2.0 * np.pi) - np.pi) if resolved is None else resolved[0]
+            candidate_pose = pose_with_tilt(actual_roll, tilt_x_deg, tilt_y_deg) if abs(tilt_x_deg) >= 1e-9 or abs(tilt_y_deg) >= 1e-9 else resolved[1]
+            key = (
+                tuple(np.round(np.asarray(seed, dtype=float), 10)),
+                int(round(actual_roll * 1e6)),
+                int(round(tilt_x_deg * 1000.0)),
+                int(round(tilt_y_deg * 1000.0)),
+            )
+            if key in request_keys:
+                return
+            request_keys.add(key)
+            ik_requests.append((np.asarray(seed, dtype=float).copy(), actual_roll, candidate_pose, tilt_x_deg, tilt_y_deg))
+
+        # Near j5=+/-90 degrees, a tiny tangent-plane tilt can move the IK
+        # solver away from the wrist singularity without changing TCP
+        # position. The normal-error gate below remains active, so this is a
+        # bounded pose adjustment rather than permission to point away from
+        # the tunnel wall.
+        tilt_pairs = ((-2.0, 0.0), (2.0, 0.0), (0.0, -2.0), (0.0, 2.0), (-1.0, 0.0), (1.0, 0.0), (0.0, -1.0), (0.0, 1.0))
+        for seed, local_rolls in prioritized_tilt_by_seed[:2]:
+            for local_roll in local_rolls:
+                for tilt_x_deg, tilt_y_deg in tilt_pairs:
+                    append_request(seed, local_roll, tilt_x_deg, tilt_y_deg)
+
+        for seed, local_rolls in prioritized_rolls_by_seed:
+            for local_roll in local_rolls:
+                append_request(seed, local_roll)
+        for seed in seed_requests:
+            for roll, _candidate_pose in roll_requests:
+                append_request(seed, roll)
+
+        for seed, roll, candidate_pose, tilt_x_deg, tilt_y_deg in ik_requests:
+                state.set_joint_group_positions(group_name, seed)
+                state.update()
+                if not state.set_from_ik(group_name, candidate_pose, ee_link, ik_timeout):
+                    failures += 1
+                    continue
+                state.update()
+                positions = nearest_equivalent_joint_positions(
+                    np.asarray(state.get_joint_group_positions(group_name), dtype=float), baseline
+                )
+                evaluated = evaluate(positions, pose, normals[index])
+                if not int(evaluated["node_valid"]):
+                    failures += 1
+                    continue
+                if any(
+                    np.max(np.abs(circular_joint_delta(positions - np.asarray(existing["positions"])))) < 1e-5
+                    for existing in candidates
+                ):
+                    continue
+                evaluated["source"] = f"ik_roll_{np.rad2deg(roll):.1f}deg"
+                evaluated["roll_deg"] = float(np.rad2deg(roll))
+                evaluated["tilt_x_deg"] = float(tilt_x_deg)
+                evaluated["tilt_y_deg"] = float(tilt_y_deg)
+                candidates.append(evaluated)
+                if len(candidates) >= candidate_limit:
+                    break
+
+        candidate_sets.append(candidates)
+        failure_counts.append(failures)
+
+    def check_edge(previous: np.ndarray, current: np.ndarray) -> tuple[bool, float, str]:
+        aligned = nearest_equivalent_joint_positions(current, previous)
+        delta = aligned - previous
+        max_delta = float(np.max(np.abs(delta)))
+        if max_delta > max_joint_step:
+            return False, max_delta, "joint_step_gate"
+        sample_count = max(2, int(np.ceil(max_delta / np.deg2rad(1.0))) + 1)
+        for fraction in np.linspace(0.0, 1.0, sample_count):
+            q = previous + fraction * delta
+            state.set_joint_group_positions(group_name, q)
+            state.update()
+            with psm.read_only() as scene:
+                colliding, _ = _state_collision_summary(scene, state, group_name)
+            if colliding:
+                return False, max_delta, "interpolated_collision"
+        return True, max_delta, "safe"
+
+    edge_info: list[list[list[tuple[int, float]]]] = [[]]
+    reachable: list[list[bool]] = []
+    predecessor: list[list[int | None]] = []
+    path_cost: list[list[float]] = []
+    transition_stats: list[dict[str, object]] = []
+    if candidate_sets:
+        first_count = len(candidate_sets[0])
+        reachable.append([True] * first_count)
+        predecessor.append([None] * first_count)
+        path_cost.append([0.0] * first_count)
+    for index in range(1, len(candidate_sets)):
+        current_edges: list[list[tuple[int, float]]] = []
+        current_reachable: list[bool] = []
+        current_predecessor: list[int | None] = []
+        current_cost: list[float] = []
+        safe_edge_count = 0
+        step_gate_count = 0
+        interpolated_collision_count = 0
+        min_pair_step = float("inf")
+        min_pair_step_collision = float("inf")
+        for current in candidate_sets[index]:
+            edges: list[tuple[int, float]] = []
+            best_prev: int | None = None
+            best_cost = float("inf")
+            for previous_index, previous in enumerate(candidate_sets[index - 1]):
+                safe, max_delta, reason = check_edge(
+                    np.asarray(previous["positions"], dtype=float),
+                    np.asarray(current["positions"], dtype=float),
+                )
+                min_pair_step = min(min_pair_step, max_delta)
+                if reason == "joint_step_gate":
+                    step_gate_count += 1
+                elif reason == "interpolated_collision":
+                    interpolated_collision_count += 1
+                    min_pair_step_collision = min(min_pair_step_collision, max_delta)
+                if safe:
+                    safe_edge_count += 1
+                    edges.append((previous_index, max_delta))
+                    if reachable[index - 1][previous_index] and path_cost[index - 1][previous_index] + max_delta < best_cost:
+                        best_prev = previous_index
+                        best_cost = path_cost[index - 1][previous_index] + max_delta
+            current_edges.append(edges)
+            current_reachable.append(best_prev is not None)
+            current_predecessor.append(best_prev)
+            current_cost.append(best_cost)
+        edge_info.append(current_edges)
+        reachable.append(current_reachable)
+        predecessor.append(current_predecessor)
+        path_cost.append(current_cost)
+        transition_stats.append(
+            {
+                "from_waypoint": index - 1,
+                "to_waypoint": index,
+                "possible_pairs": len(candidate_sets[index - 1]) * len(candidate_sets[index]),
+                "safe_edges": safe_edge_count,
+                "joint_step_gate_rejections": step_gate_count,
+                "interpolated_collision_rejections": interpolated_collision_count,
+                "min_pair_step_deg": float(np.rad2deg(min_pair_step)) if np.isfinite(min_pair_step) else None,
+                "min_collision_rejection_step_deg": (
+                    float(np.rad2deg(min_pair_step_collision)) if np.isfinite(min_pair_step_collision) else None
+                ),
+                "reachable_current_count": sum(current_reachable),
+            }
+        )
+
+    can_reach_end: list[list[bool]] = [[False] * len(items) for items in candidate_sets]
+    if candidate_sets:
+        can_reach_end[-1] = list(reachable[-1])
+    for index in range(len(candidate_sets) - 2, -1, -1):
+        for current_index in range(len(candidate_sets[index])):
+            can_reach_end[index][current_index] = any(
+                any(previous_index == current_index for previous_index, _ in edge_info[index + 1][next_index])
+                and can_reach_end[index + 1][next_index]
+                for next_index in range(len(candidate_sets[index + 1]))
+            )
+
+    selected_path: set[tuple[int, int]] = set()
+    if candidate_sets and any(reachable[-1]):
+        current_index = int(np.argmin([cost if ok else float("inf") for cost, ok in zip(path_cost[-1], reachable[-1])]))
+        for index in range(len(candidate_sets) - 1, -1, -1):
+            selected_path.add((index, current_index))
+            previous_index = predecessor[index][current_index]
+            if previous_index is None:
+                break
+            current_index = previous_index
+
+    records: list[dict[str, float | int | str]] = []
+    for index, candidates in enumerate(candidate_sets):
+        for candidate_index, candidate in enumerate(candidates):
+            edges = edge_info[index][candidate_index] if index > 0 else []
+            best_edge = min((max_delta for _, max_delta in edges), default=0.0)
+            edge_valid = int(bool(edges)) if index > 0 else 1
+            complete_path = int(can_reach_end[index][candidate_index] and reachable[index][candidate_index])
+            positions = np.asarray(candidate["positions"], dtype=float)
+            records.append(
+                {
+                    "waypoint": index,
+                    "candidate": candidate_index,
+                    "valid": complete_path,
+                    "colliding": int(candidate["colliding"]),
+                    "max_joint_step_deg": float(np.rad2deg(best_edge)),
+                    "roll_deg": float(candidate.get("roll_deg", 0.0)),
+                    "collision_summary": str(candidate["collision_summary"]),
+                    "source": str(candidate["source"]),
+                    "position_error_mm": float(candidate["position_error_mm"]),
+                    "normal_error_deg": float(candidate["normal_error_deg"]),
+                    "edge_prev_valid": edge_valid,
+                    "edge_prev_collision_free": edge_valid,
+                    "edge_prev_max_joint_step_deg": float(np.rad2deg(best_edge)),
+                    "reachable_in": int(reachable[index][candidate_index]),
+                    "can_reach_end": int(can_reach_end[index][candidate_index]),
+                    "path_selected": int((index, candidate_index) in selected_path),
+                    **{f"q{i}": float(value) for i, value in enumerate(positions, start=1)},
+                }
+            )
+    _write_ik_candidate_bank(ik_candidate_bank_csv, records)
+    candidate_counts = [len(items) for items in candidate_sets]
+    valid_counts = [sum(int(row["valid"]) for row in records if int(row["waypoint"]) == index) for index in range(len(poses))]
+    first_disconnected_transition = next(
+        (item for item in transition_stats if int(item["safe_edges"]) == 0),
+        None,
+    )
+    first_reachability_break = next(
+        (item for item in transition_stats if int(item["reachable_current_count"]) == 0),
+        None,
+    )
+    report: dict[str, object] = {
+        "status": "pass" if candidate_sets and any(reachable[-1]) else "fail:no_complete_safe_path",
+        "waypoint_count": len(poses),
+        "candidate_limit": candidate_limit,
+        "candidate_count_min": min(candidate_counts, default=0),
+        "candidate_count_max": max(candidate_counts, default=0),
+        "candidate_count_mean": float(np.mean(candidate_counts)) if candidate_counts else 0.0,
+        "complete_path_candidate_count_min": min(valid_counts, default=0),
+        "complete_path_candidate_count_max": max(valid_counts, default=0),
+        "waypoints_with_multiple_complete_candidates": sum(count >= 2 for count in valid_counts),
+        "waypoints_with_zero_complete_candidates": sum(count == 0 for count in valid_counts),
+        "first_disconnected_transition": first_disconnected_transition,
+        "first_reachability_break": first_reachability_break,
+        "transition_stats_first_20": transition_stats[:20],
+        "max_joint_step_deg_gate": float(np.rad2deg(max_joint_step)),
+        "elapsed_s": time.monotonic() - solve_start,
+        "candidate_failure_counts_first_10": failure_counts[:10],
+        "baseline_failures_first_20": baseline_failures,
+        "candidate_bank_csv": str(ik_candidate_bank_csv),
+        "interpretation": "valid=1 means the node belongs to at least one complete collision-free adjacent path; path_selected=1 marks the lowest-cost baseline-compatible path.",
+    }
+    _write_ik_candidate_collection_report(ik_candidate_collection_report_json, report)
+    return report
 
 
 def build_seed_joint_trajectory(joint_seeds: np.ndarray, joint_names: list[str]):
@@ -243,6 +1368,213 @@ def build_seed_joint_trajectory(joint_seeds: np.ndarray, joint_names: list[str])
     if len(result.joint_trajectory.points) < 2:
         raise RuntimeError("Seed joint trajectory contains fewer than two waypoints.")
     return result
+
+
+def build_normal_constrained_dls_trajectory(
+    moveit,
+    group_name: str,
+    ee_link: str,
+    target_poses: list[Pose],
+    target_normals: np.ndarray,
+    joint_seeds: np.ndarray,
+    joint_names: list[str],
+    warm_start_rows: int = 16,
+    iterations_per_waypoint: int = 80,
+    damping: float = 1.0e-2,
+    position_weight: float = 100.0,
+    normal_weight: float = 0.1,
+    max_joint_step_rad: float = 0.16,
+    position_tolerance_m: float = 2.0e-5,
+    normal_tolerance_rad: float = 2.0e-4,
+) -> RobotTrajectoryMsg:
+    """Project a causal joint prior onto TCP position plus wall-normal geometry.
+
+    The full-pose KDL route is intentionally not used here.  The authoritative
+    process gate constrains TCP position, stand-off, and tool-Z wall normal;
+    roll about that normal is a free redundancy.  This Route-D/Route-A hybrid
+    uses MoveIt2's native FK and Jacobian to solve exactly those constrained
+    quantities while retaining the D39 16-row observed warm start and using
+    only the previous accepted state thereafter.
+    """
+
+    if len(target_poses) != len(target_normals) or len(target_poses) != len(joint_seeds):
+        raise ValueError("normal_dls_target_seed_count_mismatch")
+    if len(target_poses) < 2 or len(joint_names) != 6:
+        raise ValueError("normal_dls_invalid_trajectory_shape")
+    if warm_start_rows < 1 or warm_start_rows >= len(target_poses):
+        raise ValueError("normal_dls_invalid_warm_start_rows")
+    state = RobotState(moveit.get_robot_model())
+    output = RobotTrajectoryMsg()
+    output.joint_trajectory.joint_names = joint_names
+    diagnostics_path = os.environ.get("D41_DLS_DIAGNOSTICS_CSV", "").strip()
+    diagnostics_case = os.environ.get("D41_DLS_CASE_ID", "unspecified").strip() or "unspecified"
+    d41_limit_aware = os.environ.get("D41_DLS_LIMIT_AWARE", "false").strip().lower() == "true"
+    d41_lower_limits = None
+    d41_upper_limits = None
+    d41_limit_buffer = 0.0
+    if d41_limit_aware:
+        try:
+            d41_lower_limits = np.asarray([float(value) for value in os.environ["D41_DLS_LOWER_LIMITS"].split()], dtype=float)
+            d41_upper_limits = np.asarray([float(value) for value in os.environ["D41_DLS_UPPER_LIMITS"].split()], dtype=float)
+        except (KeyError, ValueError) as exc:
+            raise RuntimeError("D41_DLS_LIMIT_AWARE requires finite lower/upper position limits") from exc
+        if d41_lower_limits.shape != (len(joint_names),) or d41_upper_limits.shape != (len(joint_names),):
+            raise RuntimeError("D41_DLS_LIMIT_AWARE position-limit dimension mismatch")
+        d41_limit_buffer = float(os.environ.get("D41_DLS_LIMIT_BUFFER_RAD", "1.0e-4"))
+        if not np.isfinite(d41_limit_buffer) or d41_limit_buffer < 0.0:
+            raise RuntimeError("D41_DLS_LIMIT_AWARE position-limit buffer must be finite and non-negative")
+
+    def enforce_d41_position_limits(values: np.ndarray) -> np.ndarray:
+        if not d41_limit_aware:
+            return values
+        # The position+normal task leaves tool roll redundant.  Projecting
+        # proposals into the native URDF bounds is therefore a valid
+        # joint-limit safety layer; the ordinary D40 route remains unchanged
+        # unless this explicit D41 shadow/retention switch is enabled.
+        return np.clip(values, d41_lower_limits + d41_limit_buffer, d41_upper_limits - d41_limit_buffer)
+
+    diagnostics_file = None
+    if diagnostics_path:
+        diagnostics_file = Path(diagnostics_path)
+        diagnostics_file.parent.mkdir(parents=True, exist_ok=True)
+        if not diagnostics_file.exists() or diagnostics_file.stat().st_size == 0:
+            diagnostics_file.write_text(
+                "case_id,waypoint,iteration,pre_position_mm,pre_normal_deg,post_position_mm,post_normal_deg,"
+                "damping,damping_increased,accepted_alpha,unclipped_delta_norm_rad,accepted_delta_norm_rad,"
+                "trust_region_radius_rad,trust_region_clipped,sigma_min,sigma_max,condition_number,effective_rank,"
+                "manipulability,converged,accepted\n",
+                encoding="utf-8",
+            )
+
+    def write_diagnostic(row: dict[str, object]) -> None:
+        if diagnostics_file is None:
+            return
+        with diagnostics_file.open("a", encoding="utf-8", newline="") as handle:
+            csv.DictWriter(
+                handle,
+                fieldnames=[
+                    "case_id", "waypoint", "iteration", "pre_position_mm", "pre_normal_deg",
+                    "post_position_mm", "post_normal_deg", "damping", "damping_increased",
+                    "accepted_alpha", "unclipped_delta_norm_rad", "accepted_delta_norm_rad",
+                    "trust_region_radius_rad", "trust_region_clipped", "sigma_min", "sigma_max",
+                    "condition_number", "effective_rank", "manipulability", "converged", "accepted",
+                ],
+            ).writerow(row)
+    seed_values = np.asarray(joint_seeds, dtype=float)
+    for row in seed_values[:warm_start_rows]:
+        point = JointTrajectoryPoint()
+        point.positions = [float(value) for value in row]
+        point.time_from_start = _duration_from_seconds(0.0)
+        output.joint_trajectory.points.append(point)
+
+    def target_position(index: int) -> np.ndarray:
+        return np.asarray(
+            [target_poses[index].position.x, target_poses[index].position.y, target_poses[index].position.z],
+            dtype=float,
+        )
+
+    def normalized_normal(index: int) -> np.ndarray:
+        normal = np.asarray(target_normals[index], dtype=float)
+        return normal / max(float(np.linalg.norm(normal)), 1.0e-12)
+
+    def residual(q: np.ndarray, index: int) -> tuple[np.ndarray, float, float]:
+        state.set_joint_group_positions(group_name, q)
+        state.update()
+        transform = _transform_matrix(state.get_global_link_transform(ee_link))
+        position_error = target_position(index) - transform[:3, 3]
+        tool_z = transform[:3, 2] / max(float(np.linalg.norm(transform[:3, 2])), 1.0e-12)
+        normal_error = np.cross(tool_z, normalized_normal(index))
+        return (
+            np.r_[position_error * float(position_weight), normal_error * float(normal_weight)],
+            float(np.linalg.norm(position_error)),
+            float(np.linalg.norm(normal_error)),
+        )
+
+    current = enforce_d41_position_limits(np.asarray(seed_values[warm_start_rows - 1], dtype=float).copy())
+    for index in range(warm_start_rows, len(target_poses)):
+        accepted = current.copy()
+        for _iteration in range(int(iterations_per_waypoint)):
+            error, position_norm, normal_norm = residual(accepted, index)
+            if position_norm <= float(position_tolerance_m) and normal_norm <= float(normal_tolerance_rad):
+                write_diagnostic({
+                    "case_id": diagnostics_case, "waypoint": index, "iteration": _iteration,
+                    "pre_position_mm": position_norm * 1000.0, "pre_normal_deg": np.rad2deg(normal_norm),
+                    "post_position_mm": position_norm * 1000.0, "post_normal_deg": np.rad2deg(normal_norm),
+                    "damping": float(damping), "damping_increased": False, "accepted_alpha": 0.0,
+                    "unclipped_delta_norm_rad": 0.0, "accepted_delta_norm_rad": 0.0,
+                    "trust_region_radius_rad": float(max_joint_step_rad), "trust_region_clipped": False,
+                    "sigma_min": "", "sigma_max": "", "condition_number": "", "effective_rank": "",
+                    "manipulability": "", "converged": True, "accepted": True,
+                })
+                break
+            jacobian = np.asarray(
+                state.get_jacobian(group_name, ee_link, np.zeros(3, dtype=float), False),
+                dtype=float,
+            )
+            if jacobian.shape != (6, 6) or not np.isfinite(jacobian).all():
+                raise RuntimeError(f"normal_dls_invalid_jacobian:index={index}:shape={jacobian.shape}")
+            weighted_jacobian = jacobian.copy()
+            weighted_jacobian[:3] *= float(position_weight)
+            weighted_jacobian[3:] *= float(normal_weight)
+            singular_values = np.linalg.svd(jacobian, compute_uv=False)
+            sigma_max = float(singular_values[0]) if singular_values.size else float("nan")
+            sigma_min = float(singular_values[-1]) if singular_values.size else float("nan")
+            svd_tol = sigma_max * max(jacobian.shape) * np.finfo(float).eps * 100.0
+            effective_rank = int(np.sum(singular_values > svd_tol)) if singular_values.size else 0
+            condition_number = sigma_max / sigma_min if sigma_min > 0.0 else float("inf")
+            manipulability = float(np.prod(singular_values)) if singular_values.size else float("nan")
+            system = weighted_jacobian @ weighted_jacobian.T + float(damping) ** 2 * np.eye(6)
+            unclipped_delta = weighted_jacobian.T @ np.linalg.solve(system, error)
+            if not np.isfinite(unclipped_delta).all():
+                raise RuntimeError(f"normal_dls_nonfinite_delta:index={index}")
+            delta = np.clip(unclipped_delta, -float(max_joint_step_rad), float(max_joint_step_rad))
+            trust_region_clipped = bool(np.any(np.abs(unclipped_delta) > float(max_joint_step_rad) + 1.0e-12))
+            base_cost = float(np.linalg.norm(error))
+            improved = False
+            accepted_alpha = 0.0
+            post_position_norm = position_norm
+            post_normal_norm = normal_norm
+            for alpha in (1.0, 0.5, 0.25, 0.125, 0.0625):
+                proposal = enforce_d41_position_limits(accepted + float(alpha) * delta)
+                proposal_error, _proposal_position, _proposal_normal = residual(proposal, index)
+                if float(np.linalg.norm(proposal_error)) < base_cost:
+                    accepted = proposal
+                    improved = True
+                    accepted_alpha = float(alpha)
+                    post_position_norm = float(_proposal_position)
+                    post_normal_norm = float(_proposal_normal)
+                    break
+            write_diagnostic({
+                "case_id": diagnostics_case, "waypoint": index, "iteration": _iteration,
+                "pre_position_mm": position_norm * 1000.0, "pre_normal_deg": np.rad2deg(normal_norm),
+                "post_position_mm": post_position_norm * 1000.0, "post_normal_deg": np.rad2deg(post_normal_norm),
+                "damping": float(damping), "damping_increased": False, "accepted_alpha": accepted_alpha,
+                "unclipped_delta_norm_rad": float(np.linalg.norm(unclipped_delta)),
+                "accepted_delta_norm_rad": float(accepted_alpha * np.linalg.norm(delta)),
+                "trust_region_radius_rad": float(max_joint_step_rad), "trust_region_clipped": trust_region_clipped,
+                "sigma_min": sigma_min, "sigma_max": sigma_max, "condition_number": condition_number,
+                "effective_rank": effective_rank, "manipulability": manipulability,
+                "converged": False, "accepted": improved,
+            })
+            if not improved:
+                break
+        _error, position_norm, normal_norm = residual(accepted, index)
+        # Keep the generator fail-closed, but do not impose a tighter
+        # surrogate threshold than the authoritative native path gate.  The
+        # strict MoveIt quality report remains the promotion authority.
+        if position_norm > 4.0e-3 or normal_norm > np.deg2rad(5.0):
+            raise RuntimeError(
+                f"normal_dls_geometry_residual:index={index}:position_mm={position_norm * 1000.0:.4f}:"
+                f"normal_deg={np.rad2deg(normal_norm):.4f}"
+            )
+        current = accepted
+        point = JointTrajectoryPoint()
+        point.positions = [float(value) for value in current]
+        point.time_from_start = _duration_from_seconds(0.0)
+        output.joint_trajectory.points.append(point)
+    if len(output.joint_trajectory.points) != len(target_poses):
+        raise RuntimeError("normal_dls_output_count_mismatch")
+    return output
 
 
 def _fk_positions_for_trajectory_msg(moveit, group_name: str, ee_link: str, trajectory_msg) -> np.ndarray:
@@ -297,11 +1629,214 @@ def _rotation_matrix_to_quaternion(matrix: np.ndarray) -> tuple[float, float, fl
     return tuple(float(v) for v in quat)
 
 
+def _quaternion_to_rotation_matrix(quaternion: np.ndarray) -> np.ndarray:
+    x, y, z, w = np.asarray(quaternion, dtype=float)
+    norm = max(float(np.linalg.norm([x, y, z, w])), 1e-12)
+    x, y, z, w = x / norm, y / norm, z / norm, w / norm
+    return np.array(
+        [
+            [1.0 - 2.0 * (y * y + z * z), 2.0 * (x * y - z * w), 2.0 * (x * z + y * w)],
+            [2.0 * (x * y + z * w), 1.0 - 2.0 * (x * x + z * z), 2.0 * (y * z - x * w)],
+            [2.0 * (x * z - y * w), 2.0 * (y * z + x * w), 1.0 - 2.0 * (x * x + y * y)],
+        ],
+        dtype=float,
+    )
+
+
+def _pose_to_matrix(pose: Pose) -> np.ndarray:
+    matrix = np.eye(4)
+    matrix[:3, 3] = [pose.position.x, pose.position.y, pose.position.z]
+    matrix[:3, :3] = _quaternion_to_rotation_matrix(
+        np.array([pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w], dtype=float)
+    )
+    return matrix
+
+
+def _pose_from_matrix(matrix: np.ndarray, source_pose: Pose) -> Pose:
+    pose = deepcopy(source_pose)
+    pose.position.x = float(matrix[0, 3])
+    pose.position.y = float(matrix[1, 3])
+    pose.position.z = float(matrix[2, 3])
+    pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w = _rotation_matrix_to_quaternion(
+        matrix[:3, :3]
+    )
+    return pose
+
+
+def _symmetric_roll_offsets(sample_count: int) -> list[float]:
+    count = max(1, int(sample_count))
+    if count == 1:
+        return [0.0]
+    step = 2.0 * np.pi / count
+    offsets = [0.0]
+    for rank in range(1, count):
+        magnitude = step * ((rank + 1) // 2)
+        offsets.append(magnitude if rank % 2 else -magnitude)
+    return offsets[:count]
+
+
+def _tool_axis_roll_pose_candidates(pose: Pose, sample_count: int) -> list[tuple[float, Pose]]:
+    """Return pose variants that preserve TCP position and tool-Z direction."""
+
+    base = _pose_to_matrix(pose)
+    candidates: list[tuple[float, Pose]] = []
+    for roll in _symmetric_roll_offsets(sample_count):
+        c, s = float(np.cos(roll)), float(np.sin(roll))
+        rz = np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]], dtype=float)
+        matrix = base.copy()
+        matrix[:3, :3] = base[:3, :3] @ rz
+        candidates.append((roll, _pose_from_matrix(matrix, pose)))
+    return candidates
+
+
+def _rotation_about_local_axis(axis: int, angle_rad: float) -> np.ndarray:
+    """Return a right-handed local-frame rotation matrix."""
+
+    c = float(np.cos(angle_rad))
+    s = float(np.sin(angle_rad))
+    if axis == 0:
+        return np.array([[1.0, 0.0, 0.0], [0.0, c, -s], [0.0, s, c]], dtype=float)
+    if axis == 1:
+        return np.array([[c, 0.0, s], [0.0, 1.0, 0.0], [-s, 0.0, c]], dtype=float)
+    if axis == 2:
+        return np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]], dtype=float)
+    raise ValueError(f"axis must be 0, 1, or 2, got {axis}")
+
+
+def _continuous_tcp_roll_curve(poses: list[Pose]) -> np.ndarray:
+    """Transport the TCP x-axis along the wall-normal curve.
+
+    The input poses can contain an arbitrary per-waypoint x/y frame because
+    only tool-Z is constrained by the spray process.  Parallel transport keeps
+    that free roll continuous, then unwraps it so the IK solver never receives
+    an artificial +/-180 degree frame jump.
+    """
+
+    if not poses:
+        return np.zeros(0, dtype=float)
+    base_frames = [_pose_to_matrix(pose)[:3, :3] for pose in poses]
+    transported_x = np.zeros((len(poses), 3), dtype=float)
+    transported_y = np.zeros((len(poses), 3), dtype=float)
+    first = base_frames[0]
+    z0 = first[:, 2] / max(float(np.linalg.norm(first[:, 2])), 1e-12)
+    x0 = first[:, 0] - np.dot(first[:, 0], z0) * z0
+    if np.linalg.norm(x0) < 1e-9:
+        x0 = first[:, 1] - np.dot(first[:, 1], z0) * z0
+    x0 /= max(float(np.linalg.norm(x0)), 1e-12)
+    y0 = np.cross(z0, x0)
+    y0 /= max(float(np.linalg.norm(y0)), 1e-12)
+    transported_x[0], transported_y[0] = x0, y0
+    for index in range(1, len(poses)):
+        current = base_frames[index]
+        z = current[:, 2] / max(float(np.linalg.norm(current[:, 2])), 1e-12)
+        x = transported_x[index - 1] - np.dot(transported_x[index - 1], z) * z
+        if np.linalg.norm(x) < 1e-9:
+            x = transported_y[index - 1] - np.dot(transported_y[index - 1], z) * z
+        x /= max(float(np.linalg.norm(x)), 1e-12)
+        y = np.cross(z, x)
+        y /= max(float(np.linalg.norm(y)), 1e-12)
+        if np.dot(x, transported_x[index - 1]) < 0.0:
+            x, y = -x, -y
+        transported_x[index], transported_y[index] = x, y
+
+    rolls = []
+    for index, frame in enumerate(base_frames):
+        base_x = frame[:, 0]
+        base_y = frame[:, 1]
+        rolls.append(np.arctan2(np.dot(transported_x[index], base_y), np.dot(transported_x[index], base_x)))
+    return np.unwrap(np.asarray(rolls, dtype=float))
+
+
+def _continuous_curve_step_limit(values: np.ndarray, max_step_rad: float) -> np.ndarray:
+    """Unwrap a scalar curve and cap only numerical frame discontinuities."""
+
+    curve = np.unwrap(np.asarray(values, dtype=float).copy())
+    if len(curve) < 2 or max_step_rad <= 0.0:
+        return curve
+    for index in range(1, len(curve)):
+        delta = curve[index] - curve[index - 1]
+        if abs(delta) > max_step_rad:
+            curve[index] = curve[index - 1] + np.sign(delta) * max_step_rad
+    return curve
+
+
+def _global_roll_reparameterized_pose(
+    pose: Pose,
+    base_roll_rad: float,
+    roll_bias_rad: float,
+    tilt_x_deg: float,
+    tilt_y_deg: float,
+) -> Pose:
+    """Apply a continuous roll curve and bounded tangent-plane TCP adjustment."""
+
+    base = _pose_to_matrix(pose)
+    rx = _rotation_about_local_axis(0, np.deg2rad(float(tilt_x_deg)))
+    ry = _rotation_about_local_axis(1, np.deg2rad(float(tilt_y_deg)))
+    rz = _rotation_about_local_axis(2, float(base_roll_rad + roll_bias_rad))
+    matrix = base.copy()
+    matrix[:3, :3] = base[:3, :3] @ rx @ ry @ rz
+    return _pose_from_matrix(matrix, pose)
+
+
+def _contact_pair_label(pair: object) -> str:
+    if isinstance(pair, (tuple, list)) and len(pair) >= 2:
+        return f"{pair[0]}<->{pair[1]}"
+    return str(pair)
+
+
+def _collision_result_summary(result: CollisionResult, max_pairs: int = 3) -> str:
+    count = int(getattr(result, "contact_count", 0))
+    try:
+        contacts = getattr(result, "contacts", {})
+    except TypeError:
+        # Jazzy MoveItPy exposes contacts, but the Contact element type is not
+        # always registered for Python conversion. Keep diagnostics non-fatal.
+        return f"contacts={count},pairs=unavailable"
+    if not contacts or not hasattr(contacts, "items"):
+        return f"contacts={count}"
+    pairs: list[str] = []
+    for pair, contact_list in list(contacts.items())[:max_pairs]:
+        try:
+            pair_count = len(contact_list)
+        except TypeError:
+            pair_count = 1
+        pairs.append(f"{_contact_pair_label(pair)}:{pair_count}")
+    if not pairs:
+        return f"contacts={count}"
+    return f"contacts={count},pairs={'|'.join(pairs)}"
+
+
+def _state_collision_summary(scene, state, group_name: str) -> tuple[bool, str]:
+    request = CollisionRequest()
+    request.joint_model_group_name = group_name
+    request.contacts = True
+    request.max_contacts = 12
+    request.max_contacts_per_pair = 2
+    result = CollisionResult()
+    scene.check_collision(request, result, state)
+    return bool(result.collision), _collision_result_summary(result)
+
+
 def _closed_loop_size_from_points(points: np.ndarray) -> int:
     distances = np.linalg.norm(points[1:] - points[0], axis=1)
     candidates = np.flatnonzero(distances < 1e-7) + 1
     candidates = candidates[candidates >= 16]
     return int(candidates[0]) if len(candidates) else len(points)
+
+
+def _repeated_closed_loop_size(points: np.ndarray, normals: np.ndarray, tolerance: float = 1e-6) -> int:
+    loop_size = _closed_loop_size_from_points(points)
+    if loop_size >= len(points) or len(points) % loop_size != 0:
+        return len(points)
+    reference_points = points[:loop_size]
+    reference_normals = normals[:loop_size]
+    for start in range(loop_size, len(points), loop_size):
+        if np.max(np.linalg.norm(points[start : start + loop_size] - reference_points, axis=1)) > tolerance:
+            return len(points)
+        normal_error = 1.0 - np.sum(normals[start : start + loop_size] * reference_normals, axis=1)
+        if float(np.max(np.abs(normal_error))) > tolerance:
+            return len(points)
+    return loop_size
 
 
 def build_wall_collision_objects(
@@ -312,38 +1847,58 @@ def build_wall_collision_objects(
     wall_thickness: float,
     y_thickness: float,
     segment_stride: int,
+    include_bottom_closure: bool = True,
+    open_path: bool = False,
+    tcp_points_to_wall: bool = False,
+    include_tunnel_floor: bool = False,
+    tunnel_floor_z: float = -0.20,
 ) -> list[CollisionObject]:
-    """Approximate the closed horseshoe wall as thin oriented boxes."""
+    """Approximate the contour wall as thin oriented boxes."""
 
     target_tcp = np.array([[pose.position.x, pose.position.y, pose.position.z] for pose in target_poses], dtype=float)
-    wall_points = target_tcp - stand_off * target_normals
+    wall_sign = 1.0 if tcp_points_to_wall else -1.0
+    wall_points = target_tcp + wall_sign * stand_off * target_normals
     loop_size = _closed_loop_size_from_points(wall_points)
     wall_loop = wall_points[:loop_size]
+    bottom_z = float(np.min(wall_loop[:, 2]))
     objects: list[CollisionObject] = []
     stride = max(1, int(segment_stride))
     y_axis = np.array([0.0, 1.0, 0.0], dtype=float)
-    for object_index, start in enumerate(range(0, loop_size, stride)):
-        end = (start + stride) % loop_size
+    final_start = loop_size - 1 if open_path else loop_size
+    for object_index, start in enumerate(range(0, final_start, stride)):
+        end = min(start + stride, loop_size - 1) if open_path else (start + stride) % loop_size
         p0 = wall_loop[start]
         p1 = wall_loop[end]
+        normal = target_normals[start]
+        normal = normal / max(float(np.linalg.norm(normal)), 1e-12)
         segment = p1 - p0
         length = float(np.linalg.norm(segment))
         if length <= 1e-6:
             continue
+        if not include_bottom_closure:
+            center_candidate = (p0 + p1) * 0.5
+            near_bottom = abs(float(center_candidate[2]) - bottom_z) <= max(wall_thickness * 2.0, 1e-3)
+            upward_surface = float(normal[2]) > 0.5
+            if near_bottom and upward_surface:
+                continue
         x_axis = segment / length
         z_axis = np.cross(x_axis, y_axis)
         z_axis /= max(float(np.linalg.norm(z_axis)), 1e-12)
+        if float(np.dot(z_axis, normal)) < 0.0:
+            z_axis = -z_axis
         # The local box frame is x along the contour, y along tunnel station,
-        # and z through wall thickness.
+        # and z through wall thickness. The measured wall surface is the inner
+        # coating face, so the solid wall volume is offset away from free space.
         rotation = np.column_stack([x_axis, y_axis, z_axis])
         qx, qy, qz, qw = _rotation_matrix_to_quaternion(rotation)
         primitive = SolidPrimitive()
         primitive.type = SolidPrimitive.BOX
         primitive.dimensions = [length + wall_thickness, y_thickness, wall_thickness]
         pose = Pose()
-        pose.position.x = float((p0[0] + p1[0]) * 0.5)
-        pose.position.y = float((p0[1] + p1[1]) * 0.5)
-        pose.position.z = float((p0[2] + p1[2]) * 0.5)
+        center = (p0 + p1) * 0.5 + wall_sign * normal * (wall_thickness * 0.5)
+        pose.position.x = float(center[0])
+        pose.position.y = float(center[1])
+        pose.position.z = float(center[2])
         pose.orientation.x = qx
         pose.orientation.y = qy
         pose.orientation.z = qz
@@ -355,6 +1910,26 @@ def build_wall_collision_objects(
         obj.primitive_poses.append(pose)
         obj.operation = CollisionObject.ADD
         objects.append(obj)
+    if include_tunnel_floor:
+        floor = SolidPrimitive()
+        floor.type = SolidPrimitive.BOX
+        floor.dimensions = [
+            float(np.max(wall_loop[:, 0]) - np.min(wall_loop[:, 0]) + wall_thickness),
+            float(y_thickness),
+            float(wall_thickness),
+        ]
+        floor_pose = Pose()
+        floor_pose.position.x = float((np.max(wall_loop[:, 0]) + np.min(wall_loop[:, 0])) * 0.5)
+        floor_pose.position.y = float(np.mean(wall_loop[:, 1]))
+        floor_pose.position.z = float(tunnel_floor_z - wall_thickness * 0.5)
+        floor_pose.orientation.w = 1.0
+        floor_obj = CollisionObject()
+        floor_obj.header.frame_id = frame_id
+        floor_obj.id = "tunnel_floor"
+        floor_obj.primitives.append(floor)
+        floor_obj.primitive_poses.append(floor_pose)
+        floor_obj.operation = CollisionObject.ADD
+        objects.append(floor_obj)
     return objects
 
 
@@ -367,6 +1942,11 @@ def apply_collision_environment(
     wall_thickness: float,
     y_thickness: float,
     segment_stride: int,
+    include_bottom_closure: bool = True,
+    open_path: bool = False,
+    tcp_points_to_wall: bool = False,
+    include_tunnel_floor: bool = False,
+    tunnel_floor_z: float = -0.20,
 ) -> int:
     objects = build_wall_collision_objects(
         target_poses,
@@ -376,6 +1956,11 @@ def apply_collision_environment(
         wall_thickness,
         y_thickness,
         segment_stride,
+        include_bottom_closure=include_bottom_closure,
+        open_path=open_path,
+        tcp_points_to_wall=tcp_points_to_wall,
+        include_tunnel_floor=include_tunnel_floor,
+        tunnel_floor_z=tunnel_floor_z,
     )
     psm = moveit.get_planning_scene_monitor()
     with psm.read_write() as scene:
@@ -445,6 +2030,19 @@ def write_joint_trajectory_csv(robot_trajectory, output_path: Path) -> None:
             )
 
 
+def write_joint_waypoint_csv(trajectory_msg, output_path: Path) -> None:
+    """Export untimed joint waypoints before MoveIt timing/Ruckig post-processing."""
+
+    trajectory = as_robot_trajectory_message(trajectory_msg).joint_trajectory
+    names = list(trajectory.joint_names)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["waypoint"] + [f"{name}_q" for name in names])
+        for index, point in enumerate(trajectory.points):
+            writer.writerow([index] + [float(value) for value in point.positions])
+
+
 def _duration_seconds(duration) -> float:
     return float(duration.sec) + float(duration.nanosec) * 1e-9
 
@@ -476,6 +2074,98 @@ def _trajectory_arrays(robot_trajectory) -> tuple[np.ndarray, np.ndarray, np.nda
     return t, q, dq, ddq, jerk
 
 
+def build_segmented_execution_trajectory_msg(
+    robot_trajectory,
+    production_joint_step_limit_deg: float = 20.0,
+    transition_step_cap_deg: float = 5.0,
+    transition_max_speed_deg_s: float = 12.0,
+    transition_min_duration_s: float = 2.0,
+    stop_hold_s: float = 0.20,
+) -> tuple[RobotTrajectoryMsg, list[tuple[int, int]]]:
+    """Build the actual controller trajectory with spray-off reorientation stops."""
+
+    source = deepcopy(as_robot_trajectory_message(robot_trajectory))
+    points = list(source.joint_trajectory.points)
+    if len(points) < 2:
+        raise RuntimeError("Segmented execution requires at least two joint points.")
+    q = np.asarray([point.positions for point in points], dtype=float)
+    raw_time = np.asarray([_duration_seconds(point.time_from_start) for point in points], dtype=float)
+    if np.any(np.diff(raw_time) <= 0.0):
+        raise RuntimeError("Raw trajectory timestamps must be strictly increasing before segmentation.")
+
+    transition_pairs: list[tuple[int, int]] = []
+    for index in range(len(points) - 1):
+        delta = circular_joint_delta(q[index + 1] - q[index])
+        if float(np.max(np.abs(np.rad2deg(delta)))) > float(production_joint_step_limit_deg):
+            transition_pairs.append((index, index + 1))
+    if not transition_pairs:
+        return source, []
+
+    result = deepcopy(source)
+    result.joint_trajectory.points = []
+    output_time = 0.0
+    last_raw_index = 0
+
+    def append_point(point: JointTrajectoryPoint, time_s: float) -> None:
+        point.time_from_start = _duration_from_seconds(max(time_s, output_time))
+        result.joint_trajectory.points.append(point)
+
+    def zero_boundary(point: JointTrajectoryPoint) -> JointTrajectoryPoint:
+        point.velocities = [0.0] * len(point.positions)
+        point.accelerations = [0.0] * len(point.positions)
+        return point
+
+    def append_process_point(index: int, force_zero: bool = False) -> None:
+        nonlocal output_time, last_raw_index
+        point = deepcopy(points[index])
+        if force_zero:
+            point = zero_boundary(point)
+        if result.joint_trajectory.points:
+            output_time += max(raw_time[index] - raw_time[last_raw_index], 1e-3)
+        append_point(point, output_time)
+        last_raw_index = index
+
+    cursor = 0
+    for from_index, to_index in transition_pairs:
+        for index in range(cursor, from_index + 1):
+            append_process_point(index, force_zero=index == from_index)
+
+        q0 = q[from_index]
+        delta = q[to_index] - q[from_index]
+        max_delta_deg = float(np.max(np.abs(np.rad2deg(delta))))
+        interval_count = max(
+            8,
+            int(np.ceil(max_delta_deg * 1.875 / max(float(transition_step_cap_deg), 1e-6))),
+        )
+        duration_s = max(float(transition_min_duration_s), max_delta_deg / max(float(transition_max_speed_deg_s), 1e-6))
+
+        if stop_hold_s > 0.0:
+            output_time += float(stop_hold_s)
+            append_point(zero_boundary(deepcopy(points[from_index])), output_time)
+
+        for sample_index in range(1, interval_count + 1):
+            u = sample_index / interval_count
+            blend = 10.0 * u**3 - 15.0 * u**4 + 6.0 * u**5
+            blend_d1 = 30.0 * u**2 - 60.0 * u**3 + 30.0 * u**4
+            blend_d2 = 60.0 * u - 180.0 * u**2 + 120.0 * u**3
+            sample = JointTrajectoryPoint()
+            sample.positions = (q0 + delta * blend).tolist()
+            sample.velocities = (delta * blend_d1 / duration_s).tolist()
+            sample.accelerations = (delta * blend_d2 / duration_s**2).tolist()
+            output_time += duration_s / interval_count
+            append_point(sample, output_time)
+
+        if stop_hold_s > 0.0:
+            output_time += float(stop_hold_s)
+            append_point(zero_boundary(deepcopy(points[to_index])), output_time)
+        last_raw_index = to_index
+        cursor = to_index + 1
+
+    for index in range(cursor, len(points)):
+        append_process_point(index)
+    return result, transition_pairs
+
+
 def _transform_matrix(transform) -> np.ndarray:
     if isinstance(transform, np.ndarray):
         return np.asarray(transform, dtype=float)
@@ -495,13 +2185,13 @@ def _parameter_bool(value) -> bool:
     return bool(value)
 
 
-def _nearest_polyline_distance(points: np.ndarray, polyline: np.ndarray) -> np.ndarray:
-    """Distance from each point to the closest segment of a closed 3D polyline."""
+def _nearest_polyline_distance(points: np.ndarray, polyline: np.ndarray, closed: bool = True) -> np.ndarray:
+    """Distance from each point to the closest segment of a 3D polyline."""
 
     if len(polyline) < 2:
         raise ValueError("A trajectory validation polyline needs at least two target points.")
-    a = polyline
-    b = np.roll(polyline, -1, axis=0)
+    a = polyline if closed else polyline[:-1]
+    b = np.roll(polyline, -1, axis=0) if closed else polyline[1:]
     best = np.full(len(points), np.inf)
     for start, end in zip(a, b):
         edge = end - start
@@ -516,17 +2206,18 @@ def _project_to_polyline_with_normals(
     points: np.ndarray,
     polyline: np.ndarray,
     normals: np.ndarray,
+    closed: bool = True,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Project FK points to closed target segments and interpolate normals."""
+    """Project FK points to target segments and interpolate normals."""
 
     if len(polyline) < 2:
         raise ValueError("A trajectory validation polyline needs at least two target points.")
     if len(normals) != len(polyline):
         raise ValueError("Target normals and target polyline length differ.")
-    a = polyline
-    b = np.roll(polyline, -1, axis=0)
-    na = normals
-    nb = np.roll(normals, -1, axis=0)
+    a = polyline if closed else polyline[:-1]
+    b = np.roll(polyline, -1, axis=0) if closed else polyline[1:]
+    na = normals if closed else normals[:-1]
+    nb = np.roll(normals, -1, axis=0) if closed else normals[1:]
     best_d2 = np.full(len(points), np.inf)
     best_projection = np.zeros_like(points)
     best_normal = np.zeros_like(points)
@@ -682,8 +2373,13 @@ def validate_trajectory_collision(
     report_path: Path,
     stride: int = 1,
     environment_object_count: int = 0,
+    include_bottom_closure_collision: bool = True,
+    open_path: bool = False,
+    interpolation_step_deg: float = 1.0,
+    include_tunnel_floor: bool = False,
+    tunnel_floor_z: float = -0.20,
 ) -> dict[str, float | str]:
-    """Check self/world collision for sampled post-Ruckig states."""
+    """Check self/world collision at waypoints and interpolated segment states."""
 
     trajectory = as_robot_trajectory_message(robot_trajectory).joint_trajectory
     state = RobotState(moveit.get_robot_model())
@@ -691,19 +2387,52 @@ def validate_trajectory_collision(
     if sample_indices[-1] != len(trajectory.points) - 1:
         sample_indices.append(len(trajectory.points) - 1)
     collision_indices: list[int] = []
+    collision_segments: list[int] = []
+    first_collision_contact_count = 0
+    first_collision_summary = ""
+    max_step_rad = np.deg2rad(max(float(interpolation_step_deg), 1e-3))
+    checks: list[tuple[int, np.ndarray]] = []
+    for pair_index, (start_index, end_index) in enumerate(zip(sample_indices[:-1], sample_indices[1:])):
+        start_positions = np.asarray(trajectory.points[start_index].positions, dtype=float)
+        end_positions = np.asarray(trajectory.points[end_index].positions, dtype=float)
+        segment_steps = max(1, int(np.ceil(np.max(np.abs(end_positions - start_positions)) / max_step_rad)))
+        for local_index in range(segment_steps):
+            alpha = float(local_index) / float(segment_steps)
+            checks.append((start_index, start_positions + alpha * (end_positions - start_positions)))
+    checks.append((sample_indices[-1], np.asarray(trajectory.points[sample_indices[-1]].positions, dtype=float)))
     psm = moveit.get_planning_scene_monitor()
     with psm.read_only() as scene:
-        for index in sample_indices:
-            point = trajectory.points[index]
-            state.set_joint_group_positions(group_name, point.positions)
+        for check_index, (segment_index, positions) in enumerate(checks):
+            state.set_joint_group_positions(group_name, positions)
             state.update()
-            if scene.is_state_colliding(state, group_name, False):
-                collision_indices.append(index)
+            request = CollisionRequest()
+            request.joint_model_group_name = group_name
+            request.contacts = True
+            request.max_contacts = 20
+            request.max_contacts_per_pair = 1
+            result = CollisionResult()
+            scene.check_collision(request, result, state)
+            if result.collision:
+                collision_indices.append(check_index)
+                collision_segments.append(segment_index)
+                if first_collision_contact_count == 0:
+                    first_collision_contact_count = int(result.contact_count)
+                    first_collision_summary = _collision_result_summary(result, max_pairs=8)
+                    scene.is_state_colliding(state, group_name, True)
     metrics: dict[str, float | str] = {
         "collision_environment_object_count": float(environment_object_count),
-        "collision_checked_state_count": float(len(sample_indices)),
+        "trajectory_waypoint_count": float(len(trajectory.points)),
+        "collision_checked_state_count": float(len(checks)),
+        "collision_interpolation_step_deg": float(interpolation_step_deg),
         "collision_count": float(len(collision_indices)),
         "first_collision_index": float(collision_indices[0]) if collision_indices else -1.0,
+        "first_collision_trajectory_segment": float(collision_segments[0]) if collision_segments else -1.0,
+        "first_collision_contact_count": float(first_collision_contact_count),
+        "first_collision_summary": first_collision_summary or "none",
+        "include_bottom_closure_collision": "not_applicable_open_path" if open_path else ("true" if include_bottom_closure_collision else "false"),
+        "include_tunnel_floor_collision": "true" if include_tunnel_floor else "false",
+        "tunnel_floor_z": float(tunnel_floor_z),
+        "open_path": "true" if open_path else "false",
         "status": "pass" if not collision_indices else "fail:collision",
     }
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -715,6 +2444,8 @@ def validate_trajectory_collision(
         raise RuntimeError(
             "Refusing to execute post-Ruckig trajectory; collision gate failed at trajectory indices: "
             + ", ".join(str(i) for i in collision_indices[:10])
+            + "; trajectory segments: "
+            + ", ".join(str(i) for i in collision_segments[:10])
         )
     return metrics
 
@@ -736,6 +2467,17 @@ def validate_smoothed_trajectory_fk(
     ruckig_smoothing_used: bool = True,
     time_parameterization: str = "unknown",
     fk_trace_path: Path | None = None,
+    tool_tcp_xyz: str = "",
+    tool_tcp_rpy: str = "",
+    tool_tcp_source: str = "",
+    tool_tcp_measured_by: str = "",
+    tool_tcp_measured_date: str = "",
+    tool_tcp_calibration_method: str = "",
+    max_ik_joint_step_deg: float = 20.0,
+    production_joint_step_limit_deg: float = 20.0,
+    open_path: bool = False,
+    tcp_points_to_wall: bool = False,
+    check_joint_continuity: bool = True,
 ) -> dict[str, float | str]:
     """Reject a post-Ruckig trajectory unless FK satisfies coating constraints."""
 
@@ -745,7 +2487,8 @@ def validate_smoothed_trajectory_fk(
         [[pose.position.x, pose.position.y, pose.position.z] for pose in target_poses],
         dtype=float,
     )
-    wall = target_tcp - stand_off * target_normals
+    wall_sign = 1.0 if tcp_points_to_wall else -1.0
+    wall = target_tcp + wall_sign * stand_off * target_normals
     positions: list[np.ndarray] = []
     tool_axes: list[np.ndarray] = []
     times: list[float] = []
@@ -766,17 +2509,55 @@ def validate_smoothed_trajectory_fk(
     time = np.asarray(times)
     if len(actual) < 2 or np.any(np.diff(time) <= 0.0):
         raise RuntimeError("Post-Ruckig trajectory has invalid or non-monotonic timestamps.")
-    path_deviation = _nearest_polyline_distance(actual, target_tcp)
-    wall_nearest, normals, _ = _project_to_polyline_with_normals(actual, wall, target_normals)
+    path_deviation = _nearest_polyline_distance(actual, target_tcp, closed=not open_path)
+    wall_nearest, normals, _ = _project_to_polyline_with_normals(
+        actual, wall, target_normals, closed=not open_path
+    )
     normal_error = np.rad2deg(
         np.arccos(np.clip(np.sum(tool_z * normals, axis=1), -1.0, 1.0))
     )
-    standoff_error = np.sum((actual - wall_nearest) * normals, axis=1) - stand_off
+    if tcp_points_to_wall:
+        standoff_error = np.sum((wall_nearest - actual) * normals, axis=1) - stand_off
+    else:
+        standoff_error = np.sum((actual - wall_nearest) * normals, axis=1) - stand_off
     speed = _tcp_speed_from_positions(actual, time)
     speed_mean = max(float(np.mean(speed)), 1e-12)
     speed_p05 = float(np.percentile(speed, 5))
     speed_p95 = float(np.percentile(speed, 95))
     robust_fluctuation = (speed_p95 - speed_p05) / speed_mean
+    q = np.asarray([point.positions for point in trajectory.points], dtype=float)
+    raw_joint_step = np.abs(np.diff(q, axis=0)) if len(q) > 1 else np.zeros((0, q.shape[1] if q.ndim == 2 else 0))
+    joint_step = np.abs(circular_joint_delta(np.diff(q, axis=0))) if len(q) > 1 else raw_joint_step
+    if joint_step.size:
+        max_step_flat_index = int(np.argmax(joint_step))
+        max_step_from_index, max_step_joint_index = np.unravel_index(max_step_flat_index, joint_step.shape)
+        max_joint_step_from_index = int(max_step_from_index)
+        max_joint_step_deg = float(np.rad2deg(joint_step[max_step_from_index, max_step_joint_index]))
+        max_joint_step_to_index = max_joint_step_from_index + 1
+        max_joint_step_joint = f"j{max_step_joint_index + 1}"
+        max_joint_step_from_deg = float(np.rad2deg(q[max_step_from_index, max_step_joint_index]))
+        max_joint_step_to_deg = float(np.rad2deg(q[max_joint_step_to_index, max_step_joint_index]))
+        raw_max_step_flat_index = int(np.argmax(raw_joint_step))
+        raw_max_step_from_index, raw_max_step_joint_index = np.unravel_index(
+            raw_max_step_flat_index,
+            raw_joint_step.shape,
+        )
+        max_joint_step_raw_deg = float(np.rad2deg(raw_joint_step[raw_max_step_from_index, raw_max_step_joint_index]))
+        max_joint_step_raw_joint = f"j{raw_max_step_joint_index + 1}"
+        max_joint_step_raw_from_index = int(raw_max_step_from_index)
+        max_joint_step_raw_to_index = max_joint_step_raw_from_index + 1
+    else:
+        max_joint_step_deg = 0.0
+        max_joint_step_from_index = -1
+        max_joint_step_to_index = -1
+        max_joint_step_joint = ""
+        max_joint_step_from_deg = 0.0
+        max_joint_step_to_deg = 0.0
+        max_joint_step_raw_deg = 0.0
+        max_joint_step_raw_joint = ""
+        max_joint_step_raw_from_index = -1
+        max_joint_step_raw_to_index = -1
+    production_joint_step_limit_deg = float(production_joint_step_limit_deg)
     if fk_trace_path is not None:
         fk_trace_path.parent.mkdir(parents=True, exist_ok=True)
         with fk_trace_path.open("w", newline="", encoding="utf-8") as f:
@@ -831,6 +2612,27 @@ def validate_smoothed_trajectory_fk(
         "moveit_ruckig_smoothing_used": "true" if ruckig_smoothing_used else "false",
         "moveit_time_parameterization": time_parameterization,
         "moveit_ee_link": ee_link,
+        "stand_off_m": stand_off,
+        "tcp_points_to_wall": "true" if tcp_points_to_wall else "false",
+        "max_joint_step_deg": max_joint_step_deg,
+        "max_joint_step_from_index": max_joint_step_from_index,
+        "max_joint_step_to_index": max_joint_step_to_index,
+        "max_joint_step_joint": max_joint_step_joint,
+        "max_joint_step_from_deg": max_joint_step_from_deg,
+        "max_joint_step_to_deg": max_joint_step_to_deg,
+        "max_joint_step_raw_deg": max_joint_step_raw_deg,
+        "max_joint_step_raw_joint": max_joint_step_raw_joint,
+        "max_joint_step_raw_from_index": max_joint_step_raw_from_index,
+        "max_joint_step_raw_to_index": max_joint_step_raw_to_index,
+        "max_ik_joint_step_deg": float(max_ik_joint_step_deg),
+        "production_joint_step_limit_deg": production_joint_step_limit_deg,
+        "joint_continuity_status": "pass" if max_joint_step_deg <= production_joint_step_limit_deg else "fail",
+        "tool_tcp_xyz": tool_tcp_xyz,
+        "tool_tcp_rpy": tool_tcp_rpy,
+        "tool_tcp_source": tool_tcp_source,
+        "tool_tcp_measured_by": tool_tcp_measured_by,
+        "tool_tcp_measured_date": tool_tcp_measured_date,
+        "tool_tcp_calibration_method": tool_tcp_calibration_method,
     }
     failures: list[str] = []
     if float(metrics["fk_normal_error_max_deg"]) > max_normal_error_deg:
@@ -841,7 +2643,10 @@ def validate_smoothed_trajectory_fk(
         failures.append("TCP path deviation")
     if robust_fluctuation > max_speed_fluctuation:
         failures.append("TCP speed")
-    metrics["status"] = "pass" if not failures else "fail:" + ",".join(failures)
+    report_failures = failures.copy()
+    if check_joint_continuity and metrics["joint_continuity_status"] != "pass":
+        report_failures.append("joint continuity")
+    metrics["status"] = "pass" if not report_failures else "fail:" + ",".join(report_failures)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     with report_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -971,6 +2776,12 @@ def main() -> None:
     base_frame = str(node.declare_parameter("base_frame", "base_link").value)
     ee_link = str(node.declare_parameter("ee_link", "spray_tcp_link").value)
     use_ruckig = _parameter_bool(node.declare_parameter("use_ruckig_smoothing", True).value)
+    tool_tcp_xyz = str(node.declare_parameter("tool_tcp_xyz", "").value)
+    tool_tcp_rpy = str(node.declare_parameter("tool_tcp_rpy", "").value)
+    tool_tcp_source = str(node.declare_parameter("tool_tcp_source", "").value)
+    tool_tcp_measured_by = str(node.declare_parameter("tool_tcp_measured_by", "").value)
+    tool_tcp_measured_date = str(node.declare_parameter("tool_tcp_measured_date", "").value)
+    tool_tcp_calibration_method = str(node.declare_parameter("tool_tcp_calibration_method", "").value)
     velocity_scaling = float(node.declare_parameter("velocity_scaling", 0.15).value)
     acceleration_scaling = float(node.declare_parameter("acceleration_scaling", 0.15).value)
     time_parameterization = str(node.declare_parameter("time_parameterization", "tcp_arclength").value)
@@ -986,6 +2797,35 @@ def main() -> None:
     ik_timeout = float(node.declare_parameter("ik_timeout", 0.05).value)
     max_ik_position_error = float(node.declare_parameter("max_ik_position_error", 0.002).value)
     max_ik_joint_step = np.deg2rad(float(node.declare_parameter("max_ik_joint_step_deg", 20.0).value))
+    ik_roll_sample_count = int(node.declare_parameter("ik_roll_sample_count", 1).value)
+    ik_beam_width = int(node.declare_parameter("ik_beam_width", 1).value)
+    ik_candidates_per_beam = int(node.declare_parameter("ik_candidates_per_beam", 8).value)
+    ik_beam_diversity_joint_deg = float(node.declare_parameter("ik_beam_diversity_joint_deg", 0.0).value)
+    global_roll_step_deg = float(node.declare_parameter("global_roll_step_deg", 5.0).value)
+    global_roll_bias_limit_deg = float(node.declare_parameter("global_roll_bias_limit_deg", 45.0).value)
+    global_tilt_step_deg = float(node.declare_parameter("global_tilt_step_deg", 0.5).value)
+    global_tilt_limit_deg = float(node.declare_parameter("global_tilt_limit_deg", 2.0).value)
+    global_max_backtracks = int(node.declare_parameter("global_max_backtracks", 1200).value)
+    global_reparameterization_window = int(node.declare_parameter("global_reparameterization_window", 5).value)
+    ik_search_diagnostics_csv = Path(
+        node.declare_parameter("ik_search_diagnostics_csv", "outputs/moveit_ik_search_diagnostics.csv").value
+    )
+    ik_candidate_bank_csv = Path(
+        node.declare_parameter("ik_candidate_bank_csv", "outputs/ik_candidate_bank.csv").value
+    )
+    ik_candidate_collection_report_json = Path(
+        node.declare_parameter(
+            "ik_candidate_collection_report_json",
+            "outputs/ik_candidate_bank_report.json",
+        ).value
+    )
+    ik_max_solve_seconds = float(
+        node.declare_parameter(
+            "ik_max_solve_seconds",
+            0.0,
+            ParameterDescriptor(dynamic_typing=True),
+        ).value
+    )
     seed_joint_csv = str(node.declare_parameter("seed_joint_csv", "").value).strip()
     stand_off = float(node.declare_parameter("stand_off", 0.18).value)
     validate_fk = _parameter_bool(node.declare_parameter("validate_post_ruckig_fk", True).value)
@@ -995,16 +2835,46 @@ def main() -> None:
     max_normal_error_deg = float(node.declare_parameter("max_normal_error_deg", 10.0).value)
     max_standoff_fraction = float(node.declare_parameter("max_standoff_fraction", 0.05).value)
     max_speed_fluctuation = float(node.declare_parameter("max_speed_fluctuation", 0.05).value)
+    production_joint_step_limit_deg = float(node.declare_parameter("production_joint_step_limit_deg", 20.0).value)
     quality_report = Path(node.declare_parameter("quality_report_csv", "outputs/moveit_quality_report.csv").value)
     fk_trace_csv = Path(node.declare_parameter("fk_trace_csv", "outputs/moveit_fk_tcp_trace.csv").value)
     trajectory_csv = Path(node.declare_parameter("trajectory_csv", "outputs/moveit_smoothed_joint_trajectory.csv").value)
+    segmented_execution = _parameter_bool(node.declare_parameter("segmented_execution", True).value)
+    segmented_trajectory_csv = Path(
+        node.declare_parameter(
+            "segmented_trajectory_csv",
+            "outputs/moveit_executed_segmented_joint_trajectory.csv",
+        ).value
+    )
+    transition_step_cap_deg = float(node.declare_parameter("transition_step_cap_deg", 5.0).value)
+    transition_max_speed_deg_s = float(node.declare_parameter("transition_max_speed_deg_s", 12.0).value)
+    transition_min_duration_s = float(node.declare_parameter("transition_min_duration_s", 2.0).value)
+    transition_stop_hold_s = float(node.declare_parameter("transition_stop_hold_s", 0.20).value)
+    waypoint_trajectory_csv = Path(
+        node.declare_parameter(
+            "waypoint_trajectory_csv",
+            "outputs/moveit_waypoint_joint_trajectory.csv",
+        ).value
+    )
     dynamics_report = Path(node.declare_parameter("dynamics_report_csv", "outputs/moveit_joint_dynamics_report.csv").value)
     collision_report = Path(node.declare_parameter("collision_report_csv", "outputs/moveit_collision_report.csv").value)
     validate_collision = _parameter_bool(node.declare_parameter("validate_collision", True).value)
     collision_check_stride = max(1, int(node.declare_parameter("collision_check_stride", validation_stride).value))
     collision_segment_stride = max(1, int(node.declare_parameter("collision_segment_stride", 4).value))
+    collision_interpolation_step_deg = max(
+        1e-3, float(node.declare_parameter("collision_interpolation_step_deg", 1.0).value)
+    )
     tunnel_wall_thickness = float(node.declare_parameter("tunnel_wall_thickness", 0.025).value)
     tunnel_y_thickness = float(node.declare_parameter("tunnel_y_thickness", 0.08).value)
+    include_bottom_closure_collision = _parameter_bool(
+        node.declare_parameter("include_bottom_closure_collision", True).value
+    )
+    include_tunnel_floor_collision = _parameter_bool(
+        node.declare_parameter("include_tunnel_floor_collision", False).value
+    )
+    tunnel_floor_z = float(node.declare_parameter("tunnel_floor_z", -0.20).value)
+    open_path = _parameter_bool(node.declare_parameter("open_path", False).value)
+    tcp_points_to_wall = _parameter_bool(node.declare_parameter("tcp_points_to_wall", False).value)
     fast_exit_after_reports = _parameter_bool(node.declare_parameter("fast_exit_after_reports", False).value)
     execute_trajectory = _parameter_bool(node.declare_parameter("execute_trajectory", False).value)
     if execute_trajectory and not use_ruckig:
@@ -1034,6 +2904,11 @@ def main() -> None:
             tunnel_wall_thickness,
             tunnel_y_thickness,
             collision_segment_stride,
+            include_bottom_closure_collision,
+            open_path,
+            tcp_points_to_wall,
+            include_tunnel_floor_collision,
+            tunnel_floor_z,
         )
     joint_seeds = None
     if seed_joint_csv:
@@ -1048,6 +2923,53 @@ def main() -> None:
             raise ValueError("planning_mode=seed_joint_waypoints requires seed_joint_csv.")
         node.get_logger().info("Using continuous seed joint waypoints for closed-contour tracking.")
         trajectory_msg = build_seed_joint_trajectory(joint_seeds, joint_names)
+    elif planning_mode == "normal_dls_waypoints":
+        if joint_seeds is None:
+            raise ValueError("planning_mode=normal_dls_waypoints requires seed_joint_csv.")
+        node.get_logger().info(
+            "Using native MoveIt2 FK/Jacobian normal-constrained DLS projection from the D39 causal warm start."
+        )
+        trajectory_msg = build_normal_constrained_dls_trajectory(
+            moveit,
+            group_name,
+            ee_link,
+            waypoints,
+            waypoint_normals,
+            joint_seeds,
+            joint_names,
+        )
+    elif planning_mode in {"ik_candidate_bank", "ik_global_roll_backtracking"}:
+        if joint_seeds is None:
+            raise ValueError("planning_mode=ik_candidate_bank requires seed_joint_csv as a verified reference path.")
+        node.get_logger().info(
+            "Optimizing one globally continuous TCP roll curve with bounded pose reparameterization and backtracking."
+        )
+        report = collect_ik_candidate_bank_global_roll_backtracking(
+            moveit,
+            group_name,
+            ee_link,
+            waypoints,
+            waypoint_normals,
+            joint_names,
+            ik_timeout,
+            max_ik_position_error,
+            max_normal_error_deg,
+            max_ik_joint_step,
+            ik_candidate_bank_csv,
+            ik_candidate_collection_report_json,
+            joint_seeds,
+            global_roll_step_deg,
+            global_roll_bias_limit_deg,
+            global_tilt_step_deg,
+            global_tilt_limit_deg,
+            global_max_backtracks,
+            global_reparameterization_window,
+        )
+        node.get_logger().info(f"IK candidate bank report: {report}")
+        sys.stdout.flush()
+        sys.stderr.flush()
+        time.sleep(0.1)
+        os._exit(0 if report.get("status") == "pass" else 5)
     elif planning_mode == "ik_waypoints":
         node.get_logger().info("Using dense MoveIt2 IK waypoints for closed-contour tracking.")
         trajectory_msg = build_ik_waypoint_trajectory(
@@ -1061,6 +2983,13 @@ def main() -> None:
             max_ik_position_error,
             max_normal_error_deg,
             max_ik_joint_step,
+            ik_roll_sample_count,
+            ik_beam_width,
+            ik_candidates_per_beam,
+            ik_beam_diversity_joint_deg,
+            ik_search_diagnostics_csv,
+            ik_candidate_bank_csv,
+            ik_max_solve_seconds,
             joint_seeds,
         )
     elif planning_mode == "ompl_segments":
@@ -1096,8 +3025,10 @@ def main() -> None:
     else:
         raise ValueError(
             f"Unsupported planning_mode={planning_mode!r}. "
-            "Use seed_joint_waypoints, ik_waypoints, or ompl_segments."
+            "Use seed_joint_waypoints, normal_dls_waypoints, ik_candidate_bank, "
+            "ik_global_roll_backtracking, ik_waypoints, or ompl_segments."
         )
+    write_joint_waypoint_csv(trajectory_msg, waypoint_trajectory_csv)
     trajectory = build_and_smooth_moveit_trajectory(
         moveit,
         group_name,
@@ -1111,10 +3042,31 @@ def main() -> None:
         target_tcp_speed=target_tcp_speed,
         zero_boundary_state=zero_boundary_state,
     )
+    raw_trajectory = trajectory
+    executed_trajectory = trajectory
+    execution_transition_pairs: list[tuple[int, int]] = []
+    if segmented_execution:
+        segmented_msg, execution_transition_pairs = build_segmented_execution_trajectory_msg(
+            raw_trajectory,
+            production_joint_step_limit_deg=production_joint_step_limit_deg,
+            transition_step_cap_deg=transition_step_cap_deg,
+            transition_max_speed_deg_s=transition_max_speed_deg_s,
+            transition_min_duration_s=transition_min_duration_s,
+            stop_hold_s=transition_stop_hold_s,
+        )
+        executed_trajectory = RobotTrajectory(moveit.get_robot_model())
+        executed_trajectory.joint_model_group_name = group_name
+        executed_trajectory.set_robot_trajectory_msg(execution_start_state, segmented_msg)
+        node.get_logger().info(
+            "Using executable segmented trajectory with "
+            f"{len(execution_transition_pairs)} spray-off reorientation transitions."
+        )
+    validation_trajectory = executed_trajectory if segmented_execution else raw_trajectory
+    quality_metrics: dict[str, float | str] = {}
     if validate_fk:
-        validate_smoothed_trajectory_fk(
+        quality_metrics = validate_smoothed_trajectory_fk(
             moveit,
-            trajectory,
+            raw_trajectory if segmented_execution else validation_trajectory,
             group_name,
             ee_link,
             waypoints,
@@ -1129,21 +3081,44 @@ def main() -> None:
             ruckig_smoothing_used=use_ruckig,
             time_parameterization=time_parameterization,
             fk_trace_path=fk_trace_csv,
+            tool_tcp_xyz=tool_tcp_xyz,
+            tool_tcp_rpy=tool_tcp_rpy,
+            tool_tcp_source=tool_tcp_source,
+            tool_tcp_measured_by=tool_tcp_measured_by,
+            tool_tcp_measured_date=tool_tcp_measured_date,
+            tool_tcp_calibration_method=tool_tcp_calibration_method,
+            max_ik_joint_step_deg=float(np.rad2deg(max_ik_joint_step)),
+            production_joint_step_limit_deg=production_joint_step_limit_deg,
+            open_path=open_path,
+            tcp_points_to_wall=tcp_points_to_wall,
+            check_joint_continuity=not segmented_execution,
         )
     if validate_dynamics:
-        validate_joint_dynamics(moveit, trajectory, group_name, dynamics_report)
+        validate_joint_dynamics(moveit, validation_trajectory, group_name, dynamics_report)
     if validate_collision:
         validate_trajectory_collision(
             moveit,
-            trajectory,
+            validation_trajectory,
             group_name,
             collision_report,
             stride=collision_check_stride,
             environment_object_count=collision_object_count,
+            include_bottom_closure_collision=include_bottom_closure_collision,
+            open_path=open_path,
+            interpolation_step_deg=collision_interpolation_step_deg,
+            include_tunnel_floor=include_tunnel_floor_collision,
+            tunnel_floor_z=tunnel_floor_z,
         )
-    write_joint_trajectory_csv(trajectory, trajectory_csv)
+    write_joint_trajectory_csv(raw_trajectory, trajectory_csv)
+    if segmented_execution:
+        write_joint_trajectory_csv(executed_trajectory, segmented_trajectory_csv)
     if execute_trajectory:
-        moveit.execute(trajectory, controllers=[])
+        if quality_metrics.get("status") != "pass":
+            raise RuntimeError(
+                "Refusing to execute post-Ruckig trajectory; FK quality report status is "
+                f"{quality_metrics.get('status', 'missing')!r}."
+            )
+        moveit.execute(executed_trajectory, controllers=[])
     else:
         node.get_logger().warn(
             "Trajectory was planned, Ruckig-smoothed, FK-validated, and exported, "

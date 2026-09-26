@@ -1,0 +1,90 @@
+{
+  "backend": {
+    "binary": {
+      "path": "D:\\robotfucker\\tmp\\d65_install\\stage4f_articulated_certificate\\lib\\stage4f_articulated_certificate\\stage4f_articulated_certificate",
+      "sha256": "216c13417c8f26c4c0ecb7c47aeac298bd58e6275cdb08b8b2d3d416b6da0b46",
+      "size_bytes": 181400
+    },
+    "certificate": "D:\\robotfucker\\outputs\\D65_FINAL_CLOSURE\\continuous_certificate_auto0\\run_1788340073324744800\\D54_CONTINUOUS_SELF_COLLISION_CERTIFICATION.json",
+    "certificate_sha256": "b2c62ca3ba7f5e2d323c4fbc409c017259e4c8beb9dbf37c4a95bf736feb3b97",
+    "exit_code": 0,
+    "manifest_sha256": "c03aa5b584144274d3ffe7b96e0b6f493eb49e108da5a5d169365e88736cd42f",
+    "missing_fields": [],
+    "raw_status": "PASS",
+    "run_nonce": "run_1788340073324744800",
+    "runtime_s": 247.0446293,
+    "schema_version": "d54-fk-aware-articulated-certificate-v1"
+  },
+  "certificate_type": "QUALIFIED_FK_LIPSCHITZ",
+  "collision_interval_count": 0,
+  "compiled_method": {
+    "coverage": "all required pairs and all trajectory intervals",
+    "exact_external_nonlinear_ccd_backend": "NOT_CLAIMED",
+    "method": "MoveIt2 exact FK state witnesses plus FCL signed distance and configuration-independent jerk-bounded link-motion Lipschitz radius",
+    "numerical_acceptance_margin_m": 1e-09,
+    "unresolved_is_not_pass": true
+  },
+  "execution": {
+    "total_runtime_s": 249.05610769999998
+  },
+  "hardware_or_physical_clearance": null,
+  "input_evidence": {
+    "authorized_binding": {
+      "errors": [],
+      "status": "VALID",
+      "trajectory_id": "adversarial_0100"
+    },
+    "family": "ADVERSARIAL",
+    "model_identity": {
+      "srdf_sha256": "0d6ca01d4667cb8f4772a8a26d5e83e1098c604d1cac0ef3739cb3d495c3e182",
+      "urdf_sha256": "f9c53b9da6bca9387d635da7caee4927dab12e8f15e6e76eabe0faa1794620b4"
+    },
+    "profile_j": {
+      "path": "D:\\robotfucker\\outputs\\D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE\\profile_j_timing025_auto0\\summary.json",
+      "sha256": "d13598530d713427971f0a93926514501fdbeb3bc7277ace64c8a5767f5ea51e",
+      "size_bytes": 955
+    },
+    "profile_j_validation": {
+      "errors": [],
+      "interval_count": 7004,
+      "jerk_bound_rad_s3": 8.0,
+      "state_count": 7005,
+      "status": "VALID"
+    },
+    "status": "VALID",
+    "trajectory": {
+      "path": "D:\\robotfucker\\outputs\\D59_OFFLINE_ALGORITHM_SYSTEM_CLOSURE\\timing_scale025_auto0\\trajectories\\adversarial_0100.csv",
+      "sha256": "13f8075296a0defa12f17348cd6bafb913a8c10d22012a651d5614082df0a264",
+      "size_bytes": 3722480
+    },
+    "trajectory_validation": {
+      "errors": [],
+      "jerk_bound_rad_s3": 8.0,
+      "joint_count": 6,
+      "row_count": 7005,
+      "state_consistency_checked": true,
+      "status": "VALID"
+    }
+  },
+  "interval_count": 7004,
+  "minimum_certified_model_clearance_m": 0.006362091817055339,
+  "required_pair_count": 10,
+  "required_pairs": [
+    "base_link|forearm_link",
+    "base_link|wrist1_link",
+    "base_link|wrist2_link",
+    "base_link|wrist3_link",
+    "forearm_link|wrist2_link",
+    "forearm_link|wrist3_link",
+    "shoulder_link|wrist2_link",
+    "shoulder_link|wrist3_link",
+    "upperarm_link|wrist2_link",
+    "upperarm_link|wrist3_link"
+  ],
+  "schema_version": "d65-validated-fk-lipschitz-fallback-v1",
+  "status": "PASS",
+  "trajectory_id": "adversarial_0100",
+  "unresolved_interval_count": 0,
+  "verification_domain": "model_based_articulated_continuous_self_collision",
+  "verification_result": "PASS"
+}

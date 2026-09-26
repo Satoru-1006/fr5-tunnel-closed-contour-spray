@@ -1,0 +1,43 @@
+# Copy this file before editing, for example:
+#   measured_tool_tcp.yaml
+#
+# Units:
+#   translation: meters, flange frame
+#   rotation_rpy: radians, fixed XYZ roll-pitch-yaw from flange to nozzle TCP
+#
+# A strict production run must not use the placeholder source below. Set
+# source to a measured/calibrated value such as "measured_nozzle_tcp_2026_07_05".
+# The loader also requires measured_by, measured_date, and calibration_method
+# so the TCP evidence is auditable instead of just a renamed placeholder.
+tool_tcp:
+  source: measured_nozzle_tcp_required
+  translation_xyz: [0.0, 0.0, 0.0]
+  rotation_rpy: [0.0, 0.0, 0.0]
+  measured_by: ""
+  measured_date: ""
+  calibration_method: ""
+  fixture_or_nozzle_serial: ""
+  notes: ""
+
+acceptance:
+  required_metadata:
+    measured_by: non_empty
+    measured_date: YYYY-MM-DD
+    calibration_method: non_empty
+  replace_script_args:
+    TOOL_TCP_XYZ: "<x y z from translation_xyz>"
+    TOOL_TCP_RPY: "<roll pitch yaw from rotation_rpy>"
+    TOOL_TCP_SOURCE: "<tool_tcp.source>"
+  rerun_command_template: >-
+    STAND_OFF=0.26 TARGET_TCP_SPEED=0.0031 MAX_IK_JOINT_STEP_DEG=20.0
+    INCLUDE_BOTTOM_CLOSURE_COLLISION=true TOOL_TCP_XYZ="<x y z>"
+    TOOL_TCP_RPY="<r p y>" TOOL_TCP_SOURCE="<source>"
+    bash scripts/run_moveit_strict_validation.sh
+  required_final_report_status:
+    status: pass
+    strict_audit_status: pass
+    collision_status: pass
+    collision_count: 0
+    tool_tcp_production_status: pass
+    tcp_speed_production_status: pass
+    joint_continuity_status: pass

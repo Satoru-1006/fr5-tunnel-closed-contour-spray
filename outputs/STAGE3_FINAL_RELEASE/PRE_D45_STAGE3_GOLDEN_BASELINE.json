@@ -1,0 +1,72 @@
+{
+  "D44": {
+    "canonical_mutation": false,
+    "canonical_promotions": 0,
+    "shadow_candidates_protected_as_research_assets": true
+  },
+  "authoritative_inputs": {
+    "future_joint_reads": 0,
+    "input_files": [
+      {
+        "bytes": 37369,
+        "path": "outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv",
+        "sha256": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7"
+      },
+      {
+        "bytes": 21248,
+        "path": "outputs/internal_wiper_moveit_inputs/open_arch_seed_joints.csv",
+        "sha256": "c568a6f49d6bfe170049774283b03b6576b950646dd79c449fb2e61c83034cba"
+      }
+    ],
+    "legacy_720_point_outputs_in_scope": false,
+    "point_count": 181,
+    "pose_columns": [
+      "x",
+      "y",
+      "z",
+      "qx",
+      "qy",
+      "qz",
+      "qw",
+      "nx",
+      "ny",
+      "nz"
+    ],
+    "scope": "Stage 0/1 ON-state open-arch only",
+    "seed_columns": [
+      "q1",
+      "q2",
+      "q3",
+      "q4",
+      "q5",
+      "q6"
+    ],
+    "spray_off_or_reorientation_in_scope": false
+  },
+  "canonical": {
+    "H1": 7.089328839013259e-05,
+    "H32": 0.01849100619381173,
+    "H32_limit": 0.01856902565856056,
+    "H32_margin": 7.801946474882832e-05,
+    "H32_promotion_reserve": 7.5e-05,
+    "checkpoint": "outputs/stage3_h13_d35_permanent_champion/checkpoints/committed_update_480.pt",
+    "checkpoint_sha256": "37645eea5aef8ce2fe7084c83f35429a7a13fbe3e9612eb84417ccce6cba9742",
+    "model_architecture": "causal GRU trajectory predictor; inherited AdamW state",
+    "optimizer_state_protected": true,
+    "update": 480
+  },
+  "collision_contract": {
+    "ccd": "not_available",
+    "clearance": null,
+    "method": "adaptive_discrete_interpolation"
+  },
+  "created_utc": "2026-08-27T15:52:13.007678Z",
+  "protected_reason": "read-only rollback reference captured before sealing STAGE3_FINAL_RELEASE",
+  "retained_robot_baselines": {
+    "D39": "outputs/stage3_h13_d39_causal_task_space_recovery",
+    "D40": "outputs/stage3_h13_d40_task_space_geometry_locked_causal_cartesian_recovery_execution",
+    "D40_system_champion": "routeA_DLS_position_dominant_v4",
+    "D41": "outputs/stage3_h13_d41_offline_robot_certification"
+  },
+  "schema_version": "pre_d45_stage3_golden_baseline_v1"
+}

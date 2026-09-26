@@ -1,0 +1,84 @@
+{
+  "schema_version": "stage3-h3-gate-definition-v1",
+  "stage": "Stage 3 H3",
+  "title": "Coverage Task Representation + Surface Target Pose Baseline",
+  "status": "FROZEN_BEFORE_EXPERIMENT",
+  "frozen_before_experiment": true,
+  "freeze_policy": "This file is loaded and hashed before any task sample, pose, footprint, or coverage output is generated. Acceptance criteria are not changed after observing results.",
+  "scope": {
+    "included": [
+      "coverage_task_representation",
+      "surface_task_sample_provenance",
+      "deterministic_tcp_target_pose_generation",
+      "geometric_spray_footprint_baseline",
+      "coverage_metric_computation",
+      "provenance_and_deterministic_replay"
+    ],
+    "excluded": [
+      "ml_training",
+      "reinforcement_learning",
+      "learned_planner",
+      "global_path_optimization",
+      "ik_feasibility",
+      "moveit_planning",
+      "ruckig_timing",
+      "follow_joint_trajectory_execution",
+      "robot_motion",
+      "formal_r2_rerun",
+      "stage2_modification"
+    ]
+  },
+  "mandatory_gates": [
+    "H2_AUTHORIZATION_VALID",
+    "STAGE2_BASELINE_IMMUTABLE",
+    "FORMAL_R2_IMMUTABLE",
+    "H0_H1_H2_IMMUTABLE",
+    "GEOMETRY_IDENTITY_VALID",
+    "SURFACE_SAMPLE_PROVENANCE_VALID",
+    "NORMAL_SEMANTICS_VALID",
+    "TASK_SCHEMA_VALID",
+    "STANDOFF_SEMANTICS_VALID",
+    "SPRAY_DIRECTION_VALID",
+    "TCP_POSE_VALID",
+    "ROLL_CONVENTION_VALID",
+    "FOOTPRINT_MODEL_EXPLICIT",
+    "COVERAGE_METRIC_DEFINITION_VALID",
+    "NONFINITE_FAIL_CLOSED",
+    "DEGENERACY_POLICY_VALID",
+    "BOUNDARY_POLICY_EXPLICIT",
+    "CANONICAL_HASHING_VALID",
+    "DETERMINISTIC_REPLAY_VALID",
+    "NO_FJT",
+    "NO_ROBOT_MOTION",
+    "NO_LEDGER_MUTATION",
+    "NO_ML_TRAINING",
+    "NO_PATH_PLANNING_EXPERIMENT"
+  ],
+  "acceptance_criteria": {
+    "h2_input_policy": "Every emitted task sample must reference a verified H2 canonical geometry record and preserve its geometry hash, unit, frame, transform, topology, normal, and preprocessing provenance.",
+    "task_schema": "Every sample contains surface point, unit normal, source triangle or point provenance, stand-off, spray direction, TCP position, TCP quaternion, orientation convention, roll policy, footprint parameters, source hashes, configuration hash, and seed.",
+    "pose_semantics": "TCP local +Z equals the spray direction from TCP toward the surface; TCP position is surface point minus spray direction times declared stand-off; quaternion is xyzw and maps local axes to the declared frame.",
+    "roll_semantics": "Roll uses the projected global reference-axis policy with an explicit deterministic fallback order and canonical quaternion sign.",
+    "footprint_semantics": "Footprint is a declared geometric cone projection only; no physical deposition or thickness calibration is claimed.",
+    "coverage_semantics": "Coverage, uncovered ratio, overlap redundancy, effective coverage, and uniformity are calculated from explicit weighted evaluation samples and declared footprint intersections; all thresholds remain UNRESOLVED.",
+    "invalid_geometry": "Nonfinite and missing semantic inputs fail closed. Degenerate faces, open boundaries, disconnected components, and isolated regions are reported explicitly and are never silently repaired.",
+    "replay": "Three same-input same-seed runs have exact identity for task ordering, geometry provenance, points, normals, spray directions, poses, footprint assignments, metric arrays, gate decisions, and semantic output hash.",
+    "execution_boundary": "No FJT goal, robot motion, Formal R2 mutation, ML training, or path-planning experiment is permitted."
+  },
+  "threshold_policy": {
+    "surface_coverage_ratio": "UNRESOLVED",
+    "effective_spray_coverage": "UNRESOLVED",
+    "coverage_uniformity": "UNRESOLVED",
+    "coverage_overlap_redundancy": "UNRESOLVED",
+    "post_hoc_threshold_creation": "FORBIDDEN"
+  },
+  "execution_boundary": {
+    "new_fjt_goals_sent": 0,
+    "send_goal_async_call_count": 0,
+    "robot_motion_started": "NO",
+    "formal_ledger_mutated": "NO",
+    "ml_training_started": "NO",
+    "path_planning_experiment_started": "NO",
+    "formal_stage3_dataset_created": "NO"
+  }
+}

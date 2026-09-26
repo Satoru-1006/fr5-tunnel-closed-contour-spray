@@ -1,0 +1,66 @@
+{
+  "collision_interval_count": 0,
+  "exact_external_nonlinear_ccd_backend": "NOT_CLAIMED",
+  "hardware_or_physical_clearance": null,
+  "identity": {
+    "fallback_binary_sha256": "216c13417c8f26c4c0ecb7c47aeac298bd58e6275cdb08b8b2d3d416b6da0b46",
+    "required_pairs": [
+      "base_link|forearm_link",
+      "base_link|wrist1_link",
+      "base_link|wrist2_link",
+      "base_link|wrist3_link",
+      "forearm_link|wrist2_link",
+      "forearm_link|wrist3_link",
+      "shoulder_link|wrist2_link",
+      "shoulder_link|wrist3_link",
+      "upperarm_link|wrist2_link",
+      "upperarm_link|wrist3_link"
+    ],
+    "srdf_sha256": "0d6ca01d4667cb8f4772a8a26d5e83e1098c604d1cac0ef3739cb3d495c3e182",
+    "trajectory_id": "adversarial_0101",
+    "trajectory_path": "d:\\robotfucker\\outputs\\d59_offline_algorithm_system_closure\\timing_scale025_corrected_auto1\\trajectories\\adversarial_0101.csv",
+    "trajectory_sha256": "dda61e3be2328536f0c688333f3b24861c56dbdb347e807d881ca7d71f617416",
+    "urdf_sha256": "f9c53b9da6bca9387d635da7caee4927dab12e8f15e6e76eabe0faa1794620b4"
+  },
+  "interval_count": 7029,
+  "interval_phase": {
+    "certified_interval_count": 875,
+    "checked_interval_count": 7029,
+    "collision_interval_count": 0,
+    "coverage_complete": true,
+    "method": "CONSERVATIVE_FK_INTERVAL_BVH_NODE_SEPARATING_ENCLOSURE",
+    "runtime_s": 272.7122695999997,
+    "status": "UNRESOLVED",
+    "unresolved_interval_count": 6154
+  },
+  "merge_rule": {
+    "D62_PASS": "accepted as outward-rounded interval enclosure proof",
+    "D62_UNRESOLVED": "retained unless the complete qualified fallback proves every required pair-region clear",
+    "collision": "any collision finding blocks PASS",
+    "missing_or_partial_coverage": "BLOCKED; merge raises instead of emitting a certificate",
+    "unresolved_is_not_pass": true
+  },
+  "performance": {
+    "d62_reference_before_runtime_s": 1746.6515395,
+    "d65_combined_runtime_s": 510.3441815999995,
+    "d65_fallback_runtime_s": 237.63191199999983,
+    "d65_interval_phase_runtime_s": 272.7122695999997,
+    "speedup_vs_d62_reference": 3.4224972135941787
+  },
+  "qualified_fallback": {
+    "certificate_type": "QUALIFIED_FK_LIPSCHITZ",
+    "collision_pair_region_count": 0,
+    "coverage": "all required pairs and all trajectory intervals",
+    "minimum_certified_model_clearance_m": 0.008857970896344328,
+    "numerical_acceptance_margin_m": 1e-09,
+    "runtime_s": 237.63191199999983,
+    "status": "PASS",
+    "unresolved_pair_region_count": 0
+  },
+  "schema_version": "d65-hybrid-articulated-self-collision-v1",
+  "status": "PASS",
+  "trajectory_id": "adversarial_0101",
+  "unresolved_interval_count": 0,
+  "verification_domain": "model_based_articulated_continuous_self_collision",
+  "verification_result": "PASS"
+}

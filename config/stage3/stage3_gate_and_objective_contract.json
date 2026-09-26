@@ -1,0 +1,53 @@
+{
+  "schema_version": "stage3-gate-objective-contract-v1",
+  "contract_id": "stage3-gates-objectives-20260808",
+  "status": "FROZEN_FOR_H2",
+  "classification_policy": {
+    "hard_gate": "Must be evaluated and pass before a result can be accepted.",
+    "objective": "May be optimized or ranked only after all applicable hard gates pass.",
+    "report_only": "Must be reported but cannot be promoted to a hard gate after seeing results.",
+    "unresolved": "A formal threshold or capability is not yet available; it is recorded explicitly and cannot be guessed."
+  },
+  "hard_constraints": [
+    {"metric_id": "stage2_immutable_baseline", "definition": "All H0 manifest hashes match current files.", "threshold": "true", "status": "FROZEN"},
+    {"metric_id": "authoritative_input_identity", "definition": "Only outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv and open_arch_seed_joints.csv; each has 181 data rows.", "threshold": "true", "status": "FROZEN"},
+    {"metric_id": "joint_limits", "definition": "All accepted joint states satisfy the loaded MoveIt model bounds.", "threshold": "per MoveIt model", "status": "FROZEN"},
+    {"metric_id": "tcp_deviation", "definition": "Maximum Euclidean TCP deviation.", "threshold": "<= 6 mm", "status": "FROZEN", "source": "config/ik_graph.yaml:ik.max_position_error_m"},
+    {"metric_id": "spray_distance_error", "definition": "Maximum absolute signed TCP/nozzle-to-surface distance error.", "threshold": "<= 13 mm for Stage 0/1 scope; 0.260 m nominal", "status": "FROZEN_FOR_STAGE0_1_SCOPE", "source": "config/ik_graph.yaml:moveit.stand_off_m and ik.max_standoff_error_fraction"},
+    {"metric_id": "surface_normal_deviation", "definition": "Maximum TCP +Z to oriented surface-normal angular deviation.", "threshold": "<= 10 deg", "status": "FROZEN", "source": "config/ik_graph.yaml:ik.max_normal_error_deg"},
+    {"metric_id": "joint_step", "definition": "Maximum adjacent circular joint change in the baseline graph.", "threshold": "<= 20 deg", "status": "FROZEN", "source": "config/ik_graph.yaml:ik.max_joint_step_deg"},
+    {"metric_id": "joint_velocity", "definition": "Post-Ruckig native per-joint velocity.", "threshold": "per-joint limits in ros2_moveit_bridge/config/joint_limits_with_jerk.yaml", "status": "FROZEN"},
+    {"metric_id": "joint_acceleration", "definition": "Post-Ruckig native per-joint acceleration.", "threshold": "per-joint limits in ros2_moveit_bridge/config/joint_limits_with_jerk.yaml", "status": "FROZEN"},
+    {"metric_id": "joint_jerk", "definition": "Post-Ruckig native jerk with explicit jerk_semantics label.", "threshold": "per-joint max_jerk; finite-difference jerk cannot substitute", "status": "FROZEN"},
+    {"metric_id": "state_collision", "definition": "No self or robot/world collision at a declared state.", "threshold": "false", "status": "FROZEN"},
+    {"metric_id": "segment_collision", "definition": "No collision in all samples of adaptive discrete joint interpolation.", "threshold": "false; method exactly adaptive_discrete_interpolation", "status": "FROZEN"},
+    {"metric_id": "self_collision", "definition": "No disallowed robot self collision.", "threshold": "false", "status": "FROZEN"},
+    {"metric_id": "robot_world_collision", "definition": "No robot/world collision against declared world geometry.", "threshold": "false", "status": "FROZEN"},
+    {"metric_id": "artifact_isolation", "definition": "Stage 3 writes only to stage3-prefixed/config/stage3/output namespace and does not overwrite frozen artifacts.", "threshold": "true", "status": "FROZEN"},
+    {"metric_id": "execution_boundary", "definition": "No FJT send path, no robot motion, no physical execution, no Stage 3 formal ML run.", "threshold": "true", "status": "FROZEN"}
+  ],
+  "optimization_objectives": [
+    {"metric_id": "surface_coverage_ratio", "direction": "maximize", "threshold": null, "status": "UNRESOLVED_THRESHOLD"},
+    {"metric_id": "effective_spray_coverage", "direction": "maximize", "threshold": null, "status": "UNRESOLVED_THRESHOLD"},
+    {"metric_id": "coverage_uniformity", "direction": "maximize", "threshold": null, "status": "UNRESOLVED_THRESHOLD"},
+    {"metric_id": "coverage_overlap_redundancy", "direction": "minimize_or_target_process_band", "threshold": null, "status": "UNRESOLVED_THRESHOLD"},
+    {"metric_id": "tcp_cartesian_path_length", "direction": "minimize", "threshold": null, "status": "FROZEN_DEFINITION"},
+    {"metric_id": "joint_space_accumulated_travel", "direction": "minimize", "threshold": null, "status": "FROZEN_DEFINITION"},
+    {"metric_id": "trajectory_time", "direction": "minimize", "threshold": null, "status": "FROZEN_DEFINITION"},
+    {"metric_id": "minimum_robot_world_clearance", "direction": "maximize", "threshold": null, "status": "UNRESOLVED_THRESHOLD"},
+    {"metric_id": "minimum_self_clearance", "direction": "maximize", "threshold": null, "status": "UNRESOLVED_THRESHOLD"},
+    {"metric_id": "planning_time", "direction": "minimize", "threshold": null, "status": "FROZEN_DEFINITION"}
+  ],
+  "report_only_metrics": [
+    {"metric_id": "planning_time", "reason": "Timer scope is diagnostic until all phase boundaries are implemented."},
+    {"metric_id": "spray_on_off_performance", "reason": "Formal Spray-ON/OFF ML evaluation is outside H1 authorization."},
+    {"metric_id": "generalization", "reason": "No Stage 3 dataset/model exists in H1."},
+    {"metric_id": "finite_difference_jerk", "reason": "Must not be confused with native trajectory jerk."}
+  ],
+  "unresolved_items": [
+    {"id": "coverage_acceptance", "status": "UNRESOLVED", "reason": "Requires calibrated footprint/deposition model and an approved acceptance band."},
+    {"id": "clearance_acceptance", "status": "UNRESOLVED", "reason": "Capability is qualified separately; no safety threshold is inferred from a positive distance."},
+    {"id": "unseen_geometry_acceptance", "status": "UNRESOLVED", "reason": "Dataset split and future model are not present in H1."}
+  ],
+  "freeze_rule": "No metric may be promoted from objective or report_only to hard_gate after an experiment result is observed without a versioned contract revision and a new gate run."
+}

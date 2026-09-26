@@ -1,0 +1,51 @@
+{
+  "schema_version": "stage3-h3-task-representation-contract-v1",
+  "status": "FROZEN_FOR_H3",
+  "purpose": "Machine-readable surface task sample contract; geometric TEST_FIXTURE baseline only.",
+  "input_authority": {
+    "source": "H2 canonical geometry manifest",
+    "required_fields": [
+      "geometry_id",
+      "geometry_hash",
+      "length_unit_original",
+      "canonical_length_unit",
+      "coordinate_frame",
+      "transform_matrix",
+      "transform_provenance",
+      "normal_source",
+      "normal_orientation_method",
+      "preprocessing_version",
+      "processing",
+      "purpose"
+    ],
+    "required_purpose": "TEST_FIXTURE",
+    "formal_dataset": false
+  },
+  "record_schema": {
+    "geometry_id": "string",
+    "task_sample_id": "string",
+    "surface_point_xyz_m": "finite array[3]",
+    "surface_normal_unit": "finite unit array[3]",
+    "source_triangle_id": "integer or null",
+    "source_barycentric_uvw": "finite array[3] summing to one or null",
+    "source_point_id": "integer or null",
+    "coordinate_frame": "string",
+    "nominal_standoff_m": "finite positive number",
+    "spray_direction_unit": "finite unit array[3]",
+    "tcp_target_position_xyz_m": "finite array[3]",
+    "tcp_target_orientation_xyzw": "finite unit quaternion[4]",
+    "orientation_convention": "explicit string/object",
+    "roll_policy": "explicit deterministic object",
+    "spray_state": "offline geometric baseline state",
+    "coverage_footprint_parameters": "explicit object",
+    "source_geometry_hash": "sha256 string",
+    "h2_manifest_hash": "sha256 string",
+    "configuration_hash": "sha256 string",
+    "random_seed": "integer",
+    "surface_sample_weight": "finite nonnegative number"
+  },
+  "target_semantics": "GEOMETRIC_TASK_TARGET",
+  "forbidden_semantics": ["ROBOT_REACHABLE_TARGET", "EXECUTABLE_TARGET"],
+  "sample_weight_policy": "H2 area probability for source triangle divided by observed deterministic sample count for that triangle; weights are normalized within each geometry.",
+  "repair_policy": "No silent repair; repair is not applied in the H3 baseline."
+}

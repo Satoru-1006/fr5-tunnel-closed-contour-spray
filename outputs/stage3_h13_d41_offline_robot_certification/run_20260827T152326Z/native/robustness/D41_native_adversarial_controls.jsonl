@@ -1,0 +1,8 @@
+{"control":"endpoint_free_mid_segment_collision","status":"PASS","trials":1,"link":"forearm_link","obstacle_center":[-0.42499999999999999,0,0.152],"obstacle_side_m":0.040000000000000001,"q0":[-1,-0.69999999999999996,0.80000000000000004,0,0,0],"q1":[1,0.69999999999999996,-0.80000000000000004,0,0,0],"discrete_mid_collision":true,"native_continuous_collision":true}
+{"control":"free_space_negative_control","status":"PASS","detail":"far obstacle remains free for endpoints and native sweep"}
+{"control":"self_collision_negative_control","status":"PASS","detail":"deliberate feasible joint state produces native self collision"}
+{"control":"self_collision_negative_control_detail","q":[-1.5388388093126519,0.089560286735724581,-2.6759293795387253,-3.0521654331547774,-2.0899656685260903,-2.8783824178455135],"pairs":["upperarm_link|wrist2_link"]}
+{"control":"near_miss_positive_clearance","status":"PASS","detail":"native distance is positive and below 10 mm"}
+{"control":"near_miss_detail","distance_m":0.0019844529498920611,"obstacle_center":[-0.375,0,0.152]}
+{"control":"comfortable_clearance","status":"PASS","detail":"native distance exceeds 50 mm"}
+{"control":"comfortable_clearance_detail","distance_m":0.067068803252274281,"obstacle_center":[-0.30499999999999999,0,0.152]}

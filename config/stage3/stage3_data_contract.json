@@ -1,0 +1,63 @@
+{
+  "schema_version": "stage3-data-contract-v1",
+  "contract_id": "stage3-geometry-data-20260808",
+  "status": "FROZEN_SCHEMA_ONLY",
+  "scope": "Schema and preprocessing policy only; H1 does not fabricate a Stage 3 dataset.",
+  "record_fields": {
+    "geometry_id": "stable geometry identity, unique within dataset",
+    "dataset_id": "dataset release identity",
+    "sample_id": "stable surface sample identity within geometry",
+    "mesh_path": "relative path or null",
+    "point_cloud_path": "relative path or null",
+    "coordinate_frame": "frame name plus transform provenance",
+    "length_unit": "declared unit; converted to m at validation boundary",
+    "normal_convention": "normal direction and sign convention",
+    "origin": "origin definition in coordinate_frame",
+    "transform_provenance": "ordered source-to-frame transforms with hashes",
+    "surface_bounds": "axis-aligned bounds in declared frame",
+    "triangle_count": "integer or null for point-cloud-only records",
+    "point_count": "integer or null for mesh-only records",
+    "normal_source": "file, face-derived, vertex-interpolated, or estimated",
+    "normal_orientation": "orientation method, reference direction, and confidence",
+    "train_validation_test_role": "training | validation | test | generalization",
+    "random_seed": "integer or null for deterministic preprocessing",
+    "geometry_hash": "SHA256 of canonical source bytes and transform manifest",
+    "preprocessing_version": "versioned preprocessing implementation identity"
+  },
+  "mesh_contract": {
+    "supported_formats": ["STL", "OBJ", "PLY", "glTF/GLB"],
+    "watertight_requirement": "Required for volumetric/inside-outside operations; not required for surface-only coverage if explicitly declared.",
+    "normal_requirement": "Normals required after preprocessing; source normals may be replaced only with provenance.",
+    "units": "Source unit is mandatory; canonical internal unit is m.",
+    "frame": "Frame name and source-to-frame transform are mandatory.",
+    "degenerate_triangle_handling": "Reject zero-area triangles from coverage sampling and report count; never silently repair into area.",
+    "duplicate_vertex_handling": "Deduplicate only with a declared metric tolerance and record the pre/post counts.",
+    "mesh_repair_policy": "No automatic repair in H1; H2 may add versioned repair steps with before/after hashes and a human-readable report.",
+    "sampling_policy": "Area-weighted triangle sampling with deterministic seed for coverage; exact triangle IDs and barycentric coordinates are recorded."
+  },
+  "point_cloud_contract": {
+    "point_format": "XYZ or XYZRGB/XYZ normal extension with an explicit schema",
+    "xyz_units": "Mandatory source unit; canonical internal unit is m.",
+    "normal_optional_required": "Optional on input; required after deterministic normal estimation before normal-sensitive validation.",
+    "downsampling": "Voxel or uniform sampling with voxel size/sample budget recorded; never use an unrecorded default.",
+    "outlier_removal": "Disabled unless a versioned rule, threshold, retained/rejected counts, and seed are recorded.",
+    "normal_estimation": "Declared neighborhood size/search method, implementation version, and seed if applicable.",
+    "orientation": "Orient normals using a declared viewpoint/reference field; sign flips are recorded.",
+    "registration": "Registration transform, algorithm, convergence, inlier count, and source/target hashes are mandatory; no registration is assumed."
+  },
+  "canonicalization": {
+    "hashing": "SHA256 over canonical source bytes plus ordered transform/preprocessing manifest",
+    "ordering": "Stable lexical geometry_id and sample_id order; no filesystem iteration order",
+    "nonfinite_values": "Reject NaN and infinity before hashing",
+    "missing_geometry": "Fail closed for a required record; do not create placeholder samples"
+  },
+  "stage01_baseline_identity": {
+    "geometry_id": "open_arch_181_stage01",
+    "dataset_id": "internal_wiper_moveit_inputs",
+    "source_paths": ["outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv", "outputs/internal_wiper_moveit_inputs/open_arch_seed_joints.csv"],
+    "row_count": 181,
+    "coordinate_frame": "base_link",
+    "spray_state": "ON",
+    "legacy_720_or_off_reorientation_included": false
+  }
+}

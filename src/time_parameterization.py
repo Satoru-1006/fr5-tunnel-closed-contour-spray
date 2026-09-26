@@ -268,8 +268,23 @@ def _estimate_waypoint_velocities(
     nominal_t = s / max(target_tcp_speed, 1e-6)
     v = np.zeros_like(q)
     if len(q) > 2:
-        dt = np.maximum(nominal_t[2:] - nominal_t[:-2], 1e-6)
-        v[1:-1] = (q[2:] - q[:-2]) / dt[:, None]
+        dt_prev = np.maximum(nominal_t[1:-1] - nominal_t[:-2], 1e-6)
+        dt_next = np.maximum(nominal_t[2:] - nominal_t[1:-1], 1e-6)
+        d_prev = q[1:-1] - q[:-2]
+        d_next = q[2:] - q[1:-1]
+        central_dt = np.maximum(nominal_t[2:] - nominal_t[:-2], 1e-6)
+        central = (q[2:] - q[:-2]) / central_dt[:, None]
+        # A central-difference velocity can point through a local joint
+        # reversal.  Ruckig then overshoots the waypoint and may leave the
+        # physical joint range even though both endpoints are valid.  Keep a
+        # nonzero cruise velocity only when the neighboring joint motions
+        # have the same sign, and cap it by the adjacent-segment speeds.
+        same_direction = d_prev * d_next > 0.0
+        local_cap = 0.5 * np.minimum(
+            np.abs(d_prev) / dt_prev[:, None],
+            np.abs(d_next) / dt_next[:, None],
+        )
+        v[1:-1] = np.where(same_direction, np.sign(central) * np.minimum(np.abs(central), local_cap), 0.0)
         if closed_loop:
             v[0] = v[1]
             v[-1] = v[-2]

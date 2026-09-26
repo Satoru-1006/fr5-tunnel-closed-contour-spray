@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>stage3_h13_d41_native</name>
+  <version>0.1.0</version>
+  <description>D41 native MoveIt2/Bullet collision, distance, Jacobian, and adversarial certification probe.</description>
+  <maintainer email="research@example.invalid">Stage 3 research</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>geometry_msgs</depend>
+  <depend>moveit_core</depend>
+  <depend>moveit_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>shape_msgs</depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

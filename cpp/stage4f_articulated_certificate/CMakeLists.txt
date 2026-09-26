@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.22)
+project(stage4f_articulated_certificate)
+
+find_package(ament_cmake REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(moveit_core REQUIRED)
+find_package(rclcpp REQUIRED)
+
+add_executable(stage4f_articulated_certificate stage4f_articulated_certificate.cpp)
+target_compile_features(stage4f_articulated_certificate PRIVATE cxx_std_17)
+target_link_libraries(stage4f_articulated_certificate Eigen3::Eigen fcl)
+ament_target_dependencies(stage4f_articulated_certificate moveit_core rclcpp)
+target_link_libraries(stage4f_articulated_certificate moveit_core::moveit_collision_detection_fcl)
+
+install(TARGETS stage4f_articulated_certificate DESTINATION lib/${PROJECT_NAME})
+ament_package()
