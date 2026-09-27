@@ -45,6 +45,7 @@ D41_IDENTITY = D41_RUN / "D41_AUTHORITATIVE_IDENTITY.json"
 P2A_RESULT = ROOT / "outputs/p2a_axiswise_robustness_margin.json"
 P2A_AXIS_MODULE = ROOT / "src/p2a_axiswise_robustness.py"
 POSE_COUNT = 181
+STAND_OFF_M = 0.260
 COLLISION_METHOD = "adaptive_discrete_interpolation"
 STRICT_SELF_CCD = "NOT_AVAILABLE"
 PROJECT_LIMIT_PROVENANCE = "PROJECT_CONFIGURED_LIMITS"
@@ -340,6 +341,92 @@ def _validate_current_target_surface_normals(surface_normals: np.ndarray) -> np.
     return normals
 
 
+def _project_target_normals_to_fk_samples(
+    target_positions: np.ndarray,
+    target_normals: np.ndarray,
+    fk_positions: np.ndarray,
+    *,
+    max_path_deviation_m: float,
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Match FK samples to the strict validator's wall-polyline normal reference."""
+    points = np.asarray(target_positions, dtype=np.float64)
+    normals = _validate_current_target_surface_normals(target_normals)
+    samples = np.asarray(fk_positions, dtype=np.float64)
+    if points.shape != (POSE_COUNT, 3) or samples.shape != (POSE_COUNT, 3):
+        raise RuntimeError(f"authoritative_target_or_fk_position_shape:{points.shape}:{samples.shape}")
+    if not np.isfinite(points).all() or not np.isfinite(samples).all():
+        raise RuntimeError("authoritative_target_or_fk_positions_nonfinite")
+    if not math.isfinite(max_path_deviation_m) or max_path_deviation_m <= 0.0:
+        raise RuntimeError("strict_path_deviation_threshold_invalid")
+
+    # Match validate_smoothed_trajectory_fk: tcp_points_to_wall=true and the
+    # open target wall is offset from the commanded TCP path along its normals.
+    wall_points = points + STAND_OFF_M * normals
+    edges = np.diff(wall_points, axis=0)
+    edge_squared = np.einsum("ij,ij->i", edges, edges)
+    if np.any(edge_squared <= 1e-24):
+        raise RuntimeError("authoritative_wall_polyline_contains_degenerate_segment")
+
+    best_wall_d2 = np.full(POSE_COUNT, np.inf, dtype=np.float64)
+    aligned_normals = np.zeros((POSE_COUNT, 3), dtype=np.float64)
+    segment_indices = np.zeros(POSE_COUNT, dtype=np.int64)
+    fractions = np.zeros(POSE_COUNT, dtype=np.float64)
+    for segment_index, (start, edge, denom) in enumerate(zip(wall_points[:-1], edges, edge_squared)):
+        alpha = np.clip(((samples - start) @ edge) / denom, 0.0, 1.0)
+        projection = start + alpha[:, None] * edge
+        delta = samples - projection
+        distance_squared = np.einsum("ij,ij->i", delta, delta)
+        choose = distance_squared < best_wall_d2
+        interpolated = (1.0 - alpha[:, None]) * normals[segment_index] + alpha[:, None] * normals[segment_index + 1]
+        lengths = np.linalg.norm(interpolated, axis=1)
+        if np.any(lengths <= 1e-12):
+            raise RuntimeError(f"authoritative_wall_normal_interpolation_degenerate:{segment_index}")
+        interpolated /= lengths[:, None]
+        aligned_normals[choose] = interpolated[choose]
+        segment_indices[choose] = segment_index
+        fractions[choose] = alpha[choose]
+        best_wall_d2[choose] = distance_squared[choose]
+
+    # Require the nominal FK to remain on the authoritative open TCP path. This
+    # uses the same path-distance gate as the strict MoveIt2 validation.
+    best_path_d2 = np.full(POSE_COUNT, np.inf, dtype=np.float64)
+    path_edges = np.diff(points, axis=0)
+    path_squared = np.einsum("ij,ij->i", path_edges, path_edges)
+    if np.any(path_squared <= 1e-24):
+        raise RuntimeError("authoritative_tcp_polyline_contains_degenerate_segment")
+    for start, edge, denom in zip(points[:-1], path_edges, path_squared):
+        alpha = np.clip(((samples - start) @ edge) / denom, 0.0, 1.0)
+        delta = samples - (start + alpha[:, None] * edge)
+        best_path_d2 = np.minimum(best_path_d2, np.einsum("ij,ij->i", delta, delta))
+    path_deviation = np.sqrt(best_path_d2)
+    max_path_deviation = float(np.max(path_deviation))
+    if max_path_deviation > max_path_deviation_m + 1e-12:
+        raise RuntimeError(
+            f"nominal_fk_outside_authoritative_tcp_path:{max_path_deviation:.12g}>{max_path_deviation_m:.12g}"
+        )
+
+    wall_lengths = np.linalg.norm(edges, axis=1)
+    wall_station_prefix = np.concatenate(([0.0], np.cumsum(wall_lengths)))
+    stations = wall_station_prefix[segment_indices] + fractions * wall_lengths[segment_indices]
+    station_steps = np.diff(stations)
+    return aligned_normals, {
+        "method": "strict_wall_polyline_projection_with_interpolated_normals",
+        "source_path": str(POSES),
+        "waypoint_alignment": "each FK sample projected to nearest segment of the current authoritative open-path wall polyline",
+        "open_path": True,
+        "tcp_points_to_wall": True,
+        "stand_off_m": STAND_OFF_M,
+        "max_authoritative_tcp_path_deviation_m": max_path_deviation,
+        "max_authoritative_tcp_path_deviation_limit_m": max_path_deviation_m,
+        "max_wall_projection_distance_m": float(np.sqrt(np.max(best_wall_d2))),
+        "wall_projection_segment_index_by_sample": segment_indices.tolist(),
+        "wall_projection_fraction_by_sample": fractions.tolist(),
+        "wall_polyline_station_m_by_sample": stations.tolist(),
+        "station_backstep_count_beyond_1um": int(np.sum(station_steps < -1e-6)),
+        "minimum_station_step_m": float(np.min(station_steps)) if station_steps.size else None,
+    }
+
+
 def _scan_variant_axes(
     row: Mapping[str, Any], variant_id: str, *, all_formal_axes: bool,
     scratch: Path, native_binary: Path, fk_binary: Path, overlay: Path,
@@ -369,16 +456,19 @@ def _scan_variant_axes(
         raise RuntimeError(f"candidate_nominal_MoveIt_FK_missing:{variant_id}")
     fk = fk_by_case[case_id]
     poses = np.column_stack((fk["position"], fk["quaternion"]))
-    _target_positions, _target_quaternions, target_normals = d46.read_targets()
-    target_normals = _validate_current_target_surface_normals(target_normals)
+    target_positions, _target_quaternions, target_normals = d46.read_targets()
+    thresholds = d46.read_json(d46.OUT / "STAGE4_SYSTEM_BENCHMARK_V1.json")["diagnostic_thresholds"]
+    path_threshold_m = float(thresholds["tcp_trajectory_error_m"]["value"])
+    aligned_normals, normal_reference_mapping = _project_target_normals_to_fk_samples(
+        target_positions, target_normals, poses[:, :3], max_path_deviation_m=path_threshold_m,
+    )
     nominal = ProcessTrajectory(
         tcp_poses=poses, joint_states=q, timestamps_s=timestamps,
-        surface_normals=target_normals, joint_lower_rad=lower, joint_upper_rad=upper,
+        surface_normals=aligned_normals, joint_lower_rad=lower, joint_upper_rad=upper,
         metadata={"robot": "FAIRINO_FR5", "scope": "181-point ON-state open-arch only", "candidate": variant_id,
                   "nominal_source": "fresh MoveIt2 FK of candidate post-Ruckig q",
-                  "surface_normal_source": "current authoritative 181-point open-arch target CSV, row-aligned by waypoint index"},
+                  "surface_normal_source": "current authoritative target wall polyline, nearest-segment projection aligned to nominal FK samples"},
     )
-    thresholds = d46.read_json(d46.OUT / "STAGE4_SYSTEM_BENCHMARK_V1.json")["diagnostic_thresholds"]
     specs = p2a._build_axis_specs(q, lower, upper)
     if not all_formal_axes:
         specs = [spec for spec in specs if spec.axis_id.startswith("joint:")]
@@ -392,7 +482,11 @@ def _scan_variant_axes(
     (variant_root / "scan").mkdir()
     axes = p2a.scan_axes_batched(nominal, specs, evaluator.evaluate_batch)
     full_path = variant_root / "axis_results_full.json"
-    _write_json(full_path, {"variant_id": variant_id, "axis_results": axes})
+    _write_json(full_path, {
+        "variant_id": variant_id,
+        "normal_reference_mapping": normal_reference_mapping,
+        "axis_results": axes,
+    })
     compact = [_axis_compact(axis, variant_id) for axis in axes]
     return compact, {
         "axis_results_full_path": str(full_path),
@@ -403,6 +497,7 @@ def _scan_variant_axes(
         "native_batches": evaluator._batch_number,
         "scan_case_count": sum(len(axis.get("coarse_observations", [])) + len(axis.get("refinement_observations", [])) for axis in axes),
         "nominal_fk_trace": str(fk_root / "fk" / "STAGE4A_FK_TRACE.csv"),
+        "normal_reference_mapping": normal_reference_mapping,
     }
 
 

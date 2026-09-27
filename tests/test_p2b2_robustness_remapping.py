@@ -24,6 +24,7 @@ from scripts.run_p2b2_robustness_remapping import (  # noqa: E402
     VARIANT_DESIGN,
     _campaign_status,
     _find_input_hash,
+    _project_target_normals_to_fk_samples,
     _validate_current_target_surface_normals,
 )
 from scripts.run_p2b1_solver_policy_ablation import canonicalize_xacro_source_comment  # noqa: E402
@@ -158,6 +159,34 @@ def test_current_target_normals_preserve_waypoint_order_and_require_181_unit_vec
     invalid[42] *= 2.0
     with pytest.raises(RuntimeError, match="unit_vectors"):
         _validate_current_target_surface_normals(invalid)
+
+
+def test_surface_normals_follow_fk_sample_projection_not_csv_row_number() -> None:
+    angle = np.linspace(0.0, np.pi, 181)
+    target_positions = np.column_stack((0.4 * np.cos(angle), np.zeros(181), 0.4 * np.sin(angle)))
+    target_normals = np.column_stack((np.cos(angle), np.zeros(181), np.sin(angle)))
+    fk_positions = target_positions[::-1].copy()
+
+    aligned, evidence = _project_target_normals_to_fk_samples(
+        target_positions,
+        target_normals,
+        fk_positions,
+        max_path_deviation_m=0.006,
+    )
+    assert aligned.shape == (181, 3)
+    assert np.allclose(aligned[0], target_normals[-1], atol=4e-3)
+    assert np.allclose(aligned[-1], target_normals[0], atol=4e-3)
+    assert evidence["method"] == "strict_wall_polyline_projection_with_interpolated_normals"
+    assert evidence["station_backstep_count_beyond_1um"] > 0
+
+    off_path = fk_positions + np.asarray([0.0, 0.02, 0.0])
+    with pytest.raises(RuntimeError, match="outside_authoritative_tcp_path"):
+        _project_target_normals_to_fk_samples(
+            target_positions,
+            target_normals,
+            off_path,
+            max_path_deviation_m=0.006,
+        )
 
 
 def test_urdf_identity_normalizes_only_the_xacro_generated_checkout_comment() -> None:
