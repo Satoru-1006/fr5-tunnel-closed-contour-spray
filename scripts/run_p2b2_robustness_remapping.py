@@ -603,6 +603,7 @@ def main() -> int:
         "project": "FAIRINO_FR5", "stage": "P2-B2", "repository": "https://github.com/Satoru-1006/fr5-tunnel-closed-contour-spray.git",
         "branch": branch, "source_base_commit": SOURCE_BASE, "execution_code_commit": head,
         "model_source_commit": model_commit.stdout.strip(), "model_source_remote": source_remote.stdout.strip(),
+        "collision_method": COLLISION_METHOD,
         "model_source_worktree_clean": True, "d41_derived_model_regeneration": model_reproduction,
         "runtime": {"runner": "Windows Python -> WSL2 Ubuntu-24.04-D", "ros_moveit_ruckig": runtime_text},
         "inputs": inputs,
