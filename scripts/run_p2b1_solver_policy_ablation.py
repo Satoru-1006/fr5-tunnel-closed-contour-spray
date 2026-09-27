@@ -466,6 +466,7 @@ def frozen_p2a_j6_margin() -> float | None:
 def _run_native_with_fresh_build(
     run_dir: Path, cases: list[dict[str, Any]], native_name: str, d46: Any,
     native_binary: Path, overlay: Path, underlay: Path, urdf: Path, distro: str,
+    timeout_s: int = 7200,
 ) -> Path:
     native = run_dir / native_name
     native.mkdir(parents=True, exist_ok=False)
@@ -480,7 +481,7 @@ def _run_native_with_fresh_build(
             })
     out_cmd = f"{shlex.quote(d46.wsl_path(native_binary))} --poses {shlex.quote(d46.wsl_path(POSES))} --cases {shlex.quote(d46.wsl_path(manifest))} --urdf {shlex.quote(d46.wsl_path(urdf))} --srdf {shlex.quote(d46.wsl_path(d46.SRDF))} --output {shlex.quote(d46.wsl_path(native))}"
     script = "\n".join((source_ros(underlay, overlay), "export D41_SKIP_CONTROLS=1", out_cmd))
-    code = run_wsl(script, run_dir / "native_execution.log", distro)
+    code = run_wsl(script, run_dir / "native_execution.log", distro, timeout_s=timeout_s)
     if code:
         raise RuntimeError(f"fresh_D41_native_failure:{code}:{run_dir}")
     return native
@@ -488,13 +489,13 @@ def _run_native_with_fresh_build(
 
 def _run_fresh_fk(
     batch_root: Path, native_root: Path, d46: Any, fk_binary: Path,
-    overlay: Path, underlay: Path, urdf: Path, distro: str,
+    overlay: Path, underlay: Path, urdf: Path, distro: str, timeout_s: int = 7200,
 ) -> Path:
     trace = batch_root / "fk" / "STAGE4A_FK_TRACE.csv"
     trace.parent.mkdir(parents=True, exist_ok=True)
     command = f"{shlex.quote(d46.wsl_path(fk_binary))} --cases {shlex.quote(d46.wsl_path(native_root / 'cases.csv'))} --urdf {shlex.quote(d46.wsl_path(urdf))} --srdf {shlex.quote(d46.wsl_path(d46.SRDF))} --output {shlex.quote(d46.wsl_path(trace))}"
     script = source_ros(underlay, overlay) + "\n" + command
-    code = run_wsl(script, batch_root / "fk_execution.log", distro)
+    code = run_wsl(script, batch_root / "fk_execution.log", distro, timeout_s=timeout_s)
     if code or not trace.is_file() or trace.stat().st_size == 0:
         raise RuntimeError(f"fresh_MoveIt_FK_failure:{code}:{batch_root}")
     return trace

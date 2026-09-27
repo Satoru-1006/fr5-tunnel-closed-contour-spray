@@ -430,7 +430,8 @@ def _project_target_normals_to_fk_samples(
 def _scan_variant_axes(
     row: Mapping[str, Any], variant_id: str, *, all_formal_axes: bool,
     scratch: Path, native_binary: Path, fk_binary: Path, overlay: Path,
-    underlay: Path, urdf: Path, distro: str,
+    underlay: Path, urdf: Path, distro: str, moveit_batch_timeout_s: int = 86400,
+    attempt_label: str | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     import tools.stage4a_system_benchmark as d46
     import tools.audit_stage17_reproducibility as d17
@@ -440,14 +441,17 @@ def _scan_variant_axes(
     d46.URDF = urdf
     lower, upper, dynamic_limits = d46.load_limits()
     timestamps, q, _v, _a, _j = d46.load_post_ruckig(Path(str(row["post_ruckig_path"])))
-    variant_root = scratch / "robustness_mapping" / variant_id
+    mapping_directory = variant_id if attempt_label is None else f"{variant_id}_{attempt_label}"
+    variant_root = scratch / "robustness_mapping" / mapping_directory
     fk_root = variant_root / "nominal_fk"
     fk_root.mkdir(parents=True, exist_ok=False)
     p2a._run_existing_fk = lambda batch_root, native_root, module: p2b1._run_fresh_fk(
         batch_root, native_root, module, fk_binary, overlay, underlay, urdf, distro,
+        timeout_s=moveit_batch_timeout_s,
     )
     d46.run_native = lambda run_dir, cases, native_name="native": p2b1._run_native_with_fresh_build(
         run_dir, cases, native_name, d46, native_binary, overlay, underlay, urdf, distro,
+        timeout_s=moveit_batch_timeout_s,
     )
     case_id = f"{variant_id}_nominal"
     _trace, q_by_case = p2a._run_fk_only_cases(fk_root, [(case_id, q)], d46)
@@ -567,6 +571,44 @@ def _release_mapping(mapping: Mapping[str, Any], evidence_root: Path) -> dict[st
     return output
 
 
+def _read_complete_mapping(path: Path, variant_id: str) -> list[dict[str, Any]] | None:
+    """Return a completed mapping only when all required joint axes have a terminal result."""
+    if not path.is_file():
+        return None
+    try:
+        axes = _read_json(path).get("axis_results")
+    except (OSError, ValueError, TypeError):
+        return None
+    expected_count = 42 if variant_id == "R0" else 12
+    if not isinstance(axes, list) or len(axes) != expected_count:
+        return None
+    joint = [axis for axis in axes if str((axis.get("specification") or {}).get("axis_id", "")).startswith("joint:")]
+    expected_ids = {
+        f"joint:j{index}:{direction}"
+        for index in range(1, 7) for direction in ("positive", "negative")
+    }
+    if len(joint) != 12 or {axis["specification"].get("axis_id") for axis in joint} != expected_ids:
+        return None
+    for axis in joint:
+        if axis.get("specification", {}).get("capability_status") != "AVAILABLE":
+            return None
+        estimate = axis.get("estimated_raw_axis_margin") or {}
+        if (estimate.get("value") is None
+                and not (axis.get("axis_status") == "NO_FAILURE_WITHIN_SEARCH_DOMAIN"
+                         and axis.get("search_completeness") == "FULL_COARSE_DOMAIN_SAMPLED")):
+            return None
+    if variant_id == "R0":
+        for axis in axes:
+            if axis.get("specification", {}).get("capability_status") != "AVAILABLE":
+                continue
+            estimate = axis.get("estimated_raw_axis_margin") or {}
+            if (estimate.get("value") is None
+                    and not (axis.get("axis_status") == "NO_FAILURE_WITHIN_SEARCH_DOMAIN"
+                             and axis.get("search_completeness") == "FULL_COARSE_DOMAIN_SAMPLED")):
+                return None
+    return axes
+
+
 def _campaign_status(reference_reproduction: Mapping[str, Any], variants: Sequence[Mapping[str, Any]], landscape: Sequence[Mapping[str, Any]]) -> str:
     all_valid = all((row.get("full_validation") or {}).get("status") == "PASS" for row in variants)
     joint_rows = [row for row in landscape if str(row.get("axis_id", "")).startswith("joint:")]
@@ -627,6 +669,10 @@ def main() -> int:
     parser.add_argument("--frozen-input-source-root", type=Path, required=True, help="Read-only fallback root for D41-authenticated ignored inputs absent from the P2-B2 source checkout")
     parser.add_argument("--reference-only", action="store_true", help="Run clean-checkout R0 reference replay and full formal P2-A axes only")
     parser.add_argument("--expected-execution-commit", help="Required with --reference-only to authenticate clean replay source")
+    parser.add_argument("--resume-existing", type=Path, help="Continue an authenticated partial p2b2_formal_execution directory in place")
+    parser.add_argument("--moveit-batch-timeout-seconds", "--native-timeout-seconds",
+                        dest="moveit_batch_timeout_seconds", type=int, default=86400,
+                        help="Per-batch fresh MoveIt native and FK timeout; recorded in the execution manifest")
     args = parser.parse_args()
 
     scratch, underlay, fairino_source, reference_model, overlay, b0_reference, d39_seed, p2b1_manifest_path, frozen_input_source_root = (
@@ -641,6 +687,10 @@ def main() -> int:
         raise RuntimeError("clean_reference_replay_requires_expected_execution_commit")
     if not args.reference_only and args.expected_execution_commit:
         raise RuntimeError("expected_execution_commit_only_valid_with_reference_only")
+    if args.moveit_batch_timeout_seconds <= 7200:
+        raise RuntimeError("native_timeout_must_not_reintroduce_the_observed_7200_second_cap")
+    if args.resume_existing and args.reference_only:
+        raise RuntimeError("resume_existing_not_valid_with_reference_only")
     branch, head = _verify_execution_tree(
         clean_replay=args.reference_only,
         expected_head=args.expected_execution_commit,
@@ -657,143 +707,293 @@ def main() -> int:
     inputs, external_frozen_inputs = _verify_frozen_inputs(d39_seed, d39_seed_hash, frozen_input_source_root)
     native_binary = overlay / "lib/stage3_h13_d41_native/stage3_h13_d41_native"
     fk_binary = overlay / "lib/stage4a_fk/stage4a_fk"
-    if not native_binary.is_file() or not fk_binary.is_file():
-        raise RuntimeError("fresh_source_build_D41_native_or_stage4a_fk_missing")
-    out_root = scratch / "p2b2_formal_execution"
-    out_root.mkdir(parents=True, exist_ok=False)
-    p2b1.D39_SEED = d39_seed
-    input_root = out_root / "inputs"
-    input_root.mkdir(parents=True, exist_ok=False)
-    archived_p2b1_manifest = input_root / "P2B1_execution_manifest.json"
-    shutil.copy2(p2b1_manifest_path, archived_p2b1_manifest)
-    p2b1_manifest_hash = _sha256(p2b1_manifest_path)
-    external_input_members: dict[str, str] = {}
-    for relative, source_path in external_frozen_inputs.items():
-        destination = input_root / "frozen_authoritative" / Path(str(relative).replace("\\", "/"))
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source_path, destination)
-        if _sha256(destination) != inputs[relative]:
-            raise RuntimeError(f"archived_frozen_input_byte_mismatch:{relative}")
-        external_input_members[relative] = destination.relative_to(scratch).as_posix()
-    d39_archive_member = external_input_members.get(
-        D39_SEED_RELATIVE,
-        (input_root / "frozen_authoritative" / Path(D39_SEED_RELATIVE)).relative_to(scratch).as_posix(),
-    )
-    if not (scratch / d39_archive_member).is_file():
-        d39_archive_path = input_root / "frozen_authoritative" / Path(D39_SEED_RELATIVE)
-        d39_archive_path.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(d39_seed, d39_archive_path)
-        if _sha256(d39_archive_path) != d39_seed_hash:
-            raise RuntimeError("archived_D39_seed_byte_mismatch")
-        d39_archive_member = d39_archive_path.relative_to(scratch).as_posix()
     import tools.stage4a_system_benchmark as d46
     import src.p2a_axiswise_robustness as p2a
 
-    d46.URDF = reference_model
-    lower, upper, dynamic_limits = d46.load_limits()
-    runtime_text = _runtime_provenance(underlay, overlay, args.distro, out_root)
-    model_output = out_root / "model"
-    model_output.mkdir(parents=True, exist_ok=False)
-    model_reproduction = p2b1.regenerate_d41_urdf(
-        underlay, overlay, fairino_source, reference_model, model_output, args.distro,
-    )
-    fresh_urdf = Path(str(model_reproduction["regenerated_model"])).resolve()
-    if model_reproduction.get("status") != "BYTE_MATCH" or not fresh_urdf.is_file():
-        raise RuntimeError("D41_derived_model_regeneration_did_not_byte_match")
-    d46.URDF = fresh_urdf
-    lower, upper, dynamic_limits = d46.load_limits()
-    source_remote = subprocess.run(["git", "remote", "get-url", "origin"], cwd=fairino_source, text=True, encoding="utf-8", capture_output=True)
-    model_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=fairino_source, text=True, encoding="utf-8", capture_output=True)
-    model_dirty = subprocess.run(["git", "status", "--porcelain"], cwd=fairino_source, text=True, encoding="utf-8", capture_output=True)
-    if source_remote.returncode or model_commit.returncode or model_dirty.returncode or "FAIR-INNOVATION/frcobot_ros2" not in source_remote.stdout or model_dirty.stdout.strip():
-        raise RuntimeError("FAIRINO_description_source_identity_invalid")
-    provenance = {
-        "project": "FAIRINO_FR5", "stage": "P2-B2", "repository": "https://github.com/Satoru-1006/fr5-tunnel-closed-contour-spray.git",
-        "branch": branch, "source_base_commit": SOURCE_BASE, "execution_code_commit": head,
-        "model_source_commit": model_commit.stdout.strip(), "model_source_remote": source_remote.stdout.strip(),
-        "collision_method": COLLISION_METHOD,
-        "model_source_worktree_clean": True, "d41_derived_model_regeneration": model_reproduction,
-        "runtime": {"runner": "Windows Python -> WSL2 Ubuntu-24.04-D", "ros_moveit_ruckig": runtime_text},
-        "inputs": inputs,
-        "additional_external_inputs": {
-            "d39_seed": {"canonical_path": D39_SEED_RELATIVE, "sha256": d39_seed_hash,
-                         "p2b1_execution_manifest_sha256": p2b1_manifest_hash,
-                         "archive_member": d39_archive_member.removeprefix("p2b2_formal_execution/")},
-            "d41_authenticated_external_input_members": external_input_members,
-        },
-        "configuration": {
-            "trajectory_points": POSE_COUNT, "joint_order": list(JOINT_NAMES), "scope": "ON-state open-arch only",
-            "tcp_source": "assumed_150mm_placeholder", "stand_off_m": 0.260,
-            "time_parameterization": "tcp_arclength", "ruckig": True,
-            "dynamic_limit_provenance": PROJECT_LIMIT_PROVENANCE,
-            "collision_method": COLLISION_METHOD, "strict_self_ccd": STRICT_SELF_CCD,
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-        },
-    }
-    if not validate_provenance_schema(provenance):
-        raise RuntimeError("P2B2_provenance_schema_invalid")
-    _write_json(out_root / "source_identity.json", provenance)
-    (out_root / "runtime_provenance.txt").write_text(runtime_text + "\n", encoding="utf-8")
-    manifest = {
-        "project": "FAIRINO_FR5", "stage": "P2-B2", "branch": branch,
-        "source_base_commit": SOURCE_BASE, "execution_code_commit": head,
-        "execution_tree_clean_at_start": True, "repository": provenance["repository"],
-        "runtime": provenance["runtime"], "inputs": inputs,
-        "model_source_commit": provenance["model_source_commit"], "collision_method": COLLISION_METHOD,
-        "strict_self_ccd": STRICT_SELF_CCD, "hardware_validation": "NOT_RUN", "hardware_safety_certified": "NO",
-        "variant_design": list(VARIANT_DESIGN),
-        "additional_external_inputs": {
-            "d39_seed": {"canonical_path": D39_SEED_RELATIVE, "sha256": d39_seed_hash,
-                         "p2b1_execution_manifest_sha256": p2b1_manifest_hash,
-                         "archive_member": d39_archive_member},
-            "d41_authenticated_external_input_members": external_input_members,
-            "p2b1_execution_manifest_archive_member": "p2b2_formal_execution/inputs/P2B1_execution_manifest.json",
-        },
-        "p2b1_b1_frozen_prefix_rows": 16, "old_metric": "joint:j6:positive only",
-    }
-    _write_json(out_root / "execution_manifest.json", manifest)
+    if not native_binary.is_file() or not fk_binary.is_file():
+        raise RuntimeError("fresh_source_build_D41_native_or_stage4a_fk_missing")
+    if args.resume_existing:
+        out_root = args.resume_existing.resolve()
+        if out_root.name != "p2b2_formal_execution" or not out_root.is_dir():
+            raise RuntimeError("resume_existing_must_name_existing_p2b2_formal_execution_directory")
+        manifest = _read_json(out_root / "execution_manifest.json")
+        provenance = _read_json(out_root / "source_identity.json")
+        partial_path = out_root / "partial_campaign_state.json"
+        if not partial_path.is_file():
+            raise RuntimeError("resume_partial_campaign_state_missing")
+        previous_head = str(manifest.get("execution_code_commit") or "")
+        ancestor = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", previous_head, head],
+            cwd=ROOT, text=True, encoding="utf-8", capture_output=True,
+        ) if previous_head else None
+        if (manifest.get("branch") != BRANCH or provenance.get("branch") != BRANCH
+                or manifest.get("source_base_commit") != SOURCE_BASE
+                or manifest.get("inputs") != inputs
+                or provenance.get("inputs") != inputs
+                or not manifest.get("execution_tree_clean_at_start")
+                or ancestor is None or ancestor.returncode != 0):
+            raise RuntimeError("resume_identity_or_frozen_input_mismatch")
+        p2b1.D39_SEED = d39_seed
+        d46_runtime_expected = (manifest.get("runtime") or {}).get("ros_moveit_ruckig")
+        runtime_text = _runtime_provenance(underlay, overlay, args.distro, out_root)
+        if runtime_text != d46_runtime_expected:
+            raise RuntimeError("resume_runtime_identity_changed")
+        model_identity = provenance.get("d41_derived_model_regeneration") or {}
+        fresh_urdf = (out_root / "model" / "derived_robot_model.urdf").resolve()
+        if (model_identity.get("status") != "BYTE_MATCH" or not fresh_urdf.is_file()
+                or _sha256(fresh_urdf) != model_identity.get("model_sha256")):
+            raise RuntimeError("resume_byte_matched_model_missing_or_changed")
+        source_remote = subprocess.run(["git", "remote", "get-url", "origin"], cwd=fairino_source, text=True, encoding="utf-8", capture_output=True)
+        model_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=fairino_source, text=True, encoding="utf-8", capture_output=True)
+        model_dirty = subprocess.run(["git", "status", "--porcelain"], cwd=fairino_source, text=True, encoding="utf-8", capture_output=True)
+        if (source_remote.returncode or model_commit.returncode or model_dirty.returncode
+                or source_remote.stdout.strip() != provenance.get("model_source_remote")
+                or model_commit.stdout.strip() != provenance.get("model_source_commit") or model_dirty.stdout.strip()):
+            raise RuntimeError("resume_model_source_identity_changed")
+        d46.URDF = fresh_urdf
+        lower, upper, dynamic_limits = d46.load_limits()
+        continuations = list(manifest.get("execution_continuations") or [])
+        continuations.append({
+            "execution_code_commit": head,
+            "resumed_from_commit": previous_head,
+            "resume_reason": "Type-A native wrapper timeout repaired; measurement semantics unchanged",
+            "moveit_batch_timeout_seconds": args.moveit_batch_timeout_seconds,
+            "prior_partial_attempt_preserved": True,
+        })
+        manifest["execution_continuations"] = continuations
+        _write_json(out_root / "execution_manifest.json", manifest)
+    else:
+        out_root = scratch / "p2b2_formal_execution"
+        out_root.mkdir(parents=True, exist_ok=False)
+        p2b1.D39_SEED = d39_seed
+        input_root = out_root / "inputs"
+        input_root.mkdir(parents=True, exist_ok=False)
+        archived_p2b1_manifest = input_root / "P2B1_execution_manifest.json"
+        shutil.copy2(p2b1_manifest_path, archived_p2b1_manifest)
+        p2b1_manifest_hash = _sha256(p2b1_manifest_path)
+        external_input_members: dict[str, str] = {}
+        for relative, source_path in external_frozen_inputs.items():
+            destination = input_root / "frozen_authoritative" / Path(str(relative).replace("\\", "/"))
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_path, destination)
+            if _sha256(destination) != inputs[relative]:
+                raise RuntimeError(f"archived_frozen_input_byte_mismatch:{relative}")
+            external_input_members[relative] = destination.relative_to(scratch).as_posix()
+        d39_archive_member = external_input_members.get(
+            D39_SEED_RELATIVE,
+            (input_root / "frozen_authoritative" / Path(D39_SEED_RELATIVE)).relative_to(scratch).as_posix(),
+        )
+        if not (scratch / d39_archive_member).is_file():
+            d39_archive_path = input_root / "frozen_authoritative" / Path(D39_SEED_RELATIVE)
+            d39_archive_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(d39_seed, d39_archive_path)
+            if _sha256(d39_archive_path) != d39_seed_hash:
+                raise RuntimeError("archived_D39_seed_byte_mismatch")
+            d39_archive_member = d39_archive_path.relative_to(scratch).as_posix()
+        import tools.stage4a_system_benchmark as d46
+        import src.p2a_axiswise_robustness as p2a
 
-    variants: list[dict[str, Any]] = []
+        d46.URDF = reference_model
+        lower, upper, dynamic_limits = d46.load_limits()
+        runtime_text = _runtime_provenance(underlay, overlay, args.distro, out_root)
+        model_output = out_root / "model"
+        model_output.mkdir(parents=True, exist_ok=False)
+        model_reproduction = p2b1.regenerate_d41_urdf(
+            underlay, overlay, fairino_source, reference_model, model_output, args.distro,
+        )
+        fresh_urdf = Path(str(model_reproduction["regenerated_model"])).resolve()
+        if model_reproduction.get("status") != "BYTE_MATCH" or not fresh_urdf.is_file():
+            raise RuntimeError("D41_derived_model_regeneration_did_not_byte_match")
+        d46.URDF = fresh_urdf
+        lower, upper, dynamic_limits = d46.load_limits()
+        source_remote = subprocess.run(["git", "remote", "get-url", "origin"], cwd=fairino_source, text=True, encoding="utf-8", capture_output=True)
+        model_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=fairino_source, text=True, encoding="utf-8", capture_output=True)
+        model_dirty = subprocess.run(["git", "status", "--porcelain"], cwd=fairino_source, text=True, encoding="utf-8", capture_output=True)
+        if source_remote.returncode or model_commit.returncode or model_dirty.returncode or "FAIR-INNOVATION/frcobot_ros2" not in source_remote.stdout or model_dirty.stdout.strip():
+            raise RuntimeError("FAIRINO_description_source_identity_invalid")
+        provenance = {
+            "project": "FAIRINO_FR5", "stage": "P2-B2", "repository": "https://github.com/Satoru-1006/fr5-tunnel-closed-contour-spray.git",
+            "branch": branch, "source_base_commit": SOURCE_BASE, "execution_code_commit": head,
+            "model_source_commit": model_commit.stdout.strip(), "model_source_remote": source_remote.stdout.strip(),
+            "collision_method": COLLISION_METHOD,
+            "model_source_worktree_clean": True, "d41_derived_model_regeneration": model_reproduction,
+            "runtime": {"runner": "Windows Python -> WSL2 Ubuntu-24.04-D", "ros_moveit_ruckig": runtime_text},
+            "inputs": inputs,
+            "additional_external_inputs": {
+                "d39_seed": {"canonical_path": D39_SEED_RELATIVE, "sha256": d39_seed_hash,
+                             "p2b1_execution_manifest_sha256": p2b1_manifest_hash,
+                             "archive_member": d39_archive_member.removeprefix("p2b2_formal_execution/")},
+                "d41_authenticated_external_input_members": external_input_members,
+            },
+            "configuration": {
+                "trajectory_points": POSE_COUNT, "joint_order": list(JOINT_NAMES), "scope": "ON-state open-arch only",
+                "tcp_source": "assumed_150mm_placeholder", "stand_off_m": 0.260,
+                "time_parameterization": "tcp_arclength", "ruckig": True,
+                "dynamic_limit_provenance": PROJECT_LIMIT_PROVENANCE,
+                "collision_method": COLLISION_METHOD, "strict_self_ccd": STRICT_SELF_CCD,
+                "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+            },
+        }
+        if not validate_provenance_schema(provenance):
+            raise RuntimeError("P2B2_provenance_schema_invalid")
+        _write_json(out_root / "source_identity.json", provenance)
+        (out_root / "runtime_provenance.txt").write_text(runtime_text + "\n", encoding="utf-8")
+        manifest = {
+            "project": "FAIRINO_FR5", "stage": "P2-B2", "branch": branch,
+            "source_base_commit": SOURCE_BASE, "execution_code_commit": head,
+            "execution_tree_clean_at_start": True, "repository": provenance["repository"],
+            "runtime": provenance["runtime"], "inputs": inputs,
+            "model_source_commit": provenance["model_source_commit"], "collision_method": COLLISION_METHOD,
+            "strict_self_ccd": STRICT_SELF_CCD, "hardware_validation": "NOT_RUN", "hardware_safety_certified": "NO",
+            "variant_design": list(VARIANT_DESIGN),
+            "additional_external_inputs": {
+                "d39_seed": {"canonical_path": D39_SEED_RELATIVE, "sha256": d39_seed_hash,
+                             "p2b1_execution_manifest_sha256": p2b1_manifest_hash,
+                             "archive_member": d39_archive_member},
+                "d41_authenticated_external_input_members": external_input_members,
+                "p2b1_execution_manifest_archive_member": "p2b2_formal_execution/inputs/P2B1_execution_manifest.json",
+            },
+            "p2b1_b1_frozen_prefix_rows": 16, "old_metric": "joint:j6:positive only",
+            "moveit_batch_timeout_seconds": args.moveit_batch_timeout_seconds,
+        }
+        _write_json(out_root / "execution_manifest.json", manifest)
+
+    variants_by_id: dict[str, dict[str, Any]] = {}
     validations: dict[str, dict[str, Any]] = {}
     scans: list[dict[str, Any]] = []
     maps_by_variant: dict[str, dict[str, Any]] = {}
-    selected_designs = VARIANT_DESIGN[:1] if args.reference_only else VARIANT_DESIGN
-    for design in selected_designs:
-        row = p2b1.run_strict_variant(
-            design["variant_id"], design["solver"], 1e-4, design["gain"],
-            out_root, overlay, underlay, fresh_urdf, lower, upper, args.distro,
-            p2b2_variant="R0" if design["variant_id"] == "R0" else design["objective_family"],
-            p2b2_warm_start_rows=design["warm_start_rows"],
-            p2b2_secondary_objective=design["objective"],
+    if args.resume_existing:
+        previous_state = _read_json(out_root / "partial_campaign_state.json")
+        if previous_state.get("status") not in {"RUNNING", "INCOMPLETE"}:
+            raise RuntimeError("resume_partial_campaign_state_not_resumable")
+        known_ids = {str(design["variant_id"]) for design in VARIANT_DESIGN}
+        for prior_row in previous_state.get("completed_variants", []):
+            variant_id = str(prior_row.get("variant_id") or "")
+            if not variant_id or variant_id not in known_ids or variant_id in variants_by_id:
+                raise RuntimeError(f"resume_variant_identity_invalid:{variant_id}")
+            row = dict(prior_row)
+            row.setdefault("measurement_execution_code_commit", previous_head)
+            validation = row.get("full_validation") or {}
+            validations[variant_id] = validation
+            mapping = row.get("robustness_mapping") or {}
+            full_path = Path(str(mapping.get("axis_results_full_path") or ""))
+            full_axes = _read_complete_mapping(full_path, variant_id) if full_path.is_file() else None
+            if full_axes is not None:
+                mapping["axis_results_full_path"] = str(full_path.resolve())
+                row["robustness_mapping"] = mapping
+                row.setdefault("robustness_mapping_execution_code_commit", mapping.get("execution_code_commit") or previous_head)
+                maps_by_variant[variant_id] = mapping
+                scans.extend(_axis_compact(axis, variant_id) for axis in full_axes)
+            else:
+                row.pop("robustness_mapping", None)
+                old_attempt = out_root / "robustness_mapping" / variant_id
+                if old_attempt.exists():
+                    row.setdefault("superseded_measurement_attempts", []).append({
+                        "path": str(old_attempt),
+                        "status": "INCOMPLETE_OR_UNACCEPTED_PRIOR_ATTEMPT",
+                        "preserved": True,
+                    })
+            variants_by_id[variant_id] = row
+        protected_ids = {"R0", "R1_center_old_0.00025"}
+        protected_maps_ready = protected_ids.issubset(maps_by_variant) and all(
+            validations.get(variant_id, {}).get("status") == "PASS" for variant_id in protected_ids
         )
-        row["secondary_objective"] = design["objective"]
-        row["warm_start_rows"] = design["warm_start_rows"]
-        row["secondary_gain_units"] = "rad^2"
-        validation = _strict_validation(row, lower, upper)
-        row["full_validation"] = validation
-        if design["variant_id"] == "R0":
-            row["reference_reproduction"] = _compare_reference(row, b0_reference, d46)
+        affected_mapping = maps_by_variant.get("R1_center_old_0.0005") or {}
+        _write_json(out_root / "measurement_defect_ledger.json", {
+            "defect_id": "P2B2_NATIVE_WRAPPER_7200_SECOND_TIMEOUT",
+            "classification": "TYPE_A_MEASUREMENT_INFRASTRUCTURE_DEFECT",
+            "reproduced": True,
+            "root_cause": "P2B1 run_wsl defaulted every fresh native D41 batch to a fixed 7200 second subprocess timeout; the P2B2 R1_center_old_0.0005 robustness batch timed out after 594 of 757 cases.",
+            "affected_measurement": "R1_center_old_0.0005 robustness mapping",
+            "repair": "P2B2 now records and passes an explicit 86400 second per-native-batch timeout; the interrupted attempt remains preserved and the affected mapping is rerun in a new attempt directory.",
+            "measurement_semantics_changed": False,
+            "status": "AFFECTED_MEASUREMENT_RECOMPUTED" if affected_mapping else "REPAIR_ACCEPTED_PENDING_AFFECTED_RECOMPUTATION",
+            "prior_attempt_path": str(out_root / "robustness_mapping" / "R1_center_old_0.0005"),
+            "accepted_recomputation_path": affected_mapping.get("axis_results_full_path"),
+            "previously_correct_measurement_regressed": "NO" if protected_maps_ready else "PENDING",
+            "regression_status": "NO_REGRESSION_IN_PROTECTED_R0_AND_R1_LOW_GAIN_MEASUREMENTS" if protected_maps_ready else "PENDING_PROTECTED_MEASUREMENT_CHECK",
+        })
+
+    variants: list[dict[str, Any]] = [
+        variants_by_id[design["variant_id"]]
+        for design in VARIANT_DESIGN if design["variant_id"] in variants_by_id
+    ]
+    selected_designs = VARIANT_DESIGN[:1] if args.reference_only else VARIANT_DESIGN
+    _write_json(out_root / "partial_campaign_state.json", {
+        "completed_variants": variants,
+        "axis_measurements": scans,
+        "status": "RUNNING",
+        "execution_continuation_commit": head,
+        "moveit_batch_timeout_seconds": args.moveit_batch_timeout_seconds,
+    })
+    for design in selected_designs:
+        variant_id = design["variant_id"]
+        row = variants_by_id.get(variant_id)
+        if row is None:
+            row = p2b1.run_strict_variant(
+                variant_id, design["solver"], 1e-4, design["gain"],
+                out_root, overlay, underlay, fresh_urdf, lower, upper, args.distro,
+                p2b2_variant="R0" if variant_id == "R0" else design["objective_family"],
+                p2b2_warm_start_rows=design["warm_start_rows"],
+                p2b2_secondary_objective=design["objective"],
+            )
+            row["secondary_objective"] = design["objective"]
+            row["warm_start_rows"] = design["warm_start_rows"]
+            row["secondary_gain_units"] = "rad^2"
+            row["measurement_execution_code_commit"] = head
+            row["moveit_batch_timeout_seconds"] = args.moveit_batch_timeout_seconds
+            validation = _strict_validation(row, lower, upper)
+            row["full_validation"] = validation
+            if variant_id == "R0":
+                row["reference_reproduction"] = _compare_reference(row, b0_reference, d46)
+            else:
+                row["reference_reproduction"] = {"status": "NOT_APPLICABLE_ABLATION_CANDIDATE"}
+            variants_by_id[variant_id] = row
+            variants.append(row)
         else:
-            row["reference_reproduction"] = {"status": "NOT_APPLICABLE_ABLATION_CANDIDATE"}
-        variants.append(row)
-        validations[design["variant_id"]] = validation
-        _write_json(out_root / "partial_campaign_state.json", {"completed_variants": variants, "status": "RUNNING"})
-        if validation["status"] != "PASS":
+            validation = row.get("full_validation") or _strict_validation(row, lower, upper)
+            row["full_validation"] = validation
+            row.setdefault("measurement_execution_code_commit", previous_head if args.resume_existing else head)
+        validations[variant_id] = validation
+        variants = [
+            variants_by_id[item["variant_id"]]
+            for item in selected_designs if item["variant_id"] in variants_by_id
+        ]
+        if validation.get("status") != "PASS":
+            _write_json(out_root / "partial_campaign_state.json", {
+                "completed_variants": variants, "axis_measurements": scans, "status": "RUNNING",
+                "execution_continuation_commit": head, "moveit_batch_timeout_seconds": args.moveit_batch_timeout_seconds,
+            })
             continue
-        all_formal = design["variant_id"] == "R0"
+        prior_mapping = maps_by_variant.get(variant_id)
+        if prior_mapping:
+            continue
+        base_attempt = out_root / "robustness_mapping" / variant_id
+        attempt_label = None
+        if base_attempt.exists():
+            attempt_index = 1
+            while (out_root / "robustness_mapping" / f"{variant_id}_retry_{attempt_index:02d}").exists():
+                attempt_index += 1
+            attempt_label = f"retry_{attempt_index:02d}"
+        all_formal = variant_id == "R0"
         compact, mapping = _scan_variant_axes(
-            row, design["variant_id"], all_formal_axes=all_formal,
+            row, variant_id, all_formal_axes=all_formal,
             scratch=out_root, native_binary=native_binary, fk_binary=fk_binary,
             overlay=overlay, underlay=underlay, urdf=fresh_urdf, distro=args.distro,
+            moveit_batch_timeout_s=args.moveit_batch_timeout_seconds, attempt_label=attempt_label,
         )
+        mapping["execution_code_commit"] = head
+        mapping["moveit_batch_timeout_seconds"] = args.moveit_batch_timeout_seconds
         row["robustness_mapping"] = mapping
+        row["robustness_mapping_execution_code_commit"] = head
         scans.extend(compact)
-        maps_by_variant[design["variant_id"]] = mapping
-        full = _read_json(Path(mapping["axis_results_full_path"]))["axis_results"]
-        # Capture full per-waypoint pre/post joint margin evidence outside Git.
+        maps_by_variant[variant_id] = mapping
+        full = _read_complete_mapping(Path(mapping["axis_results_full_path"]), variant_id)
+        if full is None:
+            raise RuntimeError(f"completed_axis_scan_failed_acceptance:{variant_id}")
         profile = validation.get("full_joint_margin_profile")
         if profile is not None:
-            margin_root = out_root / "redundancy_ablation" / design["variant_id"]
+            margin_root = out_root / "redundancy_ablation" / variant_id
             margin_root.mkdir(parents=True, exist_ok=True)
             for phase in ("pre_ruckig", "post_ruckig"):
                 target = margin_root / f"joint_margins_{phase}.csv"
@@ -806,8 +1006,42 @@ def main() -> int:
                             writer.writerow({"waypoint": item["waypoint"], "joint": joint_name,
                                              "joint_margin_rad": item["joint_margins_rad"][joint_index],
                                              "normalized_joint_margin": item["normalized_joint_margins"][joint_index]})
-        row["summary"] = _variant_summary(row, validation, mapping, full if not all_formal else full, validation["full_joint_margin_profile"])
-        _write_json(out_root / "partial_campaign_state.json", {"completed_variants": variants, "axis_measurements": scans, "status": "RUNNING"})
+        row["summary"] = _variant_summary(row, validation, mapping, full, validation["full_joint_margin_profile"])
+        if variant_id == "R1_center_old_0.0005":
+            ledger = _read_json(out_root / "measurement_defect_ledger.json")
+            ledger["status"] = "AFFECTED_MEASUREMENT_RECOMPUTED"
+            ledger["accepted_recomputation_path"] = mapping["axis_results_full_path"]
+            ledger["regression_status"] = "PASS_FOR_AFFECTED_AXIS_MAPPING; FULL_CAMPAIGN_PROTECTED_SET_PENDING"
+            _write_json(out_root / "measurement_defect_ledger.json", ledger)
+        variants = [
+            variants_by_id[item["variant_id"]]
+            for item in selected_designs if item["variant_id"] in variants_by_id
+        ]
+        _write_json(out_root / "partial_campaign_state.json", {
+            "completed_variants": variants, "axis_measurements": scans, "status": "RUNNING",
+            "execution_continuation_commit": head, "moveit_batch_timeout_seconds": args.moveit_batch_timeout_seconds,
+        })
+    manifest["native_timeout_seconds"] = args.moveit_batch_timeout_seconds
+    manifest["variant_execution_code_commits"] = {
+        str(row.get("variant_id")): {
+            "strict_and_primary_measurement": row.get("measurement_execution_code_commit"),
+            "robustness_mapping": row.get("robustness_mapping_execution_code_commit")
+                or (row.get("robustness_mapping") or {}).get("execution_code_commit"),
+        }
+        for row in variants
+    }
+    _write_json(out_root / "execution_manifest.json", manifest)
+    defect_ledger_path = out_root / "measurement_defect_ledger.json"
+    if defect_ledger_path.is_file():
+        ledger = _read_json(defect_ledger_path)
+        protected_ids = {"R0", "R1_center_old_0.00025"}
+        protected_mapping_regressed = not protected_ids.issubset(maps_by_variant) or any(
+            validations.get(variant_id, {}).get("status") != "PASS" for variant_id in protected_ids
+        )
+        ledger["previously_correct_measurement_regressed"] = "YES" if protected_mapping_regressed else "NO"
+        if not protected_mapping_regressed and ledger.get("status") == "AFFECTED_MEASUREMENT_RECOMPUTED":
+            ledger["regression_status"] = "NO_REGRESSION_IN_PROTECTED_R0_AND_R1_LOW_GAIN_MEASUREMENTS"
+        _write_json(defect_ledger_path, ledger)
 
     reference_row = next((row for row in variants if row.get("variant_id") == "R0"), {})
     reference_reproduction = reference_row.get("reference_reproduction", {"status": "NOT_RUN"})
@@ -856,6 +1090,8 @@ def main() -> int:
     result = {
         "PROJECT": "FAIRINO_FR5", "STAGE": "P2-B2", "SOURCE_BASE_COMMIT": SOURCE_BASE,
         "EXECUTION_CODE_COMMIT": head, "ARTIFACT_PUBLISH_COMMIT": None,
+        "EXECUTION_CODE_COMMITS_BY_VARIANT": manifest["variant_execution_code_commits"],
+        "TYPE_A_MEASUREMENT_DEFECT_STATUS": "REPAIRED_AND_AFFECTED_MAPPING_RECOMPUTED" if defect_ledger_path.is_file() else "NONE_FOUND",
         "P2B2_STATUS": "INCOMPLETE", "P2B2_CANDIDATE_REFERENCE": "R0_B0_process_5DOF",
         "P2B2_REFERENCE_REPRODUCTION": reference_reproduction,
         "AXIS_COUNT": len(p2a._build_axis_specs(p2b1.read_q(Path(str(reference_row.get("post_ruckig_path", D41_POST)))), lower, upper)),

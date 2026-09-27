@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import sys
+import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -25,8 +27,10 @@ from scripts.run_p2b2_robustness_remapping import (  # noqa: E402
     _campaign_status,
     _find_input_hash,
     _project_target_normals_to_fk_samples,
+    _read_complete_mapping,
     _validate_current_target_surface_normals,
 )
+import scripts.run_p2b1_solver_policy_ablation as p2b1  # noqa: E402
 from scripts.run_p2b1_solver_policy_ablation import canonicalize_xacro_source_comment  # noqa: E402
 from src.p2a_axiswise_robustness import (  # noqa: E402
     AxisSpec,
@@ -132,6 +136,55 @@ def test_redundancy_ablation_has_frozen_r0_r1_r2_r3_policies_and_three_gains() -
     assert all(row["warm_start_rows"] == 16 and row["objective"] == "joint_centering" for row in by_family["R1"])
     assert all(row["warm_start_rows"] == 1 and row["objective"] == "joint_centering" for row in by_family["R2"])
     assert all(row["warm_start_rows"] == 1 and row["objective"] == "joint_limit_barrier" for row in by_family["R3"])
+
+
+def test_p2b2_native_and_fk_batches_forward_the_configured_extended_timeout(tmp_path, monkeypatch) -> None:
+    captured: list[tuple[str, int]] = []
+
+    def fake_run_wsl(script, log_path, distro, timeout_s=7200):
+        captured.append((str(log_path), timeout_s))
+        if str(log_path).endswith("fk_execution.log"):
+            trace = tmp_path / "native_batch" / "fk" / "STAGE4A_FK_TRACE.csv"
+            trace.parent.mkdir(parents=True, exist_ok=True)
+            trace.write_text("case_id,waypoint\n", encoding="utf-8")
+        return 0
+
+    monkeypatch.setattr(p2b1, "run_wsl", fake_run_wsl)
+    d46 = SimpleNamespace(wsl_path=lambda path: str(path), SRDF=tmp_path / "robot.srdf")
+    cases = [{"case_id": "case_0", "trajectory_path": tmp_path / "case.csv", "family": "P2B2"}]
+    timeout = 86400
+
+    native = p2b1._run_native_with_fresh_build(
+        tmp_path / "native_batch", cases, "native", d46,
+        tmp_path / "native_binary", tmp_path / "overlay", tmp_path / "underlay",
+        tmp_path / "robot.urdf", "Ubuntu-24.04-D", timeout_s=timeout,
+    )
+    fk = p2b1._run_fresh_fk(
+        tmp_path / "native_batch", native, d46,
+        tmp_path / "fk_binary", tmp_path / "overlay", tmp_path / "underlay",
+        tmp_path / "robot.urdf", "Ubuntu-24.04-D", timeout_s=timeout,
+    )
+
+    assert [seconds for _, seconds in captured] == [timeout, timeout]
+    assert (native / "cases.csv").is_file()
+    assert fk.name == "STAGE4A_FK_TRACE.csv"
+
+
+def test_resume_mapping_acceptance_rejects_partial_joint_scan(tmp_path) -> None:
+    axes = []
+    for joint in range(1, 7):
+        for direction in ("positive", "negative"):
+            axes.append({
+                "specification": {"axis_id": f"joint:j{joint}:{direction}", "capability_status": "AVAILABLE"},
+                "estimated_raw_axis_margin": {"value": 0.01},
+            })
+    path = tmp_path / "axes.json"
+    path.write_text(json.dumps({"axis_results": axes}), encoding="utf-8")
+    assert _read_complete_mapping(path, "R1_center_old_0.00025") == axes
+
+    axes.pop()
+    path.write_text(json.dumps({"axis_results": axes}), encoding="utf-8")
+    assert _read_complete_mapping(path, "R1_center_old_0.00025") is None
 
 
 def test_external_seed_identity_lookup_normalizes_manifest_path_separators() -> None:
