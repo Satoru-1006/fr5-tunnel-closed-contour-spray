@@ -9,6 +9,7 @@ import json
 import math
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 from typing import Any, Mapping, Sequence
@@ -35,6 +36,7 @@ BRANCH = "codex/fr5-p2b2-robustness-remap-redundancy-20260927"
 POSES = ROOT / "outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv"
 SEEDS = ROOT / "outputs/internal_wiper_moveit_inputs/open_arch_seed_joints.csv"
 D39_SEED = ROOT / "outputs/stage3_h13_d39_causal_task_space_recovery/shadow_candidates/stable_velocity_residual_update.csv"
+D39_SEED_RELATIVE = "outputs/stage3_h13_d39_causal_task_space_recovery/shadow_candidates/stable_velocity_residual_update.csv"
 D41_RUN = ROOT / "outputs/stage3_h13_d41_offline_robot_certification/run_20260827T152326Z"
 D41_PRE = D41_RUN / "strict_replay/moveit_waypoint_joint_trajectory.csv"
 D41_POST = D41_RUN / "strict_replay/moveit_smoothed_joint_trajectory.csv"
@@ -95,18 +97,31 @@ def _read_csv(path: Path) -> list[dict[str, str]]:
 
 def _verify_execution_tree(*, clean_replay: bool = False, expected_head: str | None = None) -> tuple[str, str]:
     branch, head = _git("branch", "--show-current"), _git("rev-parse", "HEAD")
-    parent, dirty = _git("rev-parse", "HEAD^"), _git("status", "--porcelain")
+    dirty = _git("status", "--porcelain")
+    ancestor = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", SOURCE_BASE, "HEAD"],
+        cwd=ROOT, text=True, encoding="utf-8", capture_output=True,
+    )
+    is_based_on_source = ancestor.returncode == 0
     identity_ok = (
-        head == expected_head and parent == SOURCE_BASE
+        head == expected_head and is_based_on_source
         if clean_replay
-        else branch == BRANCH and parent == SOURCE_BASE
+        else branch == BRANCH and is_based_on_source
     )
     if not identity_ok or dirty:
-        raise RuntimeError(f"execution_tree_identity_mismatch:branch={branch}:head={head}:parent={parent}:dirty={bool(dirty)}")
+        raise RuntimeError(f"execution_tree_identity_mismatch:branch={branch}:head={head}:source_base_ancestor={is_based_on_source}:dirty={bool(dirty)}")
     return branch or "DETACHED_CLEAN_REPLAY", head
 
 
-def _verify_frozen_inputs() -> dict[str, str]:
+def _find_input_hash(inputs: Mapping[str, Any], relative_path: str) -> str | None:
+    expected_key = relative_path.replace("\\", "/").casefold()
+    for key, value in inputs.items():
+        if str(key).replace("\\", "/").casefold() == expected_key:
+            return str(value)
+    return None
+
+
+def _verify_frozen_inputs(d39_seed: Path, d39_seed_hash: str) -> dict[str, str]:
     authority = _read_json(D41_IDENTITY)
     if authority.get("point_count") != POSE_COUNT or authority.get("scope") != "Stage 0/1 ON-state open-arch only":
         raise RuntimeError("D41_authoritative_identity_scope_mismatch")
@@ -115,10 +130,10 @@ def _verify_frozen_inputs() -> dict[str, str]:
         raise RuntimeError("D41_authoritative_identity_inputs_missing")
     actual: dict[str, str] = {}
     for relative, expected_hash in expected.items():
-        path = ROOT / relative.replace("\\", "/")
+        path = d39_seed if str(relative).replace("\\", "/").casefold() == D39_SEED_RELATIVE.casefold() else ROOT / relative.replace("\\", "/")
         if not path.is_file():
             raise FileNotFoundError(path)
-        digest = _sha256(path)
+        digest = d39_seed_hash if path == d39_seed else _sha256(path)
         if digest != expected_hash:
             raise RuntimeError(f"frozen_D41_input_identity_mismatch:{relative}")
         actual[relative] = digest
@@ -488,15 +503,19 @@ def main() -> int:
     parser.add_argument("--native-build-install", type=Path, required=True, help="Fresh P2-B2 source-built ROS overlay")
     parser.add_argument("--distro", default="Ubuntu-24.04-D")
     parser.add_argument("--p2b1-b0-reference", type=Path, required=True, help="P2-B1 B0 pre/post-Ruckig trajectory evidence directory")
+    parser.add_argument("--d39-seed", type=Path, required=True, help="P2-B1 seed CSV matching the frozen D41 and P2-B1 execution manifests")
+    parser.add_argument("--p2b1-execution-manifest", type=Path, required=True, help="P2-B1 execution manifest authenticating the external seed input")
     parser.add_argument("--reference-only", action="store_true", help="Run clean-checkout R0 reference replay and full formal P2-A axes only")
     parser.add_argument("--expected-execution-commit", help="Required with --reference-only to authenticate clean replay source")
     args = parser.parse_args()
 
-    scratch, underlay, fairino_source, reference_model, overlay, b0_reference = (
+    scratch, underlay, fairino_source, reference_model, overlay, b0_reference, d39_seed, p2b1_manifest_path = (
         path.resolve() for path in (args.scratch, args.underlay_install, args.fairino_source_repository,
-                                   args.reference_model, args.native_build_install, args.p2b1_b0_reference)
+                                   args.reference_model, args.native_build_install, args.p2b1_b0_reference,
+                                   args.d39_seed, args.p2b1_execution_manifest)
     )
-    if not all(path.exists() for path in (scratch, underlay / "setup.bash", fairino_source / ".git", reference_model, overlay / "setup.bash")):
+    if not all(path.exists() for path in (scratch, underlay / "setup.bash", fairino_source / ".git", reference_model,
+                                           overlay / "setup.bash", d39_seed, p2b1_manifest_path)):
         raise RuntimeError("P2B2_scratch_or_runtime_dependency_missing")
     if args.reference_only and not args.expected_execution_commit:
         raise RuntimeError("clean_reference_replay_requires_expected_execution_commit")
@@ -506,13 +525,32 @@ def main() -> int:
         clean_replay=args.reference_only,
         expected_head=args.expected_execution_commit,
     )
-    inputs = _verify_frozen_inputs()
+    d41_identity = _read_json(D41_IDENTITY)
+    d41_inputs = d41_identity.get("inputs") or {}
+    p2b1_manifest = _read_json(p2b1_manifest_path)
+    p2b1_inputs = p2b1_manifest.get("identity_sha256") or {}
+    expected_d41_seed = _find_input_hash(d41_inputs, D39_SEED_RELATIVE)
+    expected_p2b1_seed = _find_input_hash(p2b1_inputs, D39_SEED_RELATIVE)
+    d39_seed_hash = _sha256(d39_seed)
+    if expected_d41_seed is None or expected_d41_seed != expected_p2b1_seed or d39_seed_hash != expected_d41_seed:
+        raise RuntimeError("D39_seed_does_not_match_frozen_D41_and_P2B1_identity")
+    inputs = _verify_frozen_inputs(d39_seed, d39_seed_hash)
     native_binary = overlay / "lib/stage3_h13_d41_native/stage3_h13_d41_native"
     fk_binary = overlay / "lib/stage4a_fk/stage4a_fk"
     if not native_binary.is_file() or not fk_binary.is_file():
         raise RuntimeError("fresh_source_build_D41_native_or_stage4a_fk_missing")
     out_root = scratch / "p2b2_formal_execution"
     out_root.mkdir(parents=True, exist_ok=False)
+    p2b1.D39_SEED = d39_seed
+    input_root = out_root / "inputs"
+    input_root.mkdir(parents=True, exist_ok=False)
+    archived_seed = input_root / "D39_stable_velocity_residual_update.csv"
+    archived_p2b1_manifest = input_root / "P2B1_execution_manifest.json"
+    shutil.copy2(d39_seed, archived_seed)
+    shutil.copy2(p2b1_manifest_path, archived_p2b1_manifest)
+    if _sha256(archived_seed) != d39_seed_hash:
+        raise RuntimeError("archived_D39_seed_byte_mismatch")
+    p2b1_manifest_hash = _sha256(p2b1_manifest_path)
     import tools.stage4a_system_benchmark as d46
     import src.p2a_axiswise_robustness as p2a
 
@@ -541,6 +579,11 @@ def main() -> int:
         "model_source_worktree_clean": True, "d41_derived_model_regeneration": model_reproduction,
         "runtime": {"runner": "Windows Python -> WSL2 Ubuntu-24.04-D", "ros_moveit_ruckig": runtime_text},
         "inputs": inputs,
+        "additional_external_inputs": {
+            "d39_seed": {"canonical_path": D39_SEED_RELATIVE, "sha256": d39_seed_hash,
+                         "p2b1_execution_manifest_sha256": p2b1_manifest_hash,
+                         "archive_member": "p2b2_formal_execution/inputs/D39_stable_velocity_residual_update.csv"},
+        },
         "configuration": {
             "trajectory_points": POSE_COUNT, "joint_order": list(JOINT_NAMES), "scope": "ON-state open-arch only",
             "tcp_source": "assumed_150mm_placeholder", "stand_off_m": 0.260,
@@ -562,6 +605,12 @@ def main() -> int:
         "model_source_commit": provenance["model_source_commit"], "collision_method": COLLISION_METHOD,
         "strict_self_ccd": STRICT_SELF_CCD, "hardware_validation": "NOT_RUN", "hardware_safety_certified": "NO",
         "variant_design": list(VARIANT_DESIGN),
+        "additional_external_inputs": {
+            "d39_seed": {"canonical_path": D39_SEED_RELATIVE, "sha256": d39_seed_hash,
+                         "p2b1_execution_manifest_sha256": p2b1_manifest_hash,
+                         "archive_member": "p2b2_formal_execution/inputs/D39_stable_velocity_residual_update.csv"},
+            "p2b1_execution_manifest_archive_member": "p2b2_formal_execution/inputs/P2B1_execution_manifest.json",
+        },
         "p2b1_b1_frozen_prefix_rows": 16, "old_metric": "joint:j6:positive only",
     }
     _write_json(out_root / "execution_manifest.json", manifest)

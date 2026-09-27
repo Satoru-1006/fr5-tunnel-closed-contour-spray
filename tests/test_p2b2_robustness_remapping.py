@@ -20,7 +20,7 @@ from ros2_moveit_bridge.p2b2_redundancy_objectives import (  # noqa: E402
     validate_provenance_schema,
     validate_result_schema,
 )
-from scripts.run_p2b2_robustness_remapping import VARIANT_DESIGN, _campaign_status  # noqa: E402
+from scripts.run_p2b2_robustness_remapping import VARIANT_DESIGN, _campaign_status, _find_input_hash  # noqa: E402
 from src.p2a_axiswise_robustness import (  # noqa: E402
     AxisSpec,
     EvaluationResult,
@@ -125,6 +125,13 @@ def test_redundancy_ablation_has_frozen_r0_r1_r2_r3_policies_and_three_gains() -
     assert all(row["warm_start_rows"] == 16 and row["objective"] == "joint_centering" for row in by_family["R1"])
     assert all(row["warm_start_rows"] == 1 and row["objective"] == "joint_centering" for row in by_family["R2"])
     assert all(row["warm_start_rows"] == 1 and row["objective"] == "joint_limit_barrier" for row in by_family["R3"])
+
+
+def test_external_seed_identity_lookup_normalizes_manifest_path_separators() -> None:
+    expected = "a144c40bb950814797b029cb1ffd80bed5de62435ae43096d8d0732811f81712"
+    source = {r"outputs\stage3_h13_d39_causal_task_space_recovery\shadow_candidates\stable_velocity_residual_update.csv": expected}
+    assert _find_input_hash(source, "outputs/stage3_h13_d39_causal_task_space_recovery/shadow_candidates/stable_velocity_residual_update.csv") == expected
+    assert _find_input_hash(source, "outputs/missing.csv") is None
 
 
 def test_missing_capability_is_not_invoked_or_promoted_to_pass() -> None:
