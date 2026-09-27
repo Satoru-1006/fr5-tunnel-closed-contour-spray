@@ -20,7 +20,12 @@ from ros2_moveit_bridge.p2b2_redundancy_objectives import (  # noqa: E402
     validate_provenance_schema,
     validate_result_schema,
 )
-from scripts.run_p2b2_robustness_remapping import VARIANT_DESIGN, _campaign_status, _find_input_hash  # noqa: E402
+from scripts.run_p2b2_robustness_remapping import (  # noqa: E402
+    VARIANT_DESIGN,
+    _campaign_status,
+    _find_input_hash,
+    _validate_current_target_surface_normals,
+)
 from scripts.run_p2b1_solver_policy_ablation import canonicalize_xacro_source_comment  # noqa: E402
 from src.p2a_axiswise_robustness import (  # noqa: E402
     AxisSpec,
@@ -133,6 +138,26 @@ def test_external_seed_identity_lookup_normalizes_manifest_path_separators() -> 
     source = {r"outputs\stage3_h13_d39_causal_task_space_recovery\shadow_candidates\stable_velocity_residual_update.csv": expected}
     assert _find_input_hash(source, "outputs/stage3_h13_d39_causal_task_space_recovery/shadow_candidates/stable_velocity_residual_update.csv") == expected
     assert _find_input_hash(source, "outputs/missing.csv") is None
+
+
+def test_current_target_normals_preserve_waypoint_order_and_require_181_unit_vectors() -> None:
+    normals = np.zeros((181, 3), dtype=np.float64)
+    normals[:, 0] = 1.0
+    normals[10] = np.asarray([0.0, 0.0, -1.0])
+    validated = _validate_current_target_surface_normals(normals)
+    assert np.array_equal(validated, normals)
+    assert np.array_equal(validated[10], [0.0, 0.0, -1.0])
+
+    with pytest.raises(RuntimeError, match="shape_or_finiteness"):
+        _validate_current_target_surface_normals(np.zeros((180, 3)))
+    invalid = normals.copy()
+    invalid[42, 1] = np.nan
+    with pytest.raises(RuntimeError, match="shape_or_finiteness"):
+        _validate_current_target_surface_normals(invalid)
+    invalid = normals.copy()
+    invalid[42] *= 2.0
+    with pytest.raises(RuntimeError, match="unit_vectors"):
+        _validate_current_target_surface_normals(invalid)
 
 
 def test_urdf_identity_normalizes_only_the_xacro_generated_checkout_comment() -> None:

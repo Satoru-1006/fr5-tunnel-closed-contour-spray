@@ -329,6 +329,17 @@ def _axis_compact(axis: Mapping[str, Any], variant_id: str) -> dict[str, Any]:
     }
 
 
+def _validate_current_target_surface_normals(surface_normals: np.ndarray) -> np.ndarray:
+    """Validate the ordered normals belonging to the current 181-point target."""
+    normals = np.asarray(surface_normals, dtype=np.float64)
+    if normals.shape != (POSE_COUNT, 3) or not np.isfinite(normals).all():
+        raise RuntimeError(f"authoritative_target_normals_shape_or_finiteness:{normals.shape}")
+    lengths = np.linalg.norm(normals, axis=1)
+    if np.any(lengths <= 1e-12) or not np.allclose(lengths, 1.0, rtol=0.0, atol=1e-6):
+        raise RuntimeError("authoritative_target_normals_must_be_unit_vectors")
+    return normals
+
+
 def _scan_variant_axes(
     row: Mapping[str, Any], variant_id: str, *, all_formal_axes: bool,
     scratch: Path, native_binary: Path, fk_binary: Path, overlay: Path,
@@ -358,12 +369,14 @@ def _scan_variant_axes(
         raise RuntimeError(f"candidate_nominal_MoveIt_FK_missing:{variant_id}")
     fk = fk_by_case[case_id]
     poses = np.column_stack((fk["position"], fk["quaternion"]))
-    reference = p2a._read_d41_process_reference(D41_FK)
+    _target_positions, _target_quaternions, target_normals = d46.read_targets()
+    target_normals = _validate_current_target_surface_normals(target_normals)
     nominal = ProcessTrajectory(
         tcp_poses=poses, joint_states=q, timestamps_s=timestamps,
-        surface_normals=reference["surface_normals"], joint_lower_rad=lower, joint_upper_rad=upper,
+        surface_normals=target_normals, joint_lower_rad=lower, joint_upper_rad=upper,
         metadata={"robot": "FAIRINO_FR5", "scope": "181-point ON-state open-arch only", "candidate": variant_id,
-                  "nominal_source": "fresh MoveIt2 FK of candidate post-Ruckig q"},
+                  "nominal_source": "fresh MoveIt2 FK of candidate post-Ruckig q",
+                  "surface_normal_source": "current authoritative 181-point open-arch target CSV, row-aligned by waypoint index"},
     )
     thresholds = d46.read_json(d46.OUT / "STAGE4_SYSTEM_BENCHMARK_V1.json")["diagnostic_thresholds"]
     specs = p2a._build_axis_specs(q, lower, upper)
