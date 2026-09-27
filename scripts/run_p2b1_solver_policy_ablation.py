@@ -211,6 +211,8 @@ def strict_environment(
     name: str, solver: str, buffer_rad: float, gain: float | None,
     output: Path, repo: Path, overlay: Path, urdf: Path,
     lower: np.ndarray, upper: np.ndarray,
+    *, p2b2_variant: str | None = None, p2b2_warm_start_rows: int | None = None,
+    p2b2_secondary_objective: str | None = None,
 ) -> dict[str, str]:
     strict = output / "strict_replay"
     dls_diag = strict / "D41_dls_diagnostics.csv"
@@ -253,6 +255,12 @@ def strict_environment(
     }
     if gain is not None:
         env["P2B1_SECONDARY_GAIN"] = format(gain, ".17g")
+    if p2b2_variant is not None:
+        env["P2B2_VARIANT"] = p2b2_variant
+        if p2b2_warm_start_rows is None or p2b2_secondary_objective is None:
+            raise ValueError("P2B2_runner_requires_frozen_policy_parameters")
+        env["P2B2_WARM_START_ROWS"] = str(int(p2b2_warm_start_rows))
+        env["P2B2_SECONDARY_OBJECTIVE"] = p2b2_secondary_objective
     return env
 
 
@@ -260,10 +268,16 @@ def run_strict_variant(
     name: str, solver: str, buffer_rad: float, gain: float | None,
     root_out: Path, overlay: Path, underlay: Path, urdf: Path,
     lower: np.ndarray, upper: np.ndarray, distro: str,
+    *, p2b2_variant: str | None = None, p2b2_warm_start_rows: int | None = None,
+    p2b2_secondary_objective: str | None = None,
 ) -> dict[str, Any]:
     output = root_out / "variants" / name
     output.mkdir(parents=True, exist_ok=False)
-    env = strict_environment(name, solver, buffer_rad, gain, output, ROOT, overlay, urdf, lower, upper)
+    env = strict_environment(
+        name, solver, buffer_rad, gain, output, ROOT, overlay, urdf, lower, upper,
+        p2b2_variant=p2b2_variant, p2b2_warm_start_rows=p2b2_warm_start_rows,
+        p2b2_secondary_objective=p2b2_secondary_objective,
+    )
     assignments = [f"export {key}={shlex.quote(value)}" for key, value in env.items()]
     script = "\n".join((source_ros(underlay, overlay), *assignments, f"bash {shlex.quote(wsl_path(ROOT / 'scripts/run_moveit_strict_validation.sh'))}"))
     code = run_wsl(script, output / "strict_execution.log", distro)

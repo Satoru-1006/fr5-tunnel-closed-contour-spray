@@ -45,6 +45,10 @@ from p2b1_solver_policy_ablation import (
     tangent_bases as _p2b1_tangent_bases,
     weighted_task as _p2b1_weighted_task,
 )
+from p2b2_redundancy_objectives import (
+    rank_aware_secondary_command as _p2b2_rank_aware_secondary_command,
+    secondary_objective as _p2b2_secondary_objective,
+)
 
 
 def _configured_jerk_limits() -> dict[str, float]:
@@ -1480,11 +1484,33 @@ def build_p2b1_process_task_dls_trajectory(
     max_joint_step_rad: float = 0.16,
     position_tolerance_m: float = 2.0e-5,
     normal_tolerance_rad: float = 2.0e-4,
+    secondary_objective_name: str = "joint_centering",
 ) -> RobotTrajectoryMsg:
     """P2-B1's exact five-dimensional position-plus-direction task solver."""
     variant = str(variant).upper()
     if variant not in {"B0", "B1"}:
         raise ValueError("P2B1_process_solver_variant_must_be_B0_or_B1")
+    p2b2_variant = os.environ.get("P2B2_VARIANT", "").strip().upper()
+    if p2b2_variant:
+        expected = {
+            "R0": ("B0", 16, "none"),
+            "R1": ("B1", 16, "joint_centering"),
+            "R2": ("B1", 1, "joint_centering"),
+            "R3": ("B1", 1, "joint_limit_barrier"),
+        }
+        if p2b2_variant not in expected:
+            raise ValueError("unsupported_P2B2_VARIANT")
+        expected_solver, expected_warm_rows, expected_objective = expected[p2b2_variant]
+        configured_warm_rows = int(os.environ.get("P2B2_WARM_START_ROWS", str(expected_warm_rows)))
+        configured_objective = os.environ.get("P2B2_SECONDARY_OBJECTIVE", expected_objective).strip()
+        if variant != expected_solver:
+            raise ValueError("P2B2_variant_solver_mismatch")
+        if configured_warm_rows != expected_warm_rows or configured_objective != expected_objective:
+            raise ValueError("P2B2_frozen_design_policy_mismatch")
+        warm_start_rows = configured_warm_rows
+        secondary_objective_name = configured_objective
+    if secondary_objective_name not in {"joint_centering", "joint_limit_barrier", "none"}:
+        raise ValueError("unsupported_secondary_objective")
     if len(target_poses) != len(target_normals) or len(target_poses) != len(joint_seeds):
         raise ValueError("p2b1_target_seed_count_mismatch")
     if len(target_poses) < 2 or len(joint_names) != 6:
@@ -1544,6 +1570,13 @@ def build_p2b1_process_task_dls_trajectory(
         normal_angle = float(np.arccos(np.clip(float(np.dot(tool_z, normal)), -1.0, 1.0)))
         return residual, task_jacobian, weighted_error, weighted_jacobian, position_norm, normal_angle
 
+    def objective_value(q: np.ndarray) -> float:
+        if p2b2_variant and secondary_objective_name in {"joint_centering", "joint_limit_barrier"}:
+            value, _gradient = _p2b2_secondary_objective(q, lower, upper, secondary_objective_name)
+            return float(value)
+        value, _gradient = _p2b1_joint_centering_objective(q, lower, upper)
+        return float(value)
+
     def pressure_row(
         *, index: int, iteration: int, current: np.ndarray, raw_primary: np.ndarray,
         secondary: np.ndarray, step: np.ndarray, proposal: np.ndarray, projected: np.ndarray,
@@ -1589,7 +1622,7 @@ def build_p2b1_process_task_dls_trajectory(
         output.joint_trajectory.points.append(point)
         residual, _task_j, weighted_error, weighted_j, _position_norm, _normal_angle = linearize(row, row_index)
         metrics = _p2b1_nullspace_metrics(weighted_j)
-        objective, _gradient = _p2b1_joint_centering_objective(row, lower, upper)
+        objective = objective_value(row)
         pressure_row(
             index=row_index, iteration=-1, current=row, raw_primary=np.zeros(6), secondary=np.zeros(6),
             step=np.zeros(6), proposal=row, projected=row, accepted=row, alpha=0.0,
@@ -1604,7 +1637,7 @@ def build_p2b1_process_task_dls_trajectory(
             iteration_q = accepted.copy()
             residual, task_jacobian, weighted_error, weighted_jacobian, position_norm, normal_angle = linearize(accepted, index)
             metrics = _p2b1_nullspace_metrics(weighted_jacobian)
-            objective_before, _gradient = _p2b1_joint_centering_objective(accepted, lower, upper)
+            objective_before = objective_value(accepted)
             primary_converged = position_norm <= float(position_tolerance_m) and normal_angle <= float(normal_tolerance_rad)
             if primary_converged and variant == "B0":
                 pressure_row(
@@ -1615,8 +1648,14 @@ def build_p2b1_process_task_dls_trajectory(
                 )
                 break
             primary = _p2b1_dls_primary_command(weighted_jacobian, weighted_error, damping)
-            if variant == "B1":
-                secondary, _secondary_norm = _p2b1_secondary_command(accepted, lower, upper, metrics.projector, gain)
+            if variant == "B1" and metrics.rank == 5 and secondary_objective_name != "none":
+                if p2b2_variant:
+                    secondary, _secondary_norm, _task_residual = _p2b2_rank_aware_secondary_command(
+                        accepted, lower, upper, metrics.projector, gain,
+                        secondary_objective_name, metrics.rank, task_jacobian=weighted_jacobian,
+                    )
+                else:
+                    secondary, _secondary_norm = _p2b1_secondary_command(accepted, lower, upper, metrics.projector, gain)
             else:
                 secondary = np.zeros(6, dtype=np.float64)
             raw_step = primary + secondary
@@ -1635,7 +1674,7 @@ def build_p2b1_process_task_dls_trajectory(
                 )
                 candidate_residual, _candidate_j, candidate_weighted_error, _candidate_wj, candidate_position_norm, candidate_normal_angle = linearize(projected_proposal, index)
                 candidate_cost = float(np.linalg.norm(candidate_weighted_error))
-                objective_after, _candidate_gradient = _p2b1_joint_centering_objective(projected_proposal, lower, upper)
+                objective_after = objective_value(projected_proposal)
                 candidate_converged = candidate_position_norm <= float(position_tolerance_m) and candidate_normal_angle <= float(normal_tolerance_rad)
                 task_improved = candidate_cost < base_cost - 1e-12
                 secondary_improved_within_task_tolerance = (
@@ -1703,6 +1742,9 @@ def build_normal_constrained_dls_trajectory(
     """
 
     p2b1_variant = os.environ.get("P2B1_DLS_VARIANT", "").strip().upper()
+    p2b2_variant = os.environ.get("P2B2_VARIANT", "").strip().upper()
+    if p2b2_variant and p2b1_variant not in {"B0", "B1"}:
+        raise ValueError("P2B2_requires_process_task_DLS_route")
     if p2b1_variant in {"B0", "B1"}:
         return build_p2b1_process_task_dls_trajectory(
             moveit, group_name, ee_link, target_poses, target_normals, joint_seeds, joint_names,
@@ -1711,6 +1753,7 @@ def build_normal_constrained_dls_trajectory(
             position_weight=position_weight, normal_weight=normal_weight,
             max_joint_step_rad=max_joint_step_rad, position_tolerance_m=position_tolerance_m,
             normal_tolerance_rad=normal_tolerance_rad,
+            secondary_objective_name=os.environ.get("P2B2_SECONDARY_OBJECTIVE", "joint_centering").strip(),
         )
     if p2b1_variant not in {"", "A0", "A1"}:
         raise ValueError(f"unsupported_P2B1_DLS_VARIANT:{p2b1_variant}")
