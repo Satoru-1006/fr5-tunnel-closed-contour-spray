@@ -9,6 +9,8 @@ import json
 import math
 import os
 from pathlib import Path
+from pathlib import PurePosixPath
+import shlex
 import shutil
 import subprocess
 import sys
@@ -165,7 +167,58 @@ def _runtime_provenance(underlay: Path, overlay: Path, distro: str, root_out: Pa
     required_tokens = ("Python 3.12", "2.12.4", "0.9.2")
     if any(token not in text for token in required_tokens):
         raise RuntimeError("runtime_version_provenance_incomplete")
-    return text
+    source_module = ROOT / "ros2_moveit_bridge/plan_closed_contour_moveit.py"
+    source_sha = _sha256(source_module)
+    expected_prefix = p2b1.wsl_path(overlay)
+    identity_command = "\n".join((
+        p2b1.source_ros(underlay, overlay),
+        "printf 'BRIDGE_PREFIX=%s\\n' \"$(ros2 pkg prefix fr5_tunnel_moveit_bridge)\"",
+        "python3 -c " + shlex.quote(
+            "import hashlib,pathlib,plan_closed_contour_moveit as m; "
+            "p=pathlib.Path(m.__file__).resolve(); "
+            "print('BRIDGE_MODULE='+str(p)); "
+            "print('BRIDGE_MODULE_SHA256='+hashlib.sha256(p.read_bytes()).hexdigest())"
+        ),
+    ))
+    identity_log = root_out / "bridge_runtime_identity.txt"
+    if p2b1.run_wsl(identity_command, identity_log, distro) != 0:
+        raise RuntimeError("P2B2_bridge_overlay_identity_query_failed")
+    identity_lines = dict(
+        line.split("=", 1) for line in identity_log.read_text(encoding="utf-8").splitlines()
+        if "=" in line and line.startswith("BRIDGE_")
+    )
+    identity = _validate_overlay_bridge_identity(
+        actual_prefix=identity_lines.get("BRIDGE_PREFIX", ""),
+        module_path=identity_lines.get("BRIDGE_MODULE", ""),
+        module_sha256=identity_lines.get("BRIDGE_MODULE_SHA256", ""),
+        expected_prefix=expected_prefix,
+        expected_sha256=source_sha,
+    )
+    return text + "\n" + "\n".join(f"{key}={value}" for key, value in identity.items())
+
+
+def _validate_overlay_bridge_identity(
+    *, actual_prefix: str, module_path: str, module_sha256: str,
+    expected_prefix: str, expected_sha256: str,
+) -> dict[str, str]:
+    """Fail closed unless MoveIt resolves the package and module from this overlay."""
+    prefix = PurePosixPath(actual_prefix)
+    expected = PurePosixPath(expected_prefix)
+    module = PurePosixPath(module_path)
+    if prefix != expected:
+        raise RuntimeError(f"P2B2_bridge_package_resolved_outside_overlay:{actual_prefix}")
+    try:
+        module.relative_to(expected)
+    except ValueError as exc:
+        raise RuntimeError(f"P2B2_bridge_module_resolved_outside_overlay:{module_path}") from exc
+    if module_sha256 != expected_sha256:
+        raise RuntimeError("P2B2_bridge_module_source_identity_mismatch")
+    return {
+        "BRIDGE_PREFIX": str(prefix),
+        "BRIDGE_MODULE": str(module),
+        "BRIDGE_MODULE_SHA256": module_sha256,
+        "BRIDGE_SOURCE_SHA256": expected_sha256,
+    }
 
 
 def _profile_pair(pre_path: Path, post_path: Path, lower: np.ndarray, upper: np.ndarray) -> dict[str, Any]:
@@ -292,6 +345,24 @@ def _compare_reference(row: Mapping[str, Any], reference_dir: Path, d46: Any) ->
     }
 
 
+def _axis_capability_status(axis: Mapping[str, Any]) -> str | None:
+    """Read capability from either a full axis record or its released compact row."""
+    specification = axis.get("specification") or {}
+    status = specification.get("capability_status") if isinstance(specification, Mapping) else None
+    if status is None:
+        status = axis.get("capability_status")
+    return str(status) if status is not None else None
+
+
+def _formal_capability_counts(axes: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    statuses = [_axis_capability_status(axis) for axis in axes]
+    return {
+        "available": sum(status == "AVAILABLE" for status in statuses),
+        "unavailable": sum(status in {"NOT_AVAILABLE", "UNAVAILABLE"} for status in statuses),
+        "unclassified": sum(status not in {"AVAILABLE", "NOT_AVAILABLE", "UNAVAILABLE"} for status in statuses),
+    }
+
+
 def _axis_compact(axis: Mapping[str, Any], variant_id: str) -> dict[str, Any]:
     spec = axis.get("specification", {})
     margin_record = axis.get("estimated_raw_axis_margin") or {}
@@ -304,7 +375,7 @@ def _axis_compact(axis: Mapping[str, Any], variant_id: str) -> dict[str, Any]:
         "perturbation_family": spec.get("perturbation_family"),
         "direction": spec.get("direction"),
         "units": spec.get("units"),
-        "capability_status": spec.get("capability_status"),
+        "capability_status": _axis_capability_status(axis),
         "axis_status": axis.get("axis_status"),
         "estimated_raw_axis_margin": margin_record.get("value"),
         "last_pass": first_pass.get("magnitude"),
@@ -569,6 +640,66 @@ def _release_mapping(mapping: Mapping[str, Any], evidence_root: Path) -> dict[st
             resolved = Path(str(source)).resolve()
             output[target_key] = resolved.relative_to(evidence_root.resolve()).as_posix()
     return output
+
+
+def _canonical_variant_summaries(
+    variants: Sequence[Mapping[str, Any]], evidence_root: Path,
+) -> list[dict[str, Any]]:
+    """Keep every designed variant visible, including variants without a summary."""
+    released: list[dict[str, Any]] = []
+    for row in variants:
+        summary = row.get("summary")
+        if summary:
+            released.append({
+                key: value for key, value in summary.items()
+                if key not in {"full_validation", "robustness_mapping"}
+            } | {
+                "full_validation_status": summary["full_validation"]["status"],
+                "validation_gates": summary["full_validation"]["gates"],
+                "robustness_mapping": _release_mapping(summary["robustness_mapping"], evidence_root),
+            })
+            continue
+
+        validation = row.get("full_validation") or {}
+        mapping = row.get("robustness_mapping") or {}
+        warm_start_rows = int(row.get("warm_start_rows") or 0)
+        released.append({
+            "variant_id": row.get("variant_id"),
+            "solver": row.get("solver"),
+            "secondary_objective": row.get("secondary_objective"),
+            "gain_rad2": row.get("secondary_gain"),
+            "warm_start_rows_frozen": row.get("warm_start_rows"),
+            "frozen_waypoint_indices": list(range(max(0, warm_start_rows))),
+            "full_validation_status": validation.get("status", "NOT_RUN"),
+            "validation_gates": dict(validation.get("gates") or {}),
+            "robustness_mapping": (
+                _release_mapping(mapping, evidence_root)
+                if mapping else {
+                    "status": "NOT_RUN", "axis_count": 0,
+                    "joint_axis_count": 0, "available_axis_count": 0,
+                    "unavailable_axis_count": 0,
+                }
+            ),
+            "global_joint_axis_margin_rad": None,
+            "global_joint_axis": None,
+            "global_joint_axis_failure_mode": None,
+            "global_joint_axis_critical_waypoint": None,
+            "minimum_normalized_joint_margin_pre_ruckig": None,
+            "minimum_normalized_joint_margin_pre_joint": None,
+            "minimum_normalized_joint_margin_pre_waypoint": None,
+            "minimum_normalized_joint_margin_pre_side": None,
+            "minimum_joint_margin_pre_ruckig_rad": None,
+            "minimum_normalized_joint_margin_post_ruckig": None,
+            "minimum_normalized_joint_margin_post_joint": None,
+            "minimum_normalized_joint_margin_post_waypoint": None,
+            "minimum_normalized_joint_margin_post_side": None,
+            "minimum_joint_margin_post_ruckig_rad": None,
+            "maximum_secondary_command_norm_rad": None,
+            "accepted_secondary_step_count": None,
+            "variant_status": row.get("status") or "INCOMPLETE_NO_CANONICAL_SUMMARY",
+            "failure_reason": row.get("error") or row.get("failure_reason"),
+        })
+    return released
 
 
 def _read_complete_mapping(path: Path, variant_id: str) -> list[dict[str, Any]] | None:
@@ -1048,17 +1179,8 @@ def main() -> int:
     b0_axes_full_path = maps_by_variant.get("R0", {}).get("axis_results_full_path")
     b0_axes_full = _read_json(Path(b0_axes_full_path))["axis_results"] if b0_axes_full_path else []
     family_ranking = rank_axis_results_by_family(b0_axes_full)
-    summaries = []
-    for row in variants:
-        if not row.get("summary"):
-            continue
-        summary = row["summary"]
-        # Store summaries in canonical JSON; full trajectories and pressure rows stay in the evidence archive.
-        summaries.append({key: value for key, value in summary.items() if key not in {"full_validation", "robustness_mapping"}} | {
-            "full_validation_status": summary["full_validation"]["status"],
-            "validation_gates": summary["full_validation"]["gates"],
-            "robustness_mapping": _release_mapping(summary["robustness_mapping"], out_root),
-        })
+    # Store summaries in canonical JSON; full trajectories and pressure rows stay in the evidence archive.
+    summaries = _canonical_variant_summaries(variants, out_root)
     r0_joint = rank_joint_axis_results(b0_axes_full)
     r0_finite = [item for item in r0_joint if item["margin_rad"] is not None]
     controller = r0_finite[0] if r0_finite else None
@@ -1087,6 +1209,7 @@ def main() -> int:
                 and 0 <= int(row["critical_waypoint"]) < 16 and row.get("dominant_failure_mode") == "JOINT_LIMIT_FAILURE"
                 for row in scans if row.get("variant_id") == "R0")
     )
+    formal_capability_counts = _formal_capability_counts(b0_axes_full)
     result = {
         "PROJECT": "FAIRINO_FR5", "STAGE": "P2-B2", "SOURCE_BASE_COMMIT": SOURCE_BASE,
         "EXECUTION_CODE_COMMIT": head, "ARTIFACT_PUBLISH_COMMIT": None,
@@ -1096,8 +1219,9 @@ def main() -> int:
         "P2B2_REFERENCE_REPRODUCTION": reference_reproduction,
         "AXIS_COUNT": len(p2a._build_axis_specs(p2b1.read_q(Path(str(reference_row.get("post_ruckig_path", D41_POST)))), lower, upper)),
         "JOINT_AXIS_COUNT": 12, "TOTAL_AXIS_MEASUREMENT_ROWS": len(scans),
-        "AVAILABLE_FORMAL_AXIS_COUNT": sum(row.get("capability_status") == "AVAILABLE" for row in b0_axes_full),
-        "UNAVAILABLE_FORMAL_AXIS_COUNT": sum(row.get("capability_status") != "AVAILABLE" for row in b0_axes_full),
+        "AVAILABLE_FORMAL_AXIS_COUNT": formal_capability_counts["available"],
+        "UNAVAILABLE_FORMAL_AXIS_COUNT": formal_capability_counts["unavailable"],
+        "UNCLASSIFIED_FORMAL_AXIS_COUNT": formal_capability_counts["unclassified"],
         "ROBUSTNESS_MAPPING_STATUS": "INCOMPLETE",
         "P2B2_GLOBAL_CONTROLLING_AXIS": new_controller["axis_id"],
         "P2B2_GLOBAL_MIN_MARGIN": new_controller["margin_rad"],

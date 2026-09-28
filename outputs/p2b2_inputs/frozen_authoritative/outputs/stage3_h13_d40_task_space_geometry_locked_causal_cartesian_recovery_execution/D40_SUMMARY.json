@@ -1,0 +1,68 @@
+{
+  "BEST_SHADOW_CANDIDATE": "routeA_DLS_position_dominant_v4",
+  "BLOCKER_1_SELF_FED_STABILITY": "SOLVED_RETAINED",
+  "BLOCKER_2_TASK_SPACE_GEOMETRY": "SOLVED",
+  "BLOCKER_3_INTRINSIC_FEASIBILITY": "SOLVED",
+  "BLOCKER_4_FULL_ROBOT_CERTIFICATION": "SOLVED",
+  "CANONICAL_PROMOTION": "D40_RETENTION_BASELINE_2_LOCKED",
+  "D39_BASELINE_RETENTION_STATUS": "LOCKED",
+  "D40_RETENTION_BASELINE_2": {
+    "baseline_id": "D40_RETENTION_BASELINE_2",
+    "candidate_id": "routeA_DLS_position_dominant_v4",
+    "evidence": {
+      "ccd": "not_available",
+      "clearance": null,
+      "collision_count": 0.0,
+      "collision_method": "adaptive_discrete_interpolation",
+      "fk_normal_error_max_deg": 1.0068129181254613,
+      "fk_path_deviation_max_mm": 0.14126918172561212,
+      "fk_path_deviation_p95_mm": 0.028219554641211297,
+      "fk_standoff_error_max_abs_mm": 0.10550011330623388,
+      "future_joint_reads": 0,
+      "max_acceleration_ratio": 0.009579396534353725,
+      "max_jerk_ratio": 0.00023042942821655058,
+      "max_joint_step_deg": 14.991790333724396,
+      "max_velocity_ratio": 0.016421107188169345,
+      "native_quality_status": "pass",
+      "point_count": 181
+    },
+    "locked_gates": [
+      "D39_B1_retained",
+      "native_MoveIt2_PlanningScene",
+      "native_FK",
+      "native_task_space_quality",
+      "native_Ruckig",
+      "native_dynamics",
+      "post_Ruckig_collision",
+      "task_completion"
+    ],
+    "status": "LOCKED",
+    "system": "stable_velocity_residual_update -> native MoveIt2 FK/Jacobian normal-constrained DLS projection"
+  },
+  "FIRST_UNRESOLVED_BLOCKER": "NONE",
+  "FULL_ROBOT_CERTIFICATION": "PASS",
+  "H1_CHAMPION": "update_480",
+  "NATIVE_TASK_SPACE_QUALITY": "PASS",
+  "SYSTEM_CHAMPION": "stable_velocity_residual_update + normal_constrained_DLS",
+  "TASK_STATUS": "PASS",
+  "TEST_STATUS": "PASS: tests/test_stage3_h13_d39.py + tests/test_stage3_h13_d40.py",
+  "before_after": {
+    "D39_stable_velocity_residual_update": {
+      "fk_normal_error_max_deg": "6.1632178604247",
+      "fk_path_deviation_max_mm": "52.696673331918014",
+      "fk_path_deviation_p95_mm": "52.557053961281554",
+      "fk_standoff_error_max_abs_mm": "27.786585975634324"
+    },
+    "D40_routeA_DLS_position_dominant_v4": {
+      "fk_normal_error_max_deg": "1.0068129181254613",
+      "fk_path_deviation_max_mm": "0.14126918172561212",
+      "fk_path_deviation_p95_mm": "0.028219554641211297",
+      "fk_standoff_error_max_abs_mm": "0.10550011330623388"
+    }
+  },
+  "ccd": "not_available",
+  "clearance": null,
+  "collision_method": "adaptive_discrete_interpolation",
+  "native_evidence_directory": "D:\\robotfucker\\outputs\\stage3_h13_d40_task_space_geometry_locked_causal_cartesian_recovery_execution\\routeA_DLS_position_dominant_v4",
+  "schema_version": "d40_summary_v1"
+}

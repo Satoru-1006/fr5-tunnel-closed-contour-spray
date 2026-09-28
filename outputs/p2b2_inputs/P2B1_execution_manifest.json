@@ -1,0 +1,81 @@
+{
+  "branch": "codex/fr5-p2b1-solver-causal-ablation-20260926",
+  "collision_method": "adaptive_discrete_interpolation",
+  "derived_model_regeneration": {
+    "expected_model_sha256": "b9d20cd51aa7088b2bab5083b4919473f0e0ec94c4b0d87d4111ca5cfa270096",
+    "installed_moveit_control_xacro_sha256": "9296111525fa892d63c700b37d58bd0e9b4a2f7d9713ff3d00bd95b56b5d08b5",
+    "installed_urdf_sha256": "923a4d2f754162dadc9a6b0bcbe5b4caf9a32ccd31c479e72ed690febe211b4e",
+    "malformed_tag_rule": "single source-preserving <origins to <origin replacement per D41 H4.5",
+    "model_sha256": "b9d20cd51aa7088b2bab5083b4919473f0e0ec94c4b0d87d4111ca5cfa270096",
+    "reference_model": "D:\\fr5-p2b1-scratch-20260926\\fairino_expanded.urdf",
+    "regenerated_model": "D:\\fr5-p2b1-scratch-20260926\\execution_final\\p2b1_formal_execution\\derived_robot_model.urdf",
+    "source_moveit_control_xacro_sha256": "9296111525fa892d63c700b37d58bd0e9b4a2f7d9713ff3d00bd95b56b5d08b5",
+    "source_urdf_sha256": "923a4d2f754162dadc9a6b0bcbe5b4caf9a32ccd31c479e72ed690febe211b4e",
+    "status": "BYTE_MATCH",
+    "xacro_source": "ros2_moveit_bridge\\config\\fairino5_v6_spray_tcp.urdf.xacro"
+  },
+  "derived_robot_model_urdf": "D:\\fr5-p2b1-scratch-20260926\\fairino_expanded.urdf",
+  "execution_code_commit": "458621af8ed8d038931c12b16779debf17602b49",
+  "execution_tree_clean_at_start": true,
+  "fairino_description_source": {
+    "commit": "60755d44d521a5ad6bee8494cc19522f8801aa20",
+    "remote": "https://github.com/FAIR-INNOVATION/frcobot_ros2.git",
+    "working_tree_clean": true
+  },
+  "hardware_safety_certified": "NO",
+  "hardware_validation": "NOT_RUN",
+  "identity_sha256": {
+    "fairino_expanded.urdf": "b9d20cd51aa7088b2bab5083b4919473f0e0ec94c4b0d87d4111ca5cfa270096",
+    "outputs\\internal_wiper_moveit_inputs\\open_arch_seed_joints.csv": "c568a6f49d6bfe170049774283b03b6576b950646dd79c449fb2e61c83034cba",
+    "outputs\\internal_wiper_moveit_inputs\\open_arch_tcp_poses_base_link.csv": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7",
+    "outputs\\p2a_axiswise_robustness_margin.json": "017acce06e274c29ba2134f1e7f4e8763619cc7c7dc4b5d313be683bbe82f267",
+    "outputs\\stage3_h13_d39_causal_task_space_recovery\\shadow_candidates\\stable_velocity_residual_update.csv": "a144c40bb950814797b029cb1ffd80bed5de62435ae43096d8d0732811f81712",
+    "outputs\\stage3_h13_d41_offline_robot_certification\\run_20260827T152326Z\\strict_replay\\moveit_fk_tcp_trace.csv": "3fb08730f3f2c3002c41e40e15385b23a4018be5d43321fff39c6c87f8a87701",
+    "outputs\\stage3_h13_d41_offline_robot_certification\\run_20260827T152326Z\\strict_replay\\moveit_smoothed_joint_trajectory.csv": "4849c47a8cc7908eaf8c45fb793f771118ac7edcb4c849037b43558b3528de8f",
+    "outputs\\stage3_h13_d41_offline_robot_certification\\run_20260827T152326Z\\strict_replay\\moveit_waypoint_joint_trajectory.csv": "32ff75b28e65087387b55b3e8bc2a65f20d03ce6f575fa0e1014df404739f48e",
+    "ros2_moveit_bridge\\config\\fairino5_v6_spray_tcp.srdf": "0d6ca01d4667cb8f4772a8a26d5e83e1098c604d1cac0ef3739cb3d495c3e182",
+    "ros2_moveit_bridge\\config\\fairino5_v6_spray_tcp.urdf.xacro": "d151f3ab04e89dcb3de8fcdcfe51e92ef012e75f2b577f3744f9296b20956ff4",
+    "ros2_moveit_bridge\\config\\joint_limits_with_jerk.yaml": "55b55eec2a8f73a26dd7198d1555c2531b08320b5641a4b18275b5a691bcc276"
+  },
+  "moveit_runtime_package": "MoveItPy; source-built fr5_tunnel_moveit_bridge overlay",
+  "native_binary_sha256": {
+    "stage3_h13_d41_native": "7ccd4514cf7519f9ff652bc2ced785db681e4c47defbc4ab166a6c476c9d7b8a",
+    "stage4a_fk": "78488b248c15569970d9690fe7976f172bc90d4c71d6628cc4f5e34c28625015"
+  },
+  "native_source_build_commit": "458621af8ed8d038931c12b16779debf17602b49",
+  "operating_system_runner": "Windows Python -> WSL2 Ubuntu-24.04-D",
+  "overlay_install": "D:\\fr5-p2b1-scratch-20260926\\install_final3",
+  "project": "FAIRINO_FR5",
+  "ros_distro": "Jazzy",
+  "runtime_versions": "ROS_DISTRO=\nPython 3.12.3\nros-jazzy-moveit-core\t2.12.4-1noble.20260617.141537\nros-jazzy-moveit-plugins\t2.12.4-1noble.20260617.143705\nros-jazzy-moveit-py\t2.12.4-1noble.20260617.152552\nros-jazzy-ruckig\t0.9.2-5noble.20260225.142307\n/opt/ros/jazzy\n\n--- STDERR ---",
+  "schema": "p2b1-execution-manifest-v1",
+  "source_base_commit": "ce18bfda76931385e2fbb1f923d8f980b5c487a4",
+  "stage": "P2-B1",
+  "strict_self_ccd": "NOT_AVAILABLE",
+  "underlay_install": "D:\\robotfucker\\install",
+  "variant_environment": {
+    "collision_interpolation_deg": 0.5,
+    "collision_stride": 1,
+    "joint_order": [
+      "j1",
+      "j2",
+      "j3",
+      "j4",
+      "j5",
+      "j6"
+    ],
+    "moveit_ruckig": true,
+    "points": 181,
+    "seed_input": "outputs\\stage3_h13_d39_causal_task_space_recovery\\shadow_candidates\\stable_velocity_residual_update.csv",
+    "stand_off_m": 0.26,
+    "task_scope": "ON-state open-arch only",
+    "tcp_input": "outputs\\internal_wiper_moveit_inputs\\open_arch_tcp_poses_base_link.csv",
+    "tcp_offset_m": [
+      0.0,
+      0.0,
+      0.15
+    ],
+    "time_parameterization": "tcp_arclength",
+    "waypoint_stride": 1
+  }
+}

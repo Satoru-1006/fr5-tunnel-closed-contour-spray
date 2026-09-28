@@ -11,6 +11,9 @@
 *.yml text eol=lf
 *.md text eol=lf
 *.txt text eol=lf
+
+# Preserve byte-exact P2-B2 replay inputs authenticated by SHA-256.
+outputs/p2b2_inputs/** -text
 *.cfg text eol=lf
 
 *.png binary

@@ -1,0 +1,218 @@
+{
+  "schema": "STAGE4_FAILURE_TAXONOMY_V1",
+  "risk_ranking_schema": "STAGE4_RISK_RANKED_BOTTLENECKS_V1",
+  "stage": "P2-B2",
+  "p2b2_status": "COMPLETE_WITH_FORMAL_CAPABILITY_GAPS",
+  "frozen_baseline_optimized_in_p2b2": false,
+  "measurement_pipeline_status": "PASS_WITH_REPAIRED_TYPE_A_DEFECTS",
+  "frozen_robot_baseline_performance_status": "ROBUSTNESS_BOUNDARIES_AND_GEOMETRY_DIAGNOSTIC_FOUND",
+  "source_base_commit": "e7bb161cea7396e452584f5c4ee7f158be6a9ca5",
+  "execution_code_commit": "700212dc4d62457a6d376d42443e931e13d3ccc9",
+  "collision_method": "adaptive_discrete_interpolation",
+  "strict_self_ccd": "NOT_AVAILABLE",
+  "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+  "dynamic_limit_provenance": "PROJECT_CONFIGURED_LIMITS",
+  "hardware_validation": "NOT_RUN",
+  "hardware_safety_certified": "NO",
+  "risk_ranked_bottlenecks": [
+    {
+      "rank": 1,
+      "finding_id": "P2B2_R0_J3_ENDPOINT_ROBUSTNESS",
+      "problem_category": "TYPE_B_TASK_SPACE_TERMINAL_POSITION_ROBUSTNESS",
+      "affected_benchmark_family": "R0 available joint-state perturbations",
+      "affected_case_ids": [
+        "joint:j3:positive",
+        "joint:j3:negative"
+      ],
+      "frequency": {
+        "joint_family_terminal_position_error_axes": 8,
+        "joint_family_available_axes": 12,
+        "symmetric_j3_endpoint_cases": 2
+      },
+      "worst_magnitude": {
+        "quantity": "refined perturbation boundary",
+        "value": 0.007212549604712551,
+        "units": "rad",
+        "axis": "joint:j3:positive",
+        "first_failure_perturbation": 0.007212975400190721,
+        "first_failure_waypoint": 180,
+        "first_failure_mode": "TERMINAL_POSITION_ERROR",
+        "terminal_position_tolerance_crossed_m": 0.004000095262899387
+      },
+      "severity": "HIGH_ROBUSTNESS_SENSITIVITY_AT_TASK_ENDPOINT",
+      "reproducibility": "FORMAL_LOCAL_BRACKET_REFINED; all 10 variants passed strict validation; the symmetric J3 boundary is present in the R0 map",
+      "safety_impact": "NOT_ESTABLISHED; this is an endpoint accuracy boundary, not a collision or safety certification result",
+      "current_evidence": [
+        "outputs/p2b2_robustness_landscape.json: R0 joint:j3:positive and joint:j3:negative rows",
+        "outputs/p2b2_robustness_landscape.csv",
+        "Google Drive INTERMEDIATE_EVIDENCE: full R0 axis result and strict replay evidence"
+      ],
+      "likely_subsystem": "task-space endpoint error propagation through frozen joint trajectory and FK chain",
+      "measurement_confidence": "HIGH for the configured 4 mm endpoint criterion and local refined perturbation bracket; no claim outside the measured search domain",
+      "stage4b_problem_definition": "Measure and improve endpoint-position robustness against J3 perturbations while retaining the frozen acceptance set and reporting any trade-off as a new candidate. Do not edit the Stage 3 baseline during P2-B2."
+    },
+    {
+      "rank": 2,
+      "finding_id": "P2B2_R0_TCP_TRANSLATION_ENDPOINT_BOUNDARY",
+      "problem_category": "TYPE_B_TCP_TRANSLATION_ROBUSTNESS",
+      "affected_benchmark_family": "R0 available TCP translation perturbations",
+      "affected_case_ids": [
+        "tcp_tcp_translation:x:positive",
+        "tcp_tcp_translation:x:negative",
+        "tcp_tcp_translation:y:positive",
+        "tcp_tcp_translation:y:negative",
+        "tcp_tcp_translation:z:positive",
+        "tcp_tcp_translation:z:negative"
+      ],
+      "frequency": {
+        "terminal_position_error_axes": 6,
+        "available_translation_axes": 6
+      },
+      "worst_magnitude": {
+        "quantity": "refined translation perturbation boundary",
+        "value": 0.00399609375,
+        "units": "m",
+        "first_failure_perturbation": 0.004,
+        "first_failure_waypoint": 180,
+        "first_failure_mode": "TERMINAL_POSITION_ERROR"
+      },
+      "severity": "HIGH_ROBUSTNESS_SENSITIVITY_AT_TASK_ENDPOINT",
+      "reproducibility": "6/6 available signed translation directions observed terminal-position failure at the configured 4 mm boundary",
+      "safety_impact": "NOT_ESTABLISHED; task-position robustness does not establish collision clearance or hardware safety",
+      "current_evidence": [
+        "outputs/p2b2_robustness_landscape.json: R0 TCP_TRANSLATION rows",
+        "outputs/p2b2_robustness_landscape.csv",
+        "Google Drive INTERMEDIATE_EVIDENCE: full R0 axis result and FK trace"
+      ],
+      "likely_subsystem": "task-space acceptance boundary and endpoint tracking tolerance",
+      "measurement_confidence": "HIGH within the implemented translation axes and configured endpoint criterion; physical TCP calibration uncertainty is unavailable",
+      "stage4b_problem_definition": "Determine whether endpoint accuracy margin can be increased under calibrated TCP and registered uncertainty, without changing P2-B2 thresholds or dropping any signed axis."
+    },
+    {
+      "rank": 3,
+      "finding_id": "P2B2_R0_TCP_ROTATION_NORMAL_ERROR_BOUNDARY",
+      "problem_category": "TYPE_B_SPRAY_AXIS_ORIENTATION_ROBUSTNESS",
+      "affected_benchmark_family": "R0 available TCP rotation perturbations",
+      "affected_case_ids": [
+        "tcp_tcp_rotation:x:positive",
+        "tcp_tcp_rotation:x:negative",
+        "tcp_tcp_rotation:y:positive",
+        "tcp_tcp_rotation:y:negative"
+      ],
+      "frequency": {
+        "spray_axis_normal_error_axes": 4,
+        "available_rotation_axes": 6,
+        "no_failure_within_search_domain_axes": 2
+      },
+      "worst_magnitude": {
+        "quantity": "refined TCP rotation perturbation boundary",
+        "value": 0.1574602871712983,
+        "units": "rad",
+        "axis": "tcp_tcp_rotation:x:positive",
+        "first_failure_perturbation": 0.15748869422292583,
+        "first_failure_waypoint": 172,
+        "first_failure_mode": "SPRAY_AXIS_NORMAL_ERROR"
+      },
+      "severity": "MEDIUM_CONFIGURED_ORIENTATION_ROBUSTNESS_BOUNDARY",
+      "reproducibility": "4/6 available signed rotation directions reached the configured spray-axis normal error criterion; z directions had no failure within the registered search domain",
+      "safety_impact": "NOT_ESTABLISHED; no calibrated TCP orientation uncertainty or physical coating-quality evidence is available",
+      "current_evidence": [
+        "outputs/p2b2_robustness_landscape.json: R0 TCP_ROTATION rows",
+        "outputs/p2b2_robustness_landscape.csv",
+        "Google Drive INTERMEDIATE_EVIDENCE: full R0 axis result and FK trace"
+      ],
+      "likely_subsystem": "spray-axis orientation tracking and frozen TCP rotation sensitivity",
+      "measurement_confidence": "HIGH for the implemented normal-error metric and registered search domain; physical spray quality and calibrated tool uncertainty are unavailable",
+      "stage4b_problem_definition": "Measure and improve spray-axis orientation robustness against signed TCP rotation perturbations while retaining all six registered directions and the current acceptance rule."
+    },
+    {
+      "rank": 4,
+      "finding_id": "P2B2_NOMINAL_WALL_STATION_ORDER_PROJECTION",
+      "problem_category": "TYPE_B_GEOMETRIC_ROUTE_ORDER_DIAGNOSTIC_CANDIDATE",
+      "affected_benchmark_family": "R0 nominal open-arch wall-station mapping",
+      "affected_case_ids": [
+        "wall_station_sample_15_to_16"
+      ],
+      "frequency": {
+        "backsteps_over_1um": 1,
+        "adjacent_transitions_checked": 180
+      },
+      "worst_magnitude": {
+        "quantity": "projected wall-station step",
+        "value": -0.13194315439053514,
+        "units": "m",
+        "from_station_m": 0.3784216291250731,
+        "to_station_m": 0.24647847473453796,
+        "max_authoritative_tcp_path_deviation_m": 0.00014126918172561212,
+        "authoritative_tcp_path_deviation_limit_m": 0.006
+      },
+      "severity": "MEDIUM_DIAGNOSTIC_CANDIDATE",
+      "reproducibility": "Observed in the nominal R0 global nearest-polyline projection; the adjacent-sample diagnostic retained a backward step",
+      "safety_impact": "NOT_ESTABLISHED; no collision, clearance, coating-quality, or physical process conclusion follows from this projection diagnostic",
+      "current_evidence": [
+        "outputs/p2b2_robustness_landscape.json: R0 normal_reference_mapping summary",
+        "Google Drive INTERMEDIATE_EVIDENCE: R0 nominal FK trace and mapping evidence"
+      ],
+      "likely_subsystem": "wall-polyline station assignment or global nearest-projection ambiguity around samples 15 and 16",
+      "measurement_confidence": "MEDIUM; the numerical projection event is observed, while route-order interpretation and physical impact remain unverified",
+      "stage4b_problem_definition": "Reconstruct local station correspondence around samples 15 and 16 with an independent route-order method and compare against the existing global nearest projection; preserve the original result as evidence."
+    }
+  ],
+  "coverage_gaps": [
+    {
+      "formal_axis_count": 18,
+      "status": "NOT_AVAILABLE",
+      "reason": "NOT_IMPLEMENTED_IN_FROZEN_P2A",
+      "families": [
+        "base translation: 6 axes",
+        "base rotation: 6 axes",
+        "surface offset: 2 axes",
+        "stand-off: 2 axes",
+        "surface-normal rotation: 2 axes"
+      ],
+      "interpretation": "Coverage gap only; no PASS, FAIL, or inferred robustness result."
+    }
+  ],
+  "type_a_measurement_repairs": [
+    {
+      "defect_id": "P2B2_NATIVE_WRAPPER_7200_SECOND_TIMEOUT",
+      "root_cause": "Fixed 7200 second native subprocess timeout ended the R1 medium map after 594 of 757 cases.",
+      "repair": "Raised and recorded the per-batch timeout as 86400 seconds; recomputed the affected map in a separate retry directory.",
+      "affected_measurement_recomputed": true,
+      "protected_r0_and_low_gain_regressed": false
+    },
+    {
+      "defect_id": "P2B2_CLEAN_REPLAY_UNDERLAY_BRIDGE_FALLBACK",
+      "root_cause": "ROS package and Python import silently resolved the planning bridge from the underlay when the clean overlay omitted it.",
+      "repair": "Built the bridge from the clean checkout into the fresh overlay; the runner now verifies package prefix, imported module path, and source hash before execution.",
+      "affected_measurement_recomputed": true,
+      "protected_measurements_regressed": false,
+      "discarded_attempts_are_not_scientific_replay": true,
+      "clean_r0_reference_replay": "PASS; 42 axis rows matched the formal R0 map; strict P2-B1 reference replay matched at 0 joint and timestamp delta"
+    },
+    {
+      "defect_id": "P2B2_FORMAL_CAPABILITY_COUNT_SCHEMA",
+      "root_cause": "The summary aggregator read capability status from the top level while full rows stored it under specification.capability_status.",
+      "repair": "Added schema-aware status extraction and known-answer coverage for raw and compact records; canonical counts are recalculated as 24 available, 18 unavailable, 0 unclassified.",
+      "affected_measurements_recomputed": true,
+      "previously_correct_axis_rows_regressed": false
+    }
+  ],
+  "protected_measurement_boundaries": {
+    "collision_method": "adaptive_discrete_interpolation",
+    "strict_self_ccd": "NOT_AVAILABLE",
+    "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
+    "dynamic_limit_provenance": "PROJECT_CONFIGURED_LIMITS",
+    "hardware_validation": "NOT_RUN",
+    "hardware_safety_certified": "NO",
+    "continuous_safety_inferred_from_collision_free_samples": false,
+    "missing_axes_promoted_to_pass": false
+  },
+  "stage4b_handoff": {
+    "top_1_bottleneck": "P2B2_R0_J3_ENDPOINT_ROBUSTNESS",
+    "top_2_bottleneck": "P2B2_R0_TCP_TRANSLATION_ENDPOINT_BOUNDARY",
+    "top_3_bottleneck": "P2B2_R0_TCP_ROTATION_NORMAL_ERROR_BOUNDARY",
+    "p2b3_started": false,
+    "p2b2_robot_weaknesses_optimized": false
+  }
+}

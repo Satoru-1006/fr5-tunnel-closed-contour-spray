@@ -25,9 +25,12 @@ from ros2_moveit_bridge.p2b2_redundancy_objectives import (  # noqa: E402
 from scripts.run_p2b2_robustness_remapping import (  # noqa: E402
     VARIANT_DESIGN,
     _campaign_status,
+    _canonical_variant_summaries,
+    _formal_capability_counts,
     _find_input_hash,
     _project_target_normals_to_fk_samples,
     _read_complete_mapping,
+    _validate_overlay_bridge_identity,
     _validate_current_target_surface_normals,
 )
 import scripts.run_p2b1_solver_policy_ablation as p2b1  # noqa: E402
@@ -347,6 +350,69 @@ def test_full_domain_no_failure_is_complete_only_with_p2a_terminal_state() -> No
     assert _campaign_status(reference, [variant], rows) == "COMPLETE_WITH_FORMAL_CAPABILITY_GAPS"
     rows[0]["search_completeness"] = "INCOMPLETE_CAPABILITY_GAP"
     assert _campaign_status(reference, [variant], rows) == "INCOMPLETE"
+
+
+def test_canonical_variant_list_keeps_variants_without_a_summary() -> None:
+    variants = [{
+        "variant_id": "R3_barrier_wp0_0.001",
+        "solver": "B1",
+        "secondary_objective": "joint_limit_barrier",
+        "secondary_gain": 1e-3,
+        "warm_start_rows": 1,
+        "full_validation": {"status": "FAIL", "gates": {"ruckig": "FAIL"}},
+        "error": "post_ruckig_trajectory_invalid",
+    }]
+
+    released = _canonical_variant_summaries(variants, Path("evidence"))
+
+    assert len(released) == 1
+    assert released[0]["variant_id"] == "R3_barrier_wp0_0.001"
+    assert released[0]["full_validation_status"] == "FAIL"
+    assert released[0]["validation_gates"] == {"ruckig": "FAIL"}
+    assert released[0]["global_joint_axis_margin_rad"] is None
+    assert released[0]["robustness_mapping"]["status"] == "NOT_RUN"
+    assert released[0]["variant_status"] == "INCOMPLETE_NO_CANONICAL_SUMMARY"
+    assert released[0]["failure_reason"] == "post_ruckig_trajectory_invalid"
+
+
+def test_formal_capability_counts_read_full_and_compact_axis_records() -> None:
+    full_axes = [
+        {"specification": {"capability_status": "AVAILABLE"}},
+        {"specification": {"capability_status": "NOT_AVAILABLE"}},
+    ]
+    compact_axes = [
+        {"capability_status": "AVAILABLE"},
+        {"capability_status": "NOT_AVAILABLE"},
+        {"capability_status": "UNKNOWN"},
+    ]
+
+    assert _formal_capability_counts(full_axes) == {
+        "available": 1, "unavailable": 1, "unclassified": 0,
+    }
+    assert _formal_capability_counts(compact_axes) == {
+        "available": 1, "unavailable": 1, "unclassified": 1,
+    }
+
+
+def test_runtime_identity_rejects_bridge_fallback_to_underlay() -> None:
+    accepted = _validate_overlay_bridge_identity(
+        actual_prefix="/mnt/d/p2b2-overlay",
+        module_path="/mnt/d/p2b2-overlay/lib/python3.12/site-packages/plan_closed_contour_moveit.py",
+        module_sha256="source-sha",
+        expected_prefix="/mnt/d/p2b2-overlay",
+        expected_sha256="source-sha",
+    )
+    assert accepted["BRIDGE_PREFIX"] == "/mnt/d/p2b2-overlay"
+    assert accepted["BRIDGE_MODULE_SHA256"] == accepted["BRIDGE_SOURCE_SHA256"]
+
+    with pytest.raises(RuntimeError, match="package_resolved_outside_overlay"):
+        _validate_overlay_bridge_identity(
+            actual_prefix="/mnt/d/legacy-underlay",
+            module_path="/mnt/d/legacy-underlay/lib/python3.12/site-packages/plan_closed_contour_moveit.py",
+            module_sha256="source-sha",
+            expected_prefix="/mnt/d/p2b2-overlay",
+            expected_sha256="source-sha",
+        )
 
 
 def test_result_and_provenance_contracts_preserve_unavailable_hardware_and_ccd() -> None:
