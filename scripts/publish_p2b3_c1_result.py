@@ -84,6 +84,7 @@ def json_safe_number(value: float | None) -> float | None:
 
 def validate_and_publish(
     *, baseline_fk: Path, candidate_dir: Path, manifest_path: Path, output_dir: Path,
+    p2b2_recheck_path: Path | None = None,
 ) -> dict[str, Any]:
     target_path = ROOT / "outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv"
     seed_path = ROOT / "outputs/p2b2_inputs/stable_velocity_residual_update.csv"
@@ -142,6 +143,8 @@ def validate_and_publish(
     new_same_error = [math.dist(point, target_xyz[index]) for index, point in enumerate(new_tcp)]
     row_delta = [max_abs_delta(baseline_post_q[i], candidate_post_q[i]) for i in range(181)]
     unchanged_rows = [i for i, delta in enumerate(row_delta) if delta <= 1.0e-12]
+    numerical_delta_rows = [i for i, delta in enumerate(row_delta) if delta > 1.0e-12]
+    material_delta_rows = [i for i, delta in enumerate(row_delta) if delta > 1.0e-6]
 
     ledger: list[dict[str, Any]] = []
     for index in range(181):
@@ -211,6 +214,7 @@ def validate_and_publish(
 
     manifest = read_json(manifest_path)
     strict, acceptance = read_json(strict_path), read_json(summary_path)
+    recheck = read_json(p2b2_recheck_path) if p2b2_recheck_path is not None else None
     metrics = acceptance.get("metrics", {}) if isinstance(acceptance.get("metrics", {}), dict) else {}
     geometry_ok = max(row.distance_m for row in new_proj) <= 0.006 + 1.0e-12
     indexed_ok = max(new_same_error) <= 0.006 + 1.0e-12
@@ -221,6 +225,18 @@ def validate_and_publish(
         "WITHIN_CONFIGURED_BAND", "BELOW_CONFIGURED_BAND", "ABOVE_CONFIGURED_BAND")}
     local_slow = [row for row in new_local if row.speed_band_status == "BELOW_CONFIGURED_BAND"]
     old_local_slow = [row for row in old_local if row.speed_band_status == "BELOW_CONFIGURED_BAND"]
+
+    def bracket_spotcheck(axis_id: str) -> str:
+        if recheck is None:
+            return "TARGETED_RECHECK_REQUIRED"
+        values = recheck.get("measured_bracket_endpoints", {}).get(axis_id)
+        if not isinstance(values, dict):
+            return "TARGETED_RECHECK_MISSING"
+        last_pass = values.get("historical_last_pass", {}).get("measured", {}).get("status")
+        first_fail = values.get("historical_first_fail", {}).get("measured", {}).get("status")
+        if last_pass == "PASS" and first_fail == "FAIL":
+            return "OLD_PASS_FAIL_BRACKET_MATCHED_SPOTCHECK_ONLY"
+        return f"BRACKET_CLASSIFICATION_CHANGED:{last_pass}/{first_fail}"
     input_hashes = {str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else path.name: digest(path)
                     for path in (target_path, seed_path, baseline_pre_path, baseline_post_path)}
 
@@ -244,13 +260,13 @@ def validate_and_publish(
         "LOCAL_TIMING_VALIDATION": "IMPLEMENTED_PER_ADJACENT_SEGMENT_DISTANCE_DT_SPEED_AND_DWELL",
         "FULL_P2B2_CAMPAIGN_REPLAYED": "NO",
         "change_impact_summary": {
-            "changed_files": ["ros2_moveit_bridge/plan_closed_contour_moveit.py", "ros2_moveit_bridge/p2b3_c1_scope.py", "ros2_moveit_bridge/p2b3_c1_ordered_validation.py", "ros2_moveit_bridge/setup.py", "scripts/run_p2b3_c1_r0.py", "scripts/publish_p2b3_c1_result.py"],
+            "changed_files": ["ros2_moveit_bridge/plan_closed_contour_moveit.py", "ros2_moveit_bridge/p2b3_c1_scope.py", "ros2_moveit_bridge/p2b3_c1_ordered_validation.py", "ros2_moveit_bridge/setup.py", "scripts/run_p2b3_c1_r0.py", "scripts/run_p2b3_c1_p2b2_bracket_recheck.py", "scripts/publish_p2b3_c1_result.py"],
             "changed_functions": ["build_p2b1_process_task_dls_trajectory", "build_normal_constrained_dls_trajectory", "resolve_dls_trajectory_scope"],
             "changed_artifacts": ["P2-B3-C1 R0 candidate trajectory and its 181-row lineage result"],
             "directly_affected_tests": ["test_p2b3_c1_scope.py", "test_p2b3_c1_ordered_validation.py", "test_p2b1_solver_policy_ablation.py", "test_p2b2_robustness_remapping.py"],
             "downstream_affected_stages": ["P2-B2 R0 nominal trajectory claims; robustness margins rooted in the R0 nominal q trajectory"],
             "explicitly_unaffected_stages_results": ["D39 source observations; P2-B1 frozen design inputs; P2-B2 implementation, acceptance set, and stored historical measurements; non-C1 default solver dispatch"],
-            "reason": "The C1 flag changes output scope and solves every indexed R0 target; the resulting nominal trajectory is compared row-by-row. Historical q-based robustness margins remain valid only for their old baseline and require selective remeasurement before transfer to C1.",
+            "reason": "C1 replaces legacy rows 0..15 and changes target row 16 by more than 1e-6 rad; rows 17..180 remain within 1e-6 rad of old R0. Six old pass/fail bracket endpoints were spot-checked across J3, TCP translation X, and TCP rotation X; other axis margins still require separate transfer checks.",
         },
         "legacy_measurement": {
             "waypoint_count": 181,
@@ -271,7 +287,10 @@ def validate_and_publish(
             "waypoint_count": 181,
             "target_solved_row_count": 181,
             "seed_only_row": 0,
-            "changed_post_ruckig_rows_vs_legacy": len([value for value in row_delta if value > 1.0e-12]),
+            "post_ruckig_rows_numerically_different_gt_1e-12_rad": len(numerical_delta_rows),
+            "post_ruckig_rows_materially_different_gt_1e-6_rad": len(material_delta_rows),
+            "materially_affected_row_indices_gt_1e-6_rad": material_delta_rows,
+            "first_row_after_material_impact": max(material_delta_rows) + 1 if material_delta_rows else 0,
             "unchanged_post_ruckig_rows_vs_legacy": unchanged_rows,
             "max_post_ruckig_joint_delta_vs_legacy_rad": max(row_delta),
             "max_same_index_error_m": max(new_same_error),
@@ -305,10 +324,14 @@ def validate_and_publish(
             "spray_command_state": manifest.get("spray_command_state", "NOT_REPRESENTED"),
         },
         "P2B2_RESULT_DISPOSITION": {
-            "J3_positive_endpoint_margin": "TARGETED_RECHECK_REQUIRED",
-            "J3_negative_endpoint_margin": "TARGETED_RECHECK_REQUIRED",
-            "TCP_translation_margin": "TARGETED_RECHECK_REQUIRED",
-            "TCP_rotation_normal_margin": "TARGETED_RECHECK_REQUIRED",
+            "J3_positive_endpoint_margin": bracket_spotcheck("joint:j3:positive"),
+            "J3_negative_endpoint_margin": bracket_spotcheck("joint:j3:negative"),
+            "TCP_translation_x_positive_margin": bracket_spotcheck("tcp_tcp_translation:x:positive"),
+            "TCP_translation_x_negative_margin": bracket_spotcheck("tcp_tcp_translation:x:negative"),
+            "TCP_translation_y_z_and_full_margin_scan": "TARGETED_RECHECK_REQUIRED",
+            "TCP_rotation_x_positive_margin": bracket_spotcheck("tcp_tcp_rotation:x:positive"),
+            "TCP_rotation_x_negative_margin": bracket_spotcheck("tcp_tcp_rotation:x:negative"),
+            "TCP_rotation_y_z_and_full_normal_margin_scan": "TARGETED_RECHECK_REQUIRED",
             "nominal_process_geometry": "INVALIDATED_BY_SPECIFIC_CHANGE_REPLACED_BY_C1_R0_REPLAY",
             "wall_station_progression": "INVALIDATED_BY_SPECIFIC_CHANGE_REPLACED_BY_UNCONSTRAINED_ORDER_AWARE_VALIDATION",
             "local_timing_dwell": "INVALIDATED_BY_SPECIFIC_CHANGE_REPLACED_BY_SEGMENT_LEVEL_C1_MEASUREMENT",
@@ -320,9 +343,19 @@ def validate_and_publish(
             "P2-B2 robustness generation, acceptance thresholds, available/unavailable capability labels, and stored historical results as evidence about the old nominal R0 baseline.",
             "P2-B2 campaign findings are not erased; only claims attached to the changed nominal R0 trajectory need targeted transfer checks.",
         ],
-        "P2B2_RESULTS_TARGETED_RECHECK": ["J3± endpoint margin", "TCP translation margin", "TCP rotation/normal margin"],
+        "P2B2_RESULTS_TARGETED_RECHECK": ["J3± historical bracket endpoints", "TCP translation X± historical bracket endpoints", "TCP rotation X± historical bracket endpoints"],
+        "P2B2_RESULTS_STILL_PENDING": ["Full J3± margin rescan", "TCP translation Y/Z margins", "TCP rotation Y/Z and full normal margin scan"],
         "P2B2_RESULTS_INVALIDATED": ["Old R0 nominal process geometry/order/local timing as claims about the corrected C1 trajectory"],
         "input_identity_sha256": input_hashes,
+        "targeted_scientific_regression": None if recheck is None else {
+            "status": "SIX_OLD_BRACKET_ENDPOINTS_REMEASURED" if recheck.get("selected_case_count") == 12 else "RECHECK_SCOPE_UNRESOLVED",
+            "recheck_code_commit": recheck.get("recheck_code_commit"),
+            "selected_axes": recheck.get("selected_axes"),
+            "selected_case_count": recheck.get("selected_case_count"),
+            "measured_bracket_endpoints": recheck.get("measured_bracket_endpoints"),
+            "fresh_FK_crosscheck_max_position_delta_m": recheck.get("fresh_FK_crosscheck_max_position_delta_m"),
+            "full_p2b2_campaign_replayed": recheck.get("full_p2b2_campaign_replayed"),
+        },
         "limitations": [
             "The run is software-only using MoveIt2 PlanningScene, MoveIt FK, configured dynamics, and Ruckig; no hardware/controller execution occurred.",
             "Collision reports use adaptive_discrete_interpolation; this is not strict continuous collision detection.",
@@ -341,11 +374,13 @@ def main() -> int:
     parser.add_argument("--baseline-fk", type=Path, required=True, help="C0 Drive archive b0_reference/nominal_fk_trace.csv")
     parser.add_argument("--candidate-dir", type=Path, required=True, help="C1 strict_replay output directory")
     parser.add_argument("--manifest", type=Path, required=True, help="C1 execution_manifest.json")
+    parser.add_argument("--p2b2-recheck", type=Path, help="Selected old R0 bracket endpoint recheck JSON")
     parser.add_argument("--output-dir", type=Path, default=ROOT / "outputs")
     args = parser.parse_args()
     result = validate_and_publish(
         baseline_fk=args.baseline_fk.resolve(), candidate_dir=args.candidate_dir.resolve(),
         manifest_path=args.manifest.resolve(), output_dir=args.output_dir.resolve(),
+        p2b2_recheck_path=None if args.p2b2_recheck is None else args.p2b2_recheck.resolve(),
     )
     print(json.dumps({
         "P2B3_C1_STATUS": result["P2B3_C1_STATUS"],
