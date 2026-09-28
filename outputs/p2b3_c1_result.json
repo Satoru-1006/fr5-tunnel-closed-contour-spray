@@ -1,11 +1,69 @@
 {
-  "ARTIFACT_PUBLISH_COMMIT": "REPORTED_IN_FINAL_DELIVERY",
+  "ARTIFACT_PUBLISH_PROVENANCE": {
+    "phase_1_execution_code_commit": "cb2464153a101b9deccba7902e6350aea3fc7f62",
+    "phase_2_canonical_artifact_commit": "c07ed989fde81669c962c072cbc0cdba96afdc5d",
+    "phase_2_commit_is_not_inferred_from_precommit_inputs": true,
+    "status": "TWO_PHASE_EXPLICIT"
+  },
+  "C1_ARTIFACT_PUBLISH_COMMIT": "c07ed989fde81669c962c072cbc0cdba96afdc5d",
+  "C1_DERIVED_REFERENCE_URDF_SHA256": "b9d20cd51aa7088b2bab5083b4919473f0e0ec94c4b0d87d4111ca5cfa270096",
+  "C1_EXECUTION_CODE_COMMIT": "cb2464153a101b9deccba7902e6350aea3fc7f62",
+  "C1_FATAL_GATES": {
+    "finite_numeric_values": "PASS",
+    "geometry_fidelity": "PASS",
+    "legacy_fk_time_alignment": "PASS",
+    "ordered_traversal": "PASS",
+    "post_ruckig_acceptance": "PASS",
+    "provenance_completeness": "PASS",
+    "required_files_presence": "PASS",
+    "required_input_identity": "PASS",
+    "solver_pressure_evidence": "PASS",
+    "strict_audit": "PASS",
+    "target_lineage_completeness": "PASS",
+    "waypoint_count": "PASS"
+  },
+  "C1_NON_FATAL_LIMITATIONS": [
+    "WP179_TO_WP180_LOCAL_TIMING_ANOMALY: 0.0041438374043542055 m/s exceeds the configured 0.003 m/s +/- 5% diagnostic band; no deposition model is present.",
+    "Collision uses adaptive_discrete_interpolation; strict continuous collision detection is NOT_AVAILABLE.",
+    "Hardware/controller validation is NOT_RUN; physical torque, calibrated TCP uncertainty, and spray command state are not established."
+  ],
+  "C1_POST_RUCKIG_NOMINAL": {
+    "path": "strict_replay/moveit_smoothed_joint_trajectory.csv",
+    "sha256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+    "waypoint_count": 181
+  },
+  "C1_SOLVER_PRESSURE_EVIDENCE": {
+    "accepted_relaxed_geometry_count": 181,
+    "internal_joint_projection_count": 0,
+    "normal_residual_interpretation": "asin(norm(two tangent-plane components)); exact on the solver's accepted <=5 degree branch",
+    "path": "solver_pressure.csv",
+    "per_waypoint_fields": [
+      "target_attempted",
+      "target_state_emitted",
+      "tight_converged",
+      "final_position_residual_m",
+      "final_normal_residual_rad",
+      "iterations_used",
+      "termination_reason",
+      "final_relaxed_geometry_gate"
+    ],
+    "relaxed_normal_tolerance_rad": 0.08726646259971647,
+    "relaxed_position_tolerance_m": 0.004,
+    "row_count": 711,
+    "sha256": "d99814823f1c2efedc647861a2bfa4fc17e484d28ccae11dd9eb5694acd3330c",
+    "status": "MEASURED_FROM_P2B1_B0_SOLVER_PRESSURE",
+    "target_attempted_count": 181,
+    "tight_converged_count": 173,
+    "tight_normal_tolerance_rad": 0.0002,
+    "tight_position_tolerance_m": 2e-05
+  },
   "CARRIED_FORWARD": [
     "P2-B1 R0/B0 solver policy and its original validated design; C1 scope flag defaults preserve the historical prefix path.",
     "P2-B2 robustness generation, acceptance thresholds, available/unavailable capability labels, and stored historical results as evidence about the old nominal R0 baseline.",
     "P2-B2 campaign findings are not erased; only claims attached to the changed nominal R0 trajectory need targeted transfer checks."
   ],
   "EXECUTION_CODE_COMMIT": "cb2464153a101b9deccba7902e6350aea3fc7f62",
+  "FAIRINO_SOURCE_COMMIT": "60755d44d521a5ad6bee8494cc19522f8801aa20",
   "FULL_P2B2_CAMPAIGN_REPLAYED": "NO",
   "LOCAL_TIMING_VALIDATION": "IMPLEMENTED_PER_ADJACENT_SEGMENT_DISTANCE_DT_SPEED_AND_DWELL",
   "ORDER_AWARE_VALIDATION": "IMPLEMENTED_UNCONSTRAINED_NEAREST_PROJECTION_AND_STATION_BACKSTEP_REPORTING",
@@ -13,23 +71,23 @@
     "Old R0 nominal process geometry/order/local timing as claims about the corrected C1 trajectory"
   ],
   "P2B2_RESULTS_STILL_PENDING": [
-    "Full J3± margin rescan",
+    "Full J3\u00b1 margin rescan",
     "TCP translation Y/Z margins",
     "TCP rotation Y/Z and full normal margin scan"
   ],
   "P2B2_RESULTS_TARGETED_RECHECK": [
-    "J3± historical bracket endpoints",
-    "TCP translation X± historical bracket endpoints",
-    "TCP rotation X± historical bracket endpoints"
+    "J3\u00b1 historical bracket endpoints",
+    "TCP translation X\u00b1 historical bracket endpoints",
+    "TCP rotation X\u00b1 historical bracket endpoints"
   ],
   "P2B2_RESULT_DISPOSITION": {
-    "J3_negative_endpoint_margin": "OLD_PASS_FAIL_BRACKET_MATCHED_SPOTCHECK_ONLY",
-    "J3_positive_endpoint_margin": "OLD_PASS_FAIL_BRACKET_MATCHED_SPOTCHECK_ONLY",
-    "TCP_rotation_x_negative_margin": "OLD_PASS_FAIL_BRACKET_MATCHED_SPOTCHECK_ONLY",
-    "TCP_rotation_x_positive_margin": "OLD_PASS_FAIL_BRACKET_MATCHED_SPOTCHECK_ONLY",
+    "J3_negative_endpoint_margin": "TARGETED_RECHECK_REQUIRED",
+    "J3_positive_endpoint_margin": "TARGETED_RECHECK_REQUIRED",
+    "TCP_rotation_x_negative_margin": "TARGETED_RECHECK_REQUIRED",
+    "TCP_rotation_x_positive_margin": "TARGETED_RECHECK_REQUIRED",
     "TCP_rotation_y_z_and_full_normal_margin_scan": "TARGETED_RECHECK_REQUIRED",
-    "TCP_translation_x_negative_margin": "OLD_PASS_FAIL_BRACKET_MATCHED_SPOTCHECK_ONLY",
-    "TCP_translation_x_positive_margin": "OLD_PASS_FAIL_BRACKET_MATCHED_SPOTCHECK_ONLY",
+    "TCP_translation_x_negative_margin": "TARGETED_RECHECK_REQUIRED",
+    "TCP_translation_x_positive_margin": "TARGETED_RECHECK_REQUIRED",
     "TCP_translation_y_z_and_full_margin_scan": "TARGETED_RECHECK_REQUIRED",
     "campaign_disposition": "P2B2_NOT_INVALIDATED_AS_A_WHOLE; DO_NOT_TRANSFER_OLD_R0_MARGIN_NUMBERS_TO_C1_WITHOUT_RECHECK",
     "historical_campaign_measurements": "CARRIED_FORWARD_AS_MEASUREMENTS_OF_THE_OLD_P2B2_R0_BASELINE_ONLY",
@@ -94,6 +152,7 @@
     "post_ruckig_rows_materially_different_gt_1e-6_rad": 17,
     "post_ruckig_rows_numerically_different_gt_1e-12_rad": 181,
     "post_ruckig_status": "pass",
+    "relaxed_accepted_target_count": 181,
     "seed_only_row": 0,
     "slowest_local_segment": {
       "end_index": 13,
@@ -113,9 +172,17 @@
       "moveit_time_parameterization": "tcp_arclength",
       "strict_audit_status": "pass"
     },
-    "target_solved_row_count": 181,
+    "target_attempted_count": 181,
+    "target_state_emitted_count": 181,
+    "tight_converged_count": 173,
     "unchanged_post_ruckig_rows_vs_legacy": [],
     "waypoint_count": 181
+  },
+  "candidate_input_identity_sha256": {
+    "candidate_fk_trace": "ed8cffa87dae845df0dcc3cf50f88225e3f72b1fa425acce6def08e7ee60acee",
+    "candidate_post_ruckig_trajectory": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+    "execution_manifest": "1dffc0ff8f0e81f338b54d78f7a6d15a4ee8afe3a3cc2decc24a70d4b8092f41",
+    "solver_pressure_csv": "d99814823f1c2efedc647861a2bfa4fc17e484d28ccae11dd9eb5694acd3330c"
   },
   "change_impact_summary": {
     "changed_artifacts": [
@@ -155,6 +222,15 @@
     "outputs\\p2b2_inputs\\p2b1_b0_reference\\strict_replay\\moveit_waypoint_joint_trajectory.csv": "3d2a4d51d8483b6632d44532459c004d7a86af589cc89adfaba4288fd1e6f3e7",
     "outputs\\p2b2_inputs\\stable_velocity_residual_update.csv": "a144c40bb950814797b029cb1ffd80bed5de62435ae43096d8d0732811f81712"
   },
+  "legacy_fk_drive_source": {
+    "archive_filename": "FAIRINO_FR5_P2B2_INTERMEDIATE_EVIDENCE_2026-09-27.zip",
+    "archive_member": "INTERMEDIATE_EVIDENCE/b0_reference/nominal_fk_trace.csv",
+    "drive_file_id": "1Itbn-X_f61tew9PW2Xe-kIBxNlMM4lf6",
+    "drive_folder_id": "153wAjeoPurkZK-4aUx9eDyXT-HB_ZyIn",
+    "member_sha256": "4d2097fc2a36da4c60d6c31883e46f2d8e8db8a97feec7a661ccf92bad0cadd4",
+    "source_identity_status": "READ_BACK_FROM_DRIVE_ARCHIVE_AND_MEMBER_SHA_VERIFIED",
+    "time_alignment": "FK waypoints 0..180 map row-wise to the authenticated legacy post-Ruckig trajectory timestamps"
+  },
   "legacy_measurement": {
     "d39_seed_prefix_max_abs_joint_delta_rad": 0.0,
     "local_below_speed_band_segment_count": 1,
@@ -171,364 +247,10 @@
     "wp16_projection_segment": 16
   },
   "limitations": [
-    "The run is software-only using MoveIt2 PlanningScene, MoveIt FK, configured dynamics, and Ruckig; no hardware/controller execution occurred.",
-    "Collision reports use adaptive_discrete_interpolation; this is not strict continuous collision detection.",
-    "Clearance/CCD, physical torque, calibrated TCP uncertainty, and physical spray ON/OFF commands are not established by this artifact.",
-    "Configured speed band is the existing 0.003 m/s target with ±5% diagnostic band; local measurements are listed individually in the ledger."
+    "WP179_TO_WP180_LOCAL_TIMING_ANOMALY: 0.0041438374043542055 m/s exceeds the configured 0.003 m/s +/- 5% diagnostic band; no deposition model is present.",
+    "Collision uses adaptive_discrete_interpolation; strict continuous collision detection is NOT_AVAILABLE.",
+    "Hardware/controller validation is NOT_RUN; physical torque, calibrated TCP uncertainty, and spray command state are not established."
   ],
   "schema": "p2b3-c1-r0-ordered-path-fidelity-v1",
-  "targeted_scientific_regression": {
-    "fresh_FK_crosscheck_max_position_delta_m": 0.0,
-    "full_p2b2_campaign_replayed": false,
-    "measured_bracket_endpoints": {
-      "joint:j3:negative": {
-        "historical_first_fail": {
-          "critical_waypoint": 180,
-          "dominant_failure_mode": "TERMINAL_POSITION_ERROR",
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.22701800961417096,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.024783909690665806,
-            "max_spray_axis_normal_error_waypoint": 171,
-            "max_tcp_path_error_m": 0.0041575413274096565,
-            "max_tcp_path_error_waypoint": 118,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.01662207981870476,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.004000110669315491
-          },
-          "expected_historical_status": "FAIL",
-          "failure_modes": [
-            "TERMINAL_POSITION_ERROR"
-          ],
-          "magnitude": 0.007213003181174694,
-          "measured_status": "FAIL"
-        },
-        "historical_last_pass": {
-          "critical_waypoint": null,
-          "dominant_failure_mode": null,
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.22701739782424912,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.02478329793144171,
-            "max_spray_axis_normal_error_waypoint": 171,
-            "max_tcp_path_error_m": 0.004157188696086323,
-            "max_tcp_path_error_waypoint": 118,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704717,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.00399977139083147
-          },
-          "expected_historical_status": "PASS",
-          "failure_modes": [],
-          "magnitude": 0.007212391391252626,
-          "measured_status": "PASS"
-        }
-      },
-      "joint:j3:positive": {
-        "historical_first_fail": {
-          "critical_waypoint": 180,
-          "dominant_failure_mode": "TERMINAL_POSITION_ERROR",
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21259203103280555,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.02476290319982064,
-            "max_spray_axis_normal_error_waypoint": 172,
-            "max_tcp_path_error_m": 0.004157525314649608,
-            "max_tcp_path_error_waypoint": 118,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.01662207981870477,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.004000095262899387
-          },
-          "expected_historical_status": "FAIL",
-          "failure_modes": [
-            "TERMINAL_POSITION_ERROR"
-          ],
-          "magnitude": 0.007212975400190721,
-          "measured_status": "FAIL"
-        },
-        "historical_last_pass": {
-          "critical_waypoint": null,
-          "dominant_failure_mode": null,
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21259288262376197,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.024762051649346715,
-            "max_spray_axis_normal_error_waypoint": 172,
-            "max_tcp_path_error_m": 0.004157034463729608,
-            "max_tcp_path_error_waypoint": 118,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704723,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.003999622998681802
-          },
-          "expected_historical_status": "PASS",
-          "failure_modes": [],
-          "magnitude": 0.007212123809234382,
-          "measured_status": "PASS"
-        }
-      },
-      "tcp_tcp_rotation:x:negative": {
-        "historical_first_fail": {
-          "critical_waypoint": 171,
-          "dominant_failure_mode": "SPRAY_AXIS_NORMAL_ERROR",
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21980500643299639,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.17457506136868006,
-            "max_spray_axis_normal_error_waypoint": 171,
-            "max_tcp_path_error_m": 0.0,
-            "max_tcp_path_error_waypoint": 0,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704765,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.0
-          },
-          "expected_historical_status": "FAIL",
-          "failure_modes": [
-            "SPRAY_AXIS_NORMAL_ERROR"
-          ],
-          "magnitude": 0.15748869422292583,
-          "measured_status": "FAIL"
-        },
-        "historical_last_pass": {
-          "critical_waypoint": null,
-          "dominant_failure_mode": null,
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21980500643299639,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.17451826479577714,
-            "max_spray_axis_normal_error_waypoint": 171,
-            "max_tcp_path_error_m": 0.0,
-            "max_tcp_path_error_waypoint": 0,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704765,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.0
-          },
-          "expected_historical_status": "PASS",
-          "failure_modes": [],
-          "magnitude": 0.1574318801196708,
-          "measured_status": "PASS"
-        }
-      },
-      "tcp_tcp_rotation:x:positive": {
-        "historical_first_fail": {
-          "critical_waypoint": 172,
-          "dominant_failure_mode": "SPRAY_AXIS_NORMAL_ERROR",
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21980500643299639,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.17455473571599878,
-            "max_spray_axis_normal_error_waypoint": 172,
-            "max_tcp_path_error_m": 0.0,
-            "max_tcp_path_error_waypoint": 0,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704765,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.0
-          },
-          "expected_historical_status": "FAIL",
-          "failure_modes": [
-            "SPRAY_AXIS_NORMAL_ERROR"
-          ],
-          "magnitude": 0.15748869422292583,
-          "measured_status": "FAIL"
-        },
-        "historical_last_pass": {
-          "critical_waypoint": null,
-          "dominant_failure_mode": null,
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21980500643299639,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.17449793909988562,
-            "max_spray_axis_normal_error_waypoint": 172,
-            "max_tcp_path_error_m": 0.0,
-            "max_tcp_path_error_waypoint": 0,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704765,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.0
-          },
-          "expected_historical_status": "PASS",
-          "failure_modes": [],
-          "magnitude": 0.1574318801196708,
-          "measured_status": "PASS"
-        }
-      },
-      "tcp_tcp_translation:x:negative": {
-        "historical_first_fail": {
-          "critical_waypoint": 180,
-          "dominant_failure_mode": "TERMINAL_POSITION_ERROR",
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21980500643299639,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.018883735338001206,
-            "max_spray_axis_normal_error_waypoint": 13,
-            "max_tcp_path_error_m": 0.004000000000000036,
-            "max_tcp_path_error_waypoint": 64,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704765,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.004000000000000005
-          },
-          "expected_historical_status": "FAIL",
-          "failure_modes": [
-            "TERMINAL_POSITION_ERROR"
-          ],
-          "magnitude": 0.004,
-          "measured_status": "FAIL"
-        },
-        "historical_last_pass": {
-          "critical_waypoint": null,
-          "dominant_failure_mode": null,
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21980500643299639,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.018883735338001206,
-            "max_spray_axis_normal_error_waypoint": 13,
-            "max_tcp_path_error_m": 0.003992187500000033,
-            "max_tcp_path_error_waypoint": 56,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704765,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.003992187500000002
-          },
-          "expected_historical_status": "PASS",
-          "failure_modes": [],
-          "magnitude": 0.0039921875,
-          "measured_status": "PASS"
-        }
-      },
-      "tcp_tcp_translation:x:positive": {
-        "historical_first_fail": {
-          "critical_waypoint": 180,
-          "dominant_failure_mode": "TERMINAL_POSITION_ERROR",
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21980500643299639,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.018883735338001206,
-            "max_spray_axis_normal_error_waypoint": 13,
-            "max_tcp_path_error_m": 0.004000000000000036,
-            "max_tcp_path_error_waypoint": 64,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704765,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.004000000000000005
-          },
-          "expected_historical_status": "FAIL",
-          "failure_modes": [
-            "TERMINAL_POSITION_ERROR"
-          ],
-          "magnitude": 0.004,
-          "measured_status": "FAIL"
-        },
-        "historical_last_pass": {
-          "critical_waypoint": null,
-          "dominant_failure_mode": null,
-          "evidence": {
-            "clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD",
-            "collision_method": "adaptive_discrete_interpolation",
-            "joint_limit_margin_min_rad": 0.21980500643299639,
-            "max_acceleration_ratio": 0.009579409241561908,
-            "max_jerk_ratio": 0.0005907053497581092,
-            "max_spray_axis_normal_error_rad": 0.018883735338001206,
-            "max_spray_axis_normal_error_waypoint": 13,
-            "max_tcp_path_error_m": 0.003992187500000033,
-            "max_tcp_path_error_waypoint": 56,
-            "max_velocity_ratio": 0.01895055891483406,
-            "minimum_environment_clearance_m": 0.08854440471744933,
-            "minimum_self_clearance_m": 0.016622079818704765,
-            "native_waypoint_self_collision_count": 0,
-            "native_waypoint_world_collision_count": 0,
-            "terminal_position_error_m": 0.003992187500000002
-          },
-          "expected_historical_status": "PASS",
-          "failure_modes": [],
-          "magnitude": 0.0039921875,
-          "measured_status": "PASS"
-        }
-      }
-    },
-    "recheck_code_commit": "05ff5cf853b2203ceba3dfb6c65ca040f0989a3c",
-    "selected_axes": [
-      "joint:j3:positive",
-      "joint:j3:negative",
-      "tcp_tcp_translation:x:positive",
-      "tcp_tcp_translation:x:negative",
-      "tcp_tcp_rotation:x:positive",
-      "tcp_tcp_rotation:x:negative"
-    ],
-    "selected_case_count": 12,
-    "status": "SIX_OLD_BRACKET_ENDPOINTS_REMEASURED"
-  },
-  "PROTECTED_P2B2_HASH_AUDIT": {
-    "c0_manifest_entries_checked": 5,
-    "entries_matching_stored_sha256": 4,
-    "mismatch": {
-      "path": "tests/test_p2b2_robustness_remapping.py",
-      "c0_declared_sha256": "be97a2607825ebbe393f1638503da25969b35c6ea71124608f1cbd22e32c4989",
-      "observed_sha256": "be97a2607825ebe393f1638503da25969b35c6ea71124608f1cbdd22e32c4989",
-      "frozen_base_git_blob": "6a7a2b86839d6e54e49c2af1781c56f020753d5f",
-      "worktree_git_blob": "6a7a2b86839d6e54e49c2af1781c56f020753d5f",
-      "worktree_diff_from_source_base": "NONE",
-      "classification": "C0_HASH_RECORD_MISMATCH; PROTECTED_FILE_UNMODIFIED"
-    }
-  }
+  "targeted_scientific_regression": null
 }

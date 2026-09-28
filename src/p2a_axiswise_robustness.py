@@ -170,6 +170,9 @@ def evaluate_joint_limits(trajectory: ProcessTrajectory) -> EvaluationResult:
         above = q[waypoint] - upper
         joint = int(np.argmax(np.maximum(below, above)))
         violation = float(max(below[joint], above[joint]))
+        margins = np.minimum(q - lower[None, :], upper[None, :] - q)
+        controlling_waypoint, controlling_joint = (int(value) for value in np.unravel_index(int(np.argmin(margins)), margins.shape))
+        controlling_side = "LOWER" if q[controlling_waypoint, controlling_joint] - lower[controlling_joint] <= upper[controlling_joint] - q[controlling_waypoint, controlling_joint] else "UPPER"
         return EvaluationResult(
             ResultStatus.FAIL,
             ("JOINT_LIMIT_FAILURE",),
@@ -182,7 +185,12 @@ def evaluate_joint_limits(trajectory: ProcessTrajectory) -> EvaluationResult:
                 "q_rad": float(q[waypoint, joint]),
                 "lower_rad": float(lower[joint]),
                 "upper_rad": float(upper[joint]),
+                "joint_limit_margin_min_rad": float(margins[controlling_waypoint, controlling_joint]),
+                "controlling_joint": f"j{controlling_joint + 1}",
+                "controlling_waypoint": controlling_waypoint,
+                "controlling_limit_side": controlling_side,
                 "state_was_clipped": False,
+                "metric_evaluation_status": "NOT_EVALUATED_AFTER_JOINT_LIMIT_FAILURE",
             },
         )
     if unknown:
@@ -201,11 +209,12 @@ def scan_axes_batched(
     *,
     max_refinement_iterations: int = 80,
 ) -> list[dict[str, Any]]:
-    """Coarse-scan all axes, then refine only an observed adjacent PASS→FAIL bracket.
+    """Coarse-scan all axes, then refine every observed adjacent PASS/FAIL transition.
 
     The callback may batch real MoveIt/FK evaluations. Missing callback rows fail
     closed as UNKNOWN. Every coarse and refinement perturbation is retained with
-    its requested and realized amplitude summary.
+    its requested and realized amplitude summary. UNKNOWN observations break the
+    transition graph: refinement never brackets across a missing measurement.
     """
     states: dict[str, dict[str, Any]] = {}
     coarse_candidates: list[ScanCandidate] = []
@@ -216,12 +225,8 @@ def scan_axes_batched(
             "coarse_candidates": [],
             "coarse_observations": [],
             "refinement_observations": [],
-            "low_candidate": None,
-            "low_result": None,
-            "high_candidate": None,
-            "high_result": None,
+            "boundaries": [],
             "refinement_blocked": None,
-            "refinement_iterations": 0,
         }
         states[spec.axis_id] = state
         if spec.capability_status != CapabilityStatus.AVAILABLE:
@@ -234,8 +239,8 @@ def scan_axes_batched(
             coarse_candidates.append(candidate)
 
     coarse_results = _evaluate_fail_closed(evaluate_batch, coarse_candidates)
-    active: dict[str, dict[str, Any]] = {}
-    for axis_id, state in states.items():
+    active: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    for state in states.values():
         spec: AxisSpec = state["spec"]
         if spec.capability_status != CapabilityStatus.AVAILABLE:
             continue
@@ -254,44 +259,68 @@ def scan_axes_batched(
                 else "NO_FAILURE_WITHIN_SEARCH_DOMAIN"
             )
             continue
-        first_fail = failures[0]
-        if first_fail == 0:
+        if failures[0] == 0:
             state["refinement_blocked"] = "NOMINAL_FAILURE"
-            continue
-        if statuses[first_fail - 1] != ResultStatus.PASS.value:
+        for index in range(len(statuses) - 1):
+            left_status, right_status = statuses[index], statuses[index + 1]
+            if {left_status, right_status} != {ResultStatus.PASS.value, ResultStatus.FAIL.value}:
+                continue
+            left_candidate, right_candidate = candidates[index], candidates[index + 1]
+            left_result = coarse_results[left_candidate.candidate_id]
+            right_result = coarse_results[right_candidate.candidate_id]
+            boundary = {
+                "coarse_transition_index": index,
+                "left_candidate": left_candidate,
+                "left_result": left_result,
+                "right_candidate": right_candidate,
+                "right_result": right_result,
+                "pass_candidate": left_candidate if left_status == ResultStatus.PASS.value else right_candidate,
+                "pass_result": left_result if left_status == ResultStatus.PASS.value else right_result,
+                "fail_candidate": left_candidate if left_status == ResultStatus.FAIL.value else right_candidate,
+                "fail_result": left_result if left_status == ResultStatus.FAIL.value else right_result,
+                "refinement_observations": [],
+                "refinement_iterations": 0,
+                "refinement_blocked": None,
+            }
+            state["boundaries"].append(boundary)
+            active.append((state, boundary))
+        if failures[0] > 0 and not state["boundaries"] and state["refinement_blocked"] is None:
             state["refinement_blocked"] = "NO_ADJACENT_PASS_FAIL_BRACKET"
-            continue
-        state["low_candidate"] = candidates[first_fail - 1]
-        state["low_result"] = coarse_results[candidates[first_fail - 1].candidate_id]
-        state["high_candidate"] = candidates[first_fail]
-        state["high_result"] = coarse_results[candidates[first_fail].candidate_id]
-        active[axis_id] = state
 
     for iteration in range(max_refinement_iterations):
         midpoints: list[ScanCandidate] = []
-        for state in active.values():
-            low: ScanCandidate = state["low_candidate"]
-            high: ScanCandidate = state["high_candidate"]
-            if high.magnitude - low.magnitude <= state["spec"].refinement_tolerance:
+        owners: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
+        for state, boundary in active:
+            if boundary["refinement_blocked"] is not None:
                 continue
-            midpoint = 0.5 * (low.magnitude + high.magnitude)
-            candidate = _make_candidate(nominal, state["spec"], midpoint, "refinement", iteration)
+            passing: ScanCandidate = boundary["pass_candidate"]
+            failing: ScanCandidate = boundary["fail_candidate"]
+            if abs(failing.magnitude - passing.magnitude) <= state["spec"].refinement_tolerance:
+                continue
+            midpoint = 0.5 * (passing.magnitude + failing.magnitude)
+            boundary_index = next(
+                index for index, item in enumerate(state["boundaries"]) if item is boundary
+            )
+            candidate_index = boundary_index * (max_refinement_iterations + 1) + iteration
+            candidate = _make_candidate(nominal, state["spec"], midpoint, "refinement", candidate_index)
             midpoints.append(candidate)
+            owners[candidate.candidate_id] = (state, boundary)
         if not midpoints:
             break
         midpoint_results = _evaluate_fail_closed(evaluate_batch, midpoints)
         for candidate in midpoints:
-            state = active[candidate.spec.axis_id]
+            state, boundary = owners[candidate.candidate_id]
             result = midpoint_results[candidate.candidate_id]
-            state["refinement_iterations"] += 1
-            state["refinement_observations"].append(_observation(candidate, result, nominal))
+            observation = _observation(candidate, result, nominal)
+            boundary["refinement_iterations"] += 1
+            boundary["refinement_observations"].append(observation)
+            state["refinement_observations"].append(observation)
             if result.status == ResultStatus.PASS:
-                state["low_candidate"], state["low_result"] = candidate, result
+                boundary["pass_candidate"], boundary["pass_result"] = candidate, result
             elif result.status == ResultStatus.FAIL:
-                state["high_candidate"], state["high_result"] = candidate, result
+                boundary["fail_candidate"], boundary["fail_result"] = candidate, result
             else:
-                state["refinement_blocked"] = "REFINEMENT_BLOCKED_UNKNOWN"
-                active.pop(candidate.spec.axis_id, None)
+                boundary["refinement_blocked"] = "REFINEMENT_BLOCKED_UNKNOWN"
 
     return [_finish_axis(state) for state in states.values()]
 
@@ -308,7 +337,14 @@ def _finish_axis(state: Mapping[str, Any]) -> dict[str, Any]:
             "coarse_observations": [],
             "refinement_observations": [],
             "failure_intervals": [],
+            "all_failure_intervals": [],
+            "all_refined_boundaries": [],
+            "first_failure_margin": None,
+            "global_minimum_observed_failure_boundary": None,
+            "transition_refinement_completeness": "NOT_RUN",
+            "robustness_acceptance_status": "NOT_EVALUATED",
             "monotonicity_observation": "NOT_EVALUATED_CAPABILITY_UNAVAILABLE",
+            "non_monotonic_failure_region_observed": False,
             "search_termination_reason": "CAPABILITY_UNAVAILABLE",
             "search_completeness": "NOT_RUN",
             "last_passing_perturbation": None,
@@ -320,9 +356,8 @@ def _finish_axis(state: Mapping[str, Any]) -> dict[str, Any]:
     statuses = [row["status"] for row in coarse]
     failure_indices = [i for i, status in enumerate(statuses) if status == ResultStatus.FAIL.value]
     has_fail_then_pass = any(
-        statuses[i] == ResultStatus.FAIL.value
-        and any(value == ResultStatus.PASS.value for value in statuses[i + 1 :])
-        for i in range(len(statuses))
+        statuses[i] == ResultStatus.FAIL.value and statuses[i + 1] == ResultStatus.PASS.value
+        for i in range(len(statuses) - 1)
     )
     failure_intervals: list[dict[str, Any]] = []
     index = 0
@@ -334,6 +369,8 @@ def _finish_axis(state: Mapping[str, Any]) -> dict[str, Any]:
         while index + 1 < len(statuses) and statuses[index + 1] == ResultStatus.FAIL.value:
             index += 1
         failure_intervals.append({
+            "first_index": start,
+            "last_index": index,
             "first_magnitude": coarse[start]["magnitude"],
             "last_magnitude": coarse[index]["magnitude"],
             "sample_count": index - start + 1,
@@ -361,7 +398,14 @@ def _finish_axis(state: Mapping[str, Any]) -> dict[str, Any]:
             "coarse_observations": coarse,
             "refinement_observations": refinement,
             "failure_intervals": failure_intervals,
+            "all_failure_intervals": failure_intervals,
+            "all_refined_boundaries": [],
+            "first_failure_margin": None,
+            "global_minimum_observed_failure_boundary": None,
+            "transition_refinement_completeness": "NO_OBSERVED_PASS_FAIL_TRANSITIONS",
+            "robustness_acceptance_status": "NOT_EVALUATED_BOUNDARY_REFINEMENT_IS_MEASUREMENT_ONLY",
             "monotonicity_observation": monotonicity,
+            "non_monotonic_failure_region_observed": False,
             "search_termination_reason": state.get("refinement_blocked"),
             "search_completeness": "FULL_COARSE_DOMAIN_SAMPLED" if ResultStatus.UNKNOWN.value not in statuses else "INCOMPLETE_CAPABILITY_GAP",
             "nominal_evaluation": initial,
@@ -373,55 +417,120 @@ def _finish_axis(state: Mapping[str, Any]) -> dict[str, Any]:
 
     first_fail_index = failure_indices[0]
     first_fail = coarse[first_fail_index]
-    low = state.get("low_candidate")
-    high = state.get("high_candidate")
-    low_result = state.get("low_result")
-    high_result = state.get("high_result")
-    bracket: dict[str, Any] | None = None
-    estimate: float | None = None
-    boundary_signed: float | None = None
-    last_pass_record = coarse[first_fail_index - 1] if first_fail_index > 0 and statuses[first_fail_index - 1] == ResultStatus.PASS.value else None
-    first_fail_record = first_fail
-    if low is not None and high is not None and low_result is not None and high_result is not None:
-        estimate = 0.5 * (low.magnitude + high.magnitude)
-        boundary_signed = spec.direction * estimate
-        low_record = _candidate_result_record(low, low_result, state["nominal"])
-        high_record = _candidate_result_record(high, high_result, state["nominal"])
+    refined_boundaries: list[dict[str, Any]] = []
+    for boundary in state.get("boundaries", []):
+        left: ScanCandidate = boundary["left_candidate"]
+        right: ScanCandidate = boundary["right_candidate"]
+        passing: ScanCandidate = boundary["pass_candidate"]
+        failing: ScanCandidate = boundary["fail_candidate"]
+        width = abs(failing.magnitude - passing.magnitude)
+        converged = width <= spec.refinement_tolerance
+        if boundary["refinement_blocked"]:
+            convergence = boundary["refinement_blocked"]
+        elif converged:
+            convergence = "REFINED_TO_TOLERANCE"
+        else:
+            convergence = "REFINEMENT_ITERATION_LIMIT"
+        left_status = boundary["left_result"].status.value
+        right_status = boundary["right_result"].status.value
+        boundary_magnitude = 0.5 * (passing.magnitude + failing.magnitude)
+        refined_boundaries.append({
+            "coarse_transition_index": boundary["coarse_transition_index"],
+            "coarse_left": _candidate_result_record(left, boundary["left_result"], state["nominal"]),
+            "coarse_right": _candidate_result_record(right, boundary["right_result"], state["nominal"]),
+            "transition": f"{left_status}_TO_{right_status}",
+            "last_pass": _candidate_result_record(passing, boundary["pass_result"], state["nominal"]),
+            "first_fail": _candidate_result_record(failing, boundary["fail_result"], state["nominal"]),
+            "bracket_magnitude_min": min(passing.magnitude, failing.magnitude),
+            "bracket_magnitude_max": max(passing.magnitude, failing.magnitude),
+            "width": width,
+            "boundary_estimate_magnitude": boundary_magnitude,
+            "boundary_estimate_signed": spec.direction * boundary_magnitude,
+            "units": spec.units,
+            "refinement_iterations": boundary["refinement_iterations"],
+            "refinement_status": convergence,
+            "converged_to_tolerance": converged,
+            "refinement_blocked": boundary["refinement_blocked"],
+            "refinement_observations": list(boundary["refinement_observations"]),
+        })
+    primary_boundary = next(
+        (row for row in refined_boundaries if row["transition"] == "PASS_TO_FAIL"),
+        refined_boundaries[0] if refined_boundaries else None,
+    )
+    bracket = None
+    last_pass_record = None
+    first_fail_record: dict[str, Any] | None = first_fail
+    estimate = None
+    boundary_signed = None
+    if primary_boundary is not None:
         bracket = {
-            "last_pass": low_record,
-            "first_fail": high_record,
-            "width": high.magnitude - low.magnitude,
+            "last_pass": primary_boundary["last_pass"],
+            "first_fail": primary_boundary["first_fail"],
+            "width": primary_boundary["width"],
             "units": spec.units,
         }
-        last_pass_record = low_record
-        first_fail_record = high_record
+        last_pass_record = primary_boundary["last_pass"]
+        first_fail_record = primary_boundary["first_fail"]
+        estimate = primary_boundary["boundary_estimate_magnitude"]
+        boundary_signed = primary_boundary["boundary_estimate_signed"]
     elif first_fail_index == 0:
         estimate = 0.0
         boundary_signed = 0.0
 
-    if state.get("refinement_blocked") == "REFINEMENT_BLOCKED_UNKNOWN":
-        termination = "REFINEMENT_BLOCKED_UNKNOWN"
-    elif bracket is None:
-        termination = state.get("refinement_blocked") or "FIRST_FAILURE_OBSERVED_WITHOUT_REFINEABLE_BRACKET"
-    elif bracket["width"] <= spec.refinement_tolerance:
-        termination = "REFINED_TO_TOLERANCE"
+    boundary_statuses = [row["refinement_status"] for row in refined_boundaries]
+    if any(value == "REFINEMENT_BLOCKED_UNKNOWN" for value in boundary_statuses):
+        transition_completeness = "INCOMPLETE_REFINEMENT_UNKNOWN"
+    elif any(value == "REFINEMENT_ITERATION_LIMIT" for value in boundary_statuses):
+        transition_completeness = "INCOMPLETE_REFINEMENT_ITERATION_LIMIT"
+    elif refined_boundaries:
+        transition_completeness = "ALL_OBSERVED_PASS_FAIL_TRANSITIONS_REFINED"
     else:
+        transition_completeness = "NO_OBSERVED_PASS_FAIL_TRANSITIONS"
+
+    if first_fail_index == 0:
+        termination = "NOMINAL_FAILURE"
+    elif transition_completeness == "INCOMPLETE_REFINEMENT_UNKNOWN":
+        termination = "REFINEMENT_BLOCKED_UNKNOWN"
+    elif transition_completeness == "INCOMPLETE_REFINEMENT_ITERATION_LIMIT":
         termination = "REFINEMENT_ITERATION_LIMIT"
-    complete = "LOCAL_BRACKET_REFINED" if bracket and bracket["width"] <= spec.refinement_tolerance else "COARSE_FIRST_FAILURE_ONLY"
-    if ResultStatus.UNKNOWN.value in statuses[: first_fail_index + 1]:
-        complete = "INCOMPLETE_CAPABILITY_GAP_BEFORE_FAILURE"
+    elif primary_boundary is not None and len(refined_boundaries) == 1:
+        termination = "REFINED_TO_TOLERANCE"
+    elif refined_boundaries:
+        termination = "ALL_OBSERVED_TRANSITIONS_REFINED"
+    else:
+        termination = state.get("refinement_blocked") or "FIRST_FAILURE_OBSERVED_WITHOUT_REFINEABLE_BRACKET"
+    if first_fail_index == 0:
+        complete = "NOMINAL_FAILURE"
+    elif ResultStatus.UNKNOWN.value in statuses:
+        complete = "INCOMPLETE_CAPABILITY_GAP"
+    elif transition_completeness == "ALL_OBSERVED_PASS_FAIL_TRANSITIONS_REFINED":
+        complete = "ALL_OBSERVED_TRANSITIONS_REFINED"
+    else:
+        complete = transition_completeness
+    primary_margin = None if estimate is None else {"value": estimate, "units": spec.units}
+    first_failure_margin = (
+        {"value": 0.0, "units": spec.units} if first_fail_index == 0
+        else primary_margin if primary_boundary and primary_boundary["transition"] == "PASS_TO_FAIL"
+        else None
+    )
     return {
         "specification": spec.to_record(),
-        "axis_status": "FIRST_FAILURE_OBSERVED",
+        "axis_status": "NOMINAL_FAILURE" if first_fail_index == 0 else "FIRST_FAILURE_OBSERVED",
         "coarse_state_sequence": statuses,
         "coarse_observations": coarse,
         "refinement_observations": refinement,
         "failure_intervals": failure_intervals,
+        "all_failure_intervals": failure_intervals,
+        "all_refined_boundaries": refined_boundaries,
+        "first_failure_margin": first_failure_margin,
+        "global_minimum_observed_failure_boundary": first_failure_margin,
+        "transition_refinement_completeness": transition_completeness,
+        "robustness_acceptance_status": "NOT_EVALUATED_BOUNDARY_REFINEMENT_IS_MEASUREMENT_ONLY",
         "non_monotonic_failure_region_observed": has_fail_then_pass,
         "monotonicity_observation": monotonicity,
         "first_observed_failure_interval": {
             "from_magnitude": last_pass_record["magnitude"] if last_pass_record else None,
-            "to_magnitude": first_fail_record["magnitude"],
+            "to_magnitude": first_fail_record["magnitude"] if first_fail_record else None,
             "units": spec.units,
         },
         "refined_bracket": bracket,
@@ -429,7 +538,7 @@ def _finish_axis(state: Mapping[str, Any]) -> dict[str, Any]:
         "last_passing_perturbation": last_pass_record,
         "first_failing_perturbation": first_fail_record,
         "refined_boundary_estimate": None if boundary_signed is None else {"value": boundary_signed, "units": spec.units},
-        "estimated_raw_axis_margin": None if estimate is None else {"value": estimate, "units": spec.units},
+        "estimated_raw_axis_margin": primary_margin,
         "search_termination_reason": termination,
         "search_completeness": complete,
     }
@@ -441,7 +550,18 @@ def _evaluate_fail_closed(
 ) -> dict[str, EvaluationResult]:
     if not candidates:
         return {}
-    returned = callback(candidates)
+    try:
+        returned = callback(candidates)
+    except Exception as exc:
+        reason = f"batch_evaluator_exception:{type(exc).__name__}:{exc}"
+        return {
+            candidate.candidate_id: EvaluationResult(
+                ResultStatus.UNKNOWN,
+                evaluator_capabilities={"batch_evaluator": "UNKNOWN"},
+                evidence={"reason": reason},
+            )
+            for candidate in candidates
+        }
     result: dict[str, EvaluationResult] = {}
     for candidate in candidates:
         value = returned.get(candidate.candidate_id)
@@ -481,15 +601,20 @@ def _candidate_id(spec: AxisSpec, magnitude: float, phase: str, index: int | Non
 
 def _observation(candidate: ScanCandidate, result: EvaluationResult, nominal: ProcessTrajectory) -> dict[str, Any]:
     realized = realized_perturbation(nominal, candidate.application.trajectory, candidate.spec, candidate.signed_delta, candidate.application.status)
+    record = result.to_record()
+    record["evidence"] = _complete_candidate_evidence(record, candidate.application.status)
     return {
+        "axis_id": candidate.spec.axis_id,
         "candidate_id": candidate.candidate_id,
+        "nominal_trajectory_sha256": nominal.metadata.get("trajectory_sha256"),
         "phase": candidate.phase,
         "sample_index": candidate.sample_index,
         "refinement_iteration": candidate.refinement_iteration,
         "magnitude": candidate.magnitude,
+        "signed_perturbation": candidate.signed_delta,
         "requested_perturbation": {"value": candidate.signed_delta, "units": candidate.spec.units},
         "realized_perturbation": realized,
-        **result.to_record(),
+        **record,
     }
 
 
@@ -497,13 +622,47 @@ def _candidate_result_record(candidate: ScanCandidate, result: EvaluationResult,
     realized: dict[str, Any] | None = None
     if nominal is not None:
         realized = realized_perturbation(nominal, candidate.application.trajectory, candidate.spec, candidate.signed_delta, candidate.application.status)
+    record = result.to_record()
+    record["evidence"] = _complete_candidate_evidence(record, candidate.application.status)
     return {
+        "axis_id": candidate.spec.axis_id,
         "candidate_id": candidate.candidate_id,
+        "nominal_trajectory_sha256": None if nominal is None else nominal.metadata.get("trajectory_sha256"),
         "magnitude": candidate.magnitude,
+        "signed_perturbation": candidate.signed_delta,
         "requested_perturbation": {"value": candidate.signed_delta, "units": candidate.spec.units},
         "realized_perturbation": realized,
-        **result.to_record(),
+        **record,
     }
+
+
+def _complete_candidate_evidence(record: Mapping[str, Any], application_status: ApplicationStatus) -> dict[str, Any]:
+    evidence = dict(record.get("evidence", {}))
+    failed_on_joint_limit = "JOINT_LIMIT_FAILURE" in record.get("failure_modes", [])
+    measured_fields = (
+        "joint_limit_margin_min_rad", "controlling_joint", "controlling_waypoint", "controlling_limit_side",
+        "max_tcp_path_error_m", "max_tcp_path_error_waypoint", "terminal_position_error_m",
+        "max_spray_axis_normal_error_rad", "max_spray_axis_normal_error_waypoint",
+        "max_velocity_ratio", "max_acceleration_ratio", "max_jerk_ratio",
+        "native_waypoint_world_collision_count", "native_waypoint_self_collision_count",
+        "minimum_environment_clearance_m", "minimum_environment_clearance_waypoint",
+        "minimum_environment_clearance_pair", "minimum_self_clearance_m", "minimum_self_clearance_waypoint",
+        "minimum_self_clearance_pair", "collision_method", "wp179_to_wp180_fk_tcp_speed_m_s",
+        "wp179_to_wp180_local_timing_status",
+    )
+    for key in measured_fields:
+        if key not in evidence:
+            evidence[key] = None
+    if evidence.get("collision_method") is None:
+        evidence["collision_method"] = "NOT_RUN_JOINT_LIMIT_FAILURE" if failed_on_joint_limit else "UNKNOWN"
+    evidence.setdefault("strict_continuous_self_collision_ccd", record.get("evaluator_capabilities", {}).get("strict_continuous_self_collision_ccd", "NOT_AVAILABLE"))
+    evidence.setdefault("candidate_ruckig_retime", record.get("evaluator_capabilities", {}).get("candidate_ruckig_retime", "NOT_RUN_FIXED_C1_TIMESTAMPS"))
+    evidence.setdefault("measurement_status", (
+        "NOT_EVALUATED_AFTER_JOINT_LIMIT_FAILURE" if failed_on_joint_limit else
+        "NOT_EVALUATED_OPERATOR_UNAVAILABLE" if application_status != ApplicationStatus.APPLIED else
+        "PARTIAL_OR_UNKNOWN" if record.get("status") == ResultStatus.UNKNOWN.value else "EVALUATED"
+    ))
+    return evidence
 
 
 def realized_perturbation(
@@ -716,11 +875,17 @@ class _D41BatchEvaluator:
             q_key_by_case[case_id] = q_key
             self._case_for_q[q_key] = case_id
 
-        native_root = self.d46.run_native(batch_root, case_rows, native_name="native")
-        fk_trace = _run_existing_fk(batch_root, native_root, self.d46)
-        batch_metrics = _read_native_and_fk_metrics(
-            native_root, fk_trace, self.nominal.tcp_poses, self.nominal.surface_normals, self.d46
-        )
+        try:
+            native_root = self.d46.run_native(batch_root, case_rows, native_name="native")
+            fk_trace = _run_existing_fk(batch_root, native_root, self.d46)
+            batch_metrics = _read_native_and_fk_metrics(
+                native_root, fk_trace, self.nominal.tcp_poses, self.nominal.surface_normals, self.d46
+            )
+        except Exception:
+            # Consume the directory number even on a failed experiment so the
+            # next independent chunk can proceed inside the same scratch root.
+            self._batch_number += 1
+            raise
         for case_id, q_key in q_key_by_case.items():
             metric = batch_metrics.get(case_id)
             if metric is not None:
@@ -753,6 +918,16 @@ class _D41BatchEvaluator:
         terminal_normal_error = float(normal_error[-1])
 
         velocity, acceleration, jerk = self.d46.finite_derivatives(q, self.timestamps_s)
+        tcp_segment_distance = np.linalg.norm(np.diff(actual_position, axis=0), axis=1)
+        tcp_segment_speed = tcp_segment_distance / np.diff(self.timestamps_s)
+        max_tcp_speed_segment = int(np.argmax(tcp_segment_speed)) if tcp_segment_speed.size else None
+        wp179_to_180_speed = float(tcp_segment_speed[179]) if tcp_segment_speed.size > 179 else None
+        speed_low, speed_high = 0.003 * 0.95, 0.003 * 1.05
+        wp179_to_180_speed_status = (
+            "UNKNOWN" if wp179_to_180_speed is None else
+            "WITHIN_CONFIGURED_BAND" if speed_low <= wp179_to_180_speed <= speed_high else
+            "BELOW_CONFIGURED_BAND" if wp179_to_180_speed < speed_low else "ABOVE_CONFIGURED_BAND"
+        )
         dynamic_columns = [self.dynamic_limits[f"j{index + 1}"] for index in range(6)]
         velocity_limits = np.asarray([row["velocity_rad_s"] for row in dynamic_columns], dtype=np.float64)
         acceleration_limits = np.asarray([row["acceleration_rad_s2"] for row in dynamic_columns], dtype=np.float64)
@@ -820,6 +995,8 @@ class _D41BatchEvaluator:
             failure_margin["maximum_joint_step_excess_rad"] = max_jump - self.joint_step_limit_rad
 
         q_margin = np.minimum(q - self.lower[None, :], self.upper[None, :] - q)
+        controlling_waypoint, controlling_joint = (int(value) for value in np.unravel_index(int(np.argmin(q_margin)), q_margin.shape))
+        controlling_side = "LOWER" if q[controlling_waypoint, controlling_joint] - self.lower[controlling_joint] <= self.upper[controlling_joint] - q[controlling_waypoint, controlling_joint] else "UPPER"
         nominal = self._physical_by_q.get(self._nominal_q_key, physical)
         nominal_position = np.asarray(nominal["position_error"], dtype=np.float64)
         nominal_normal = np.asarray(nominal["normal_error"], dtype=np.float64)
@@ -847,7 +1024,10 @@ class _D41BatchEvaluator:
             "transition_collision_adaptive_discrete_interpolation": "AVAILABLE",
             "native_robot_world_two_state_query": "AVAILABLE",
             "fcl_environment_and_self_distance": "AVAILABLE",
+            "environment_clearance_distance": "AVAILABLE_IF_REPORTED_BY_NATIVE_FCL",
+            "self_clearance_distance": "AVAILABLE_IF_REPORTED_BY_NATIVE_FCL",
             "finite_difference_dynamics": "AVAILABLE_AUDIT_ONLY_CONFIGURED_LIMITS_UNVERIFIED",
+            "candidate_ruckig_retime": "NOT_RUN_FIXED_C1_TIMESTAMPS",
             "strict_continuous_self_collision_ccd": "NOT_AVAILABLE",
             "physical_singularity_threshold": "UNKNOWN",
             "physical_torque": "NOT_AVAILABLE",
@@ -884,6 +1064,10 @@ class _D41BatchEvaluator:
             "jacobian_is_diagnostic_not_an_unsafe_classification": True,
             "max_tcp_path_error_m": float(np.max(position_error)),
             "max_tcp_path_error_waypoint": max_position_index,
+            "max_fk_tcp_segment_speed_m_s": float(np.max(tcp_segment_speed)) if tcp_segment_speed.size else None,
+            "max_fk_tcp_segment_speed_segment": max_tcp_speed_segment,
+            "wp179_to_wp180_fk_tcp_speed_m_s": wp179_to_180_speed,
+            "wp179_to_wp180_local_timing_status": wp179_to_180_speed_status,
             "terminal_position_error_m": terminal_position_error,
             "max_spray_axis_normal_error_rad": float(np.max(normal_error)),
             "max_spray_axis_normal_error_waypoint": max_normal_index,
@@ -892,6 +1076,9 @@ class _D41BatchEvaluator:
             "full_quaternion_difference_terminal_rad_diagnostic_only": float(full_quaternion_difference[-1]),
             "orientation_failure_gate": normal_source + "; tool-axis roll is not counted as spray-normal error",
             "joint_limit_margin_min_rad": float(np.min(q_margin)),
+            "controlling_joint": f"j{controlling_joint + 1}",
+            "controlling_waypoint": controlling_waypoint,
+            "controlling_limit_side": controlling_side,
             "max_velocity_ratio": float(np.max(velocity_ratio)),
             "max_acceleration_ratio": float(np.max(acceleration_ratio)),
             "max_jerk_ratio": float(np.max(jerk_ratio)),

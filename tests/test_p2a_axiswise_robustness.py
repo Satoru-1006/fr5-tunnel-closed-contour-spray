@@ -189,6 +189,8 @@ def test_joint_limit_exceedance_is_not_silently_clipped() -> None:
     result = evaluate_joint_limits(candidate.application.trajectory)
     assert result.status == ResultStatus.FAIL
     assert result.evidence["state_was_clipped"] is False
+    assert result.evidence["metric_evaluation_status"] == "NOT_EVALUATED_AFTER_JOINT_LIMIT_FAILURE"
+    assert result.evidence["controlling_joint"] == "j6"
     assert result.failure_margin["joint_limit_violation_rad"] > 0
 
 
@@ -205,6 +207,41 @@ def test_refinement_converges_to_known_synthetic_threshold() -> None:
     assert result["search_termination_reason"] == "REFINED_TO_TOLERANCE"
     assert result["refined_bracket"]["width"] <= result["specification"]["refinement_tolerance"]
     assert abs(result["estimated_raw_axis_margin"]["value"] - 0.37) <= 1e-4
+
+
+def test_no_failure_in_domain_stays_a_domain_limited_result() -> None:
+    spec = _joint_spec()
+    result = scan_axes_batched(
+        _trajectory(), [spec],
+        lambda candidates: {candidate.candidate_id: EvaluationResult(ResultStatus.PASS) for candidate in candidates},
+    )[0]
+    assert result["axis_status"] == "NO_FAILURE_WITHIN_SEARCH_DOMAIN"
+    assert result["search_completeness"] == "FULL_COARSE_DOMAIN_SAMPLED"
+    assert result["first_failure_margin"] is None
+
+
+def test_nominal_failure_is_explicit_and_never_reported_as_positive_margin() -> None:
+    spec = _joint_spec()
+
+    def evaluate(candidates):
+        return {
+            candidate.candidate_id: EvaluationResult(
+                ResultStatus.FAIL if candidate.magnitude == 0.0 else ResultStatus.PASS,
+                ("NOMINAL_FAILURE",) if candidate.magnitude == 0.0 else (),
+            )
+            for candidate in candidates
+        }
+
+    result = scan_axes_batched(_trajectory(), [spec], evaluate)[0]
+    assert result["search_termination_reason"] == "NOMINAL_FAILURE"
+    assert result["first_failure_margin"] == {"value": 0.0, "units": "rad"}
+
+
+def test_evaluator_exception_becomes_unknown_and_does_not_crash_scan() -> None:
+    result = scan_axes_batched(_trajectory(), [_joint_spec()], lambda _candidates: (_ for _ in ()).throw(TimeoutError("bounded test outage")))[0]
+    assert result["axis_status"] == "CAPABILITY_GAP_IN_SEARCH_DOMAIN"
+    assert result["search_completeness"] == "INCOMPLETE_CAPABILITY_GAP"
+    assert all(row["status"] == "UNKNOWN" for row in result["coarse_observations"])
 
 
 def test_non_monotonic_failure_islands_are_retained_and_not_called_monotonic() -> None:
@@ -238,6 +275,174 @@ def test_non_monotonic_failure_islands_are_retained_and_not_called_monotonic() -
     assert result["non_monotonic_failure_region_observed"] is True
     assert len(result["failure_intervals"]) >= 2
     assert result["first_failing_perturbation"]["magnitude"] < 0.3
+
+
+def test_every_transition_in_pass_fail_pass_pattern_is_refined() -> None:
+    nominal = _trajectory()
+    spec = AxisSpec(
+        axis_id="synthetic_pass_fail_pass",
+        perturbation_family=StressFamily.JOINT_STATE,
+        axis="J6",
+        coordinate_frame="joint_state_radians",
+        direction=1,
+        units="rad",
+        search_domain_max=1.0,
+        coarse_intervals=2,
+        refinement_tolerance=1e-3,
+        operator_parameters={"mode": "joint_offset", "joint_index": 5},
+    )
+
+    def evaluate(candidates):
+        output = {}
+        for candidate in candidates:
+            magnitude = candidate.magnitude
+            fail = 0.3 <= magnitude <= 0.7
+            output[candidate.candidate_id] = EvaluationResult(
+                ResultStatus.FAIL if fail else ResultStatus.PASS,
+                ("SYNTHETIC_ISLAND",) if fail else (),
+            )
+        return output
+
+    result = scan_axes_batched(nominal, [spec], evaluate)[0]
+    boundaries = result["all_refined_boundaries"]
+    assert [boundary["transition"] for boundary in boundaries] == ["PASS_TO_FAIL", "FAIL_TO_PASS"]
+    assert all(boundary["refinement_status"] == "REFINED_TO_TOLERANCE" for boundary in boundaries)
+    assert all(boundary["width"] <= spec.refinement_tolerance for boundary in boundaries)
+    assert result["transition_refinement_completeness"] == "ALL_OBSERVED_PASS_FAIL_TRANSITIONS_REFINED"
+    assert result["robustness_acceptance_status"] == "NOT_EVALUATED_BOUNDARY_REFINEMENT_IS_MEASUREMENT_ONLY"
+
+
+def test_all_three_transitions_in_pass_fail_pass_fail_pattern_are_refined() -> None:
+    nominal = _trajectory()
+    spec = AxisSpec(
+        axis_id="synthetic_two_failure_islands",
+        perturbation_family=StressFamily.JOINT_STATE,
+        axis="J6",
+        coordinate_frame="joint_state_radians",
+        direction=1,
+        units="rad",
+        search_domain_max=1.0,
+        coarse_intervals=3,
+        refinement_tolerance=1e-3,
+        operator_parameters={"mode": "joint_offset", "joint_index": 5},
+    )
+
+    def evaluate(candidates):
+        output = {}
+        for candidate in candidates:
+            magnitude = candidate.magnitude
+            fail = 0.30 <= magnitude <= 0.45 or magnitude >= 0.85
+            output[candidate.candidate_id] = EvaluationResult(
+                ResultStatus.FAIL if fail else ResultStatus.PASS,
+                ("SYNTHETIC_ISLAND",) if fail else (),
+            )
+        return output
+
+    result = scan_axes_batched(nominal, [spec], evaluate)[0]
+    boundaries = result["all_refined_boundaries"]
+    assert [boundary["transition"] for boundary in boundaries] == ["PASS_TO_FAIL", "FAIL_TO_PASS", "PASS_TO_FAIL"]
+    assert all(boundary["refinement_status"] == "REFINED_TO_TOLERANCE" for boundary in boundaries)
+    assert all(boundary["width"] <= spec.refinement_tolerance for boundary in boundaries)
+    assert len(result["all_failure_intervals"]) == 2
+    assert result["first_failure_margin"]["value"] == boundaries[0]["boundary_estimate_magnitude"]
+
+
+def test_unknown_coarse_sample_breaks_bracketing_without_blocking_later_transitions() -> None:
+    nominal = _trajectory()
+    spec = AxisSpec(
+        axis_id="synthetic_unknown_gap",
+        perturbation_family=StressFamily.JOINT_STATE,
+        axis="J6",
+        coordinate_frame="joint_state_radians",
+        direction=1,
+        units="rad",
+        search_domain_max=1.0,
+        coarse_intervals=4,
+        refinement_tolerance=1e-3,
+        operator_parameters={"mode": "joint_offset", "joint_index": 5},
+    )
+
+    def evaluate(candidates):
+        output = {}
+        for candidate in candidates:
+            magnitude = candidate.magnitude
+            if 0.2 <= magnitude <= 0.3:
+                status = ResultStatus.UNKNOWN
+            else:
+                fail = 0.3 < magnitude < 0.6 or magnitude >= 0.85
+                status = ResultStatus.FAIL if fail else ResultStatus.PASS
+            output[candidate.candidate_id] = EvaluationResult(status, ("SYNTHETIC_FAILURE",) if status == ResultStatus.FAIL else ())
+        return output
+
+    result = scan_axes_batched(nominal, [spec], evaluate)[0]
+    assert result["coarse_state_sequence"] == ["PASS", "UNKNOWN", "FAIL", "PASS", "FAIL"]
+    assert [boundary["transition"] for boundary in result["all_refined_boundaries"]] == ["FAIL_TO_PASS", "PASS_TO_FAIL"]
+    assert all(boundary["width"] <= spec.refinement_tolerance for boundary in result["all_refined_boundaries"])
+    assert result["search_completeness"] == "INCOMPLETE_CAPABILITY_GAP"
+
+
+def test_unknown_refinement_midpoint_blocks_only_its_own_boundary() -> None:
+    nominal = _trajectory()
+    spec = AxisSpec(
+        axis_id="synthetic_unknown_refinement",
+        perturbation_family=StressFamily.JOINT_STATE,
+        axis="J6",
+        coordinate_frame="joint_state_radians",
+        direction=1,
+        units="rad",
+        search_domain_max=1.0,
+        coarse_intervals=2,
+        refinement_tolerance=1e-3,
+        operator_parameters={"mode": "joint_offset", "joint_index": 5},
+    )
+
+    def evaluate(candidates):
+        output = {}
+        for candidate in candidates:
+            if np.isclose(candidate.magnitude, 0.375):
+                status = ResultStatus.UNKNOWN
+            else:
+                status = ResultStatus.FAIL if candidate.magnitude >= 0.5 else ResultStatus.PASS
+            output[candidate.candidate_id] = EvaluationResult(status)
+        return output
+
+    result = scan_axes_batched(nominal, [spec], evaluate)[0]
+    boundary, = result["all_refined_boundaries"]
+    assert boundary["refinement_status"] == "REFINEMENT_BLOCKED_UNKNOWN"
+    assert boundary["converged_to_tolerance"] is False
+    assert boundary["width"] > spec.refinement_tolerance
+    assert result["search_termination_reason"] == "REFINEMENT_BLOCKED_UNKNOWN"
+    assert result["search_completeness"] == "INCOMPLETE_REFINEMENT_UNKNOWN"
+
+
+def test_missing_batch_row_is_unknown_and_never_bridged() -> None:
+    spec = AxisSpec(
+        axis_id="synthetic_missing_batch_row",
+        perturbation_family=StressFamily.JOINT_STATE,
+        axis="J6",
+        coordinate_frame="joint_state_radians",
+        direction=1,
+        units="rad",
+        search_domain_max=1.0,
+        coarse_intervals=4,
+        refinement_tolerance=1e-3,
+        operator_parameters={"mode": "joint_offset", "joint_index": 5},
+    )
+
+    def evaluate(candidates):
+        output = {}
+        for candidate in candidates:
+            if candidate.phase == "coarse" and candidate.sample_index == 1:
+                continue
+            status = ResultStatus.FAIL if candidate.magnitude >= 0.5 else ResultStatus.PASS
+            output[candidate.candidate_id] = EvaluationResult(status)
+        return output
+
+    result = scan_axes_batched(_trajectory(), [spec], evaluate)[0]
+    assert result["coarse_state_sequence"] == ["PASS", "UNKNOWN", "FAIL", "FAIL", "FAIL"]
+    assert result["all_refined_boundaries"] == []
+    assert result["first_failure_margin"] is None
+    assert result["search_completeness"] == "INCOMPLETE_CAPABILITY_GAP"
 
 
 def test_unavailable_capability_never_yields_a_pass() -> None:
