@@ -49,6 +49,7 @@ from p2b2_redundancy_objectives import (
     rank_aware_secondary_command as _p2b2_rank_aware_secondary_command,
     secondary_objective as _p2b2_secondary_objective,
 )
+from p2b3_c1_scope import parse_initialization_only_flag, resolve_dls_trajectory_scope
 
 
 def _configured_jerk_limits() -> dict[str, float]:
@@ -1517,6 +1518,16 @@ def build_p2b1_process_task_dls_trajectory(
         raise ValueError("p2b1_invalid_trajectory_shape")
     if warm_start_rows < 1 or warm_start_rows >= len(target_poses):
         raise ValueError("p2b1_invalid_warm_start_rows")
+    c1_initialization_only = parse_initialization_only_flag(
+        os.environ.get("P2B3_C1_INITIALIZATION_ONLY", "")
+    )
+    trajectory_scope = resolve_dls_trajectory_scope(
+        initialization_only=c1_initialization_only,
+        p2b2_variant=p2b2_variant,
+        solver_variant=variant,
+        warm_start_rows=warm_start_rows,
+        secondary_objective=secondary_objective_name,
+    )
     pressure_path = os.environ.get("P2B1_SOLVER_PRESSURE_CSV", "").strip()
     if not pressure_path:
         raise RuntimeError("P2B1_SOLVER_PRESSURE_CSV_required_for_candidate_solver")
@@ -1615,23 +1626,30 @@ def build_p2b1_process_task_dls_trajectory(
             "line_search_accepted": accepted_step,
         })
 
-    for row_index, row in enumerate(seeds[:warm_start_rows]):
-        point = JointTrajectoryPoint()
-        point.positions = [float(value) for value in row]
-        point.time_from_start = _duration_from_seconds(0.0)
-        output.joint_trajectory.points.append(point)
-        residual, _task_j, weighted_error, weighted_j, _position_norm, _normal_angle = linearize(row, row_index)
-        metrics = _p2b1_nullspace_metrics(weighted_j)
-        objective = objective_value(row)
-        pressure_row(
-            index=row_index, iteration=-1, current=row, raw_primary=np.zeros(6), secondary=np.zeros(6),
-            step=np.zeros(6), proposal=row, projected=row, accepted=row, alpha=0.0,
-            clipped_joints=[], residual=residual, weighted_error=weighted_error, metrics=metrics,
-            objective_before=objective, objective_after=objective, accepted_step=True,
-        )
+    if trajectory_scope.emit_warm_start_prefix:
+        for row_index, row in enumerate(seeds[:warm_start_rows]):
+            point = JointTrajectoryPoint()
+            point.positions = [float(value) for value in row]
+            point.time_from_start = _duration_from_seconds(0.0)
+            output.joint_trajectory.points.append(point)
+            residual, _task_j, weighted_error, weighted_j, _position_norm, _normal_angle = linearize(row, row_index)
+            metrics = _p2b1_nullspace_metrics(weighted_j)
+            objective = objective_value(row)
+            pressure_row(
+                index=row_index, iteration=-1, current=row, raw_primary=np.zeros(6), secondary=np.zeros(6),
+                step=np.zeros(6), proposal=row, projected=row, accepted=row, alpha=0.0,
+                clipped_joints=[], residual=residual, weighted_error=weighted_error, metrics=metrics,
+                objective_before=objective, objective_after=objective, accepted_step=True,
+            )
 
-    current, _initial_clips = _p2b1_project_joint_limits(seeds[warm_start_rows - 1], lower, upper, buffer_rad)
-    for index in range(warm_start_rows, len(target_poses)):
+    # C1 treats D39 rows 0..15 as an observation window, not sixteen process
+    # waypoints. Start the ordered target solve from the first observed state
+    # and emit one solved state for every authoritative target (0..180).
+    # The frozen P2-B2 default still retains its configured prefix unchanged.
+    current, _initial_clips = _p2b1_project_joint_limits(
+        seeds[trajectory_scope.initial_seed_row], lower, upper, buffer_rad
+    )
+    for index in range(trajectory_scope.first_target_index, len(target_poses)):
         accepted = current.copy()
         for iteration in range(int(iterations_per_waypoint)):
             iteration_q = accepted.copy()
@@ -1737,12 +1755,18 @@ def build_normal_constrained_dls_trajectory(
     process gate constrains TCP position, stand-off, and tool-Z wall normal;
     roll about that normal is a free redundancy.  This Route-D/Route-A hybrid
     uses MoveIt2's native FK and Jacobian to solve exactly those constrained
-    quantities while retaining the D39 16-row observed warm start and using
-    only the previous accepted state thereafter.
+    quantities. The frozen default retains its configured D39 observation
+    prefix; P2-B3-C1 R0 uses D39 row 0 only as the initial seed and solves
+    target indices 0 through 180 in order.
     """
 
     p2b1_variant = os.environ.get("P2B1_DLS_VARIANT", "").strip().upper()
     p2b2_variant = os.environ.get("P2B2_VARIANT", "").strip().upper()
+    c1_initialization_only = parse_initialization_only_flag(
+        os.environ.get("P2B3_C1_INITIALIZATION_ONLY", "")
+    )
+    if c1_initialization_only and not (p2b2_variant == "R0" and p2b1_variant == "B0"):
+        raise ValueError("P2B3_C1_initialization_only_requires_R0_B0_dispatch")
     if p2b2_variant and p2b1_variant not in {"B0", "B1"}:
         raise ValueError("P2B2_requires_process_task_DLS_route")
     if p2b1_variant in {"B0", "B1"}:
