@@ -850,6 +850,15 @@ def build_stage4b_findings(axes: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "TERMINAL_POSITION_ERROR": (3, "Configured terminal position gate excursion."),
         "SPRAY_AXIS_NORMAL_ERROR": (3, "Configured spray-axis normal gate excursion; no deposition model."),
     }
+    worst_metric = {
+        "ENVIRONMENT_COLLISION": ("minimum_environment_clearance_m", "min", "m"),
+        "SELF_COLLISION": ("minimum_self_clearance_m", "min", "m"),
+        "ROBOT_WORLD_TRANSITION_COLLISION": ("native_two_state_robot_world_collision_count", "max", "count"),
+        "JOINT_LIMIT_FAILURE": ("joint_limit_violation_rad", "max", "rad"),
+        "TCP_PATH_DEVIATION": ("position_error_excess_m", "max", "m"),
+        "TERMINAL_POSITION_ERROR": ("terminal_position_error_excess_m", "max", "m"),
+        "SPRAY_AXIS_NORMAL_ERROR": ("spray_axis_normal_error_excess_rad", "max", "rad"),
+    }
     taxonomy: list[dict[str, Any]] = []
     for mode in sorted({row["mode"] for row in observations}):
         rows = [row for row in observations if row["mode"] == mode]
@@ -865,9 +874,26 @@ def build_stage4b_findings(axes: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
             if row["critical_segment"] is not None:
                 key = str(row["critical_segment"])
                 segment_counts[key] = segment_counts.get(key, 0) + 1
-        fatal_margin_values = [(key, float(value), row) for row in rows for key, value in row["failure_margin"].items()
-                               if isinstance(value, (int, float)) and math.isfinite(float(value))]
-        worst = max(fatal_margin_values, key=lambda item: item[1]) if fatal_margin_values else None
+        metric_spec = worst_metric.get(mode)
+        metric_name, selection, metric_units = metric_spec if metric_spec else (None, None, None)
+        metric_values = [
+            (float(row["failure_margin"][metric_name]), row)
+            for row in rows
+            if metric_name is not None
+            and isinstance(row["failure_margin"].get(metric_name), (int, float))
+            and math.isfinite(float(row["failure_margin"][metric_name]))
+        ]
+        if metric_values:
+            selected_value, selected_row = (min(metric_values, key=lambda item: item[0])
+                                            if selection == "min" else
+                                            max(metric_values, key=lambda item: item[0]))
+            worst = {"metric": metric_name, "value": selected_value, "units": metric_units,
+                     "candidate_id": selected_row["candidate_id"], "axis_id": selected_row["axis_id"],
+                     "critical_waypoint": selected_row["critical_waypoint"],
+                     "critical_segment": selected_row["critical_segment"],
+                     "selection_rule": "most_negative_signed_clearance" if selection == "min" else "largest_category_specific_excess_or_count"}
+        else:
+            worst = None
         magnitude_by_family: dict[str, Any] = {}
         for family in sorted({row["family"] for row in rows}):
             family_rows = [row for row in rows if row["family"] == family]
@@ -875,12 +901,6 @@ def build_stage4b_findings(axes: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
             magnitude_by_family[family] = {"value": chosen["magnitude"], "units": chosen["units"],
                                            "axis_id": chosen["axis_id"], "candidate_id": chosen["candidate_id"]}
         severity_rank, safety_impact = severity.get(mode, (2, "Measured gate failure; safety impact not determined."))
-        metric_units = None if worst is None else (
-            "m" if worst[0].endswith("_m") else
-            "rad" if worst[0].endswith("_rad") else
-            "ratio" if "ratio" in worst[0] else
-            "count" if "count" in worst[0] else "metric_specific"
-        )
         taxonomy.append({
             "problem_category": mode, "affected_benchmark_families": sorted(axes_by_family),
             "affected_axis_ids": sorted({row["axis_id"] for row in rows}),
@@ -890,11 +910,7 @@ def build_stage4b_findings(axes: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
             ),
             "critical_waypoint_frequency": waypoint_counts, "critical_segment_frequency": segment_counts,
             "worst_sampled_perturbation_magnitude_by_family": magnitude_by_family,
-            "worst_failure_margin_metric": None if worst is None else {"metric": worst[0], "value": worst[1], "units": metric_units,
-                                                                       "candidate_id": worst[2]["candidate_id"],
-                                                                       "axis_id": worst[2]["axis_id"],
-                                                                       "critical_waypoint": worst[2]["critical_waypoint"],
-                                                                       "critical_segment": worst[2]["critical_segment"]},
+            "worst_failure_margin_metric": worst,
             "severity_rank_for_stage4b_prioritization": severity_rank,
             "reproducibility": "REPEATED_DETERMINISTIC_CAMPAIGN_CASES" if len(rows) > 1 else "ONE_MEASURED_CASE",
             "safety_impact": safety_impact,
@@ -910,6 +926,11 @@ def publish_campaign(args: argparse.Namespace) -> dict[str, Any]:
     campaign = read_json(args.campaign_result.resolve())
     if campaign.get("schema") != "p2b3-c2-c1-robustness-transfer-v1":
         raise RuntimeError("campaign_result_schema_mismatch")
+    findings = build_stage4b_findings(campaign["AXIS_RESULTS"])
+    campaign["STAGE4_FAILURE_TAXONOMY_V1"] = findings["taxonomy"]
+    campaign["STAGE4_RISK_RANKED_BOTTLENECKS_V1"] = findings["ranked"]
+    campaign["STAGE4B_FINDINGS_DERIVED_STATUS"] = "REBUILT_FROM_FULL_SAVED_CANDIDATE_EVIDENCE"
+    campaign["C2_POSTPROCESSING_CODE_COMMIT"] = git("rev-parse", "HEAD")
     outputs = args.output_dir.resolve()
     outputs.mkdir(parents=True, exist_ok=True)
     result_path = outputs / "p2b3_c2_result.json"

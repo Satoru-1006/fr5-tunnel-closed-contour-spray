@@ -9,6 +9,7 @@ import pytest
 
 from scripts.run_p2b2_robustness_remapping import _project_target_normals_to_fk_samples
 from scripts.run_p2b3_c2_robustness import (
+    build_stage4b_findings,
     declared_input_sha256,
     frozen_project_root,
     resolve_artifact_commit,
@@ -103,6 +104,40 @@ def test_frozen_project_root_resolves_release_from_stage3_source_repository(tmp_
 def test_static_candidate_budget_records_explicit_native_batch_cap() -> None:
     budget = static_candidate_budget([], None, max_native_batches=7)  # type: ignore[arg-type]
     assert budget["max_native_batches"] == 7
+
+
+def test_stage4b_worst_failure_metric_uses_category_specific_units() -> None:
+    axes = [{
+        "specification": {"axis_id": "translation:x:positive", "perturbation_family": "translation", "units": "m"},
+        "coarse_observations": [
+            {"status": "FAIL", "failure_modes": ["ENVIRONMENT_COLLISION"], "candidate_id": "env-a",
+             "magnitude": 0.01, "critical_waypoint": 8, "critical_segment": 7,
+             "failure_margin": {"minimum_environment_clearance_m": -0.02, "position_error_excess_m": 9.0,
+                                "terminal_position_error_excess_m": 0.003, "native_two_state_robot_world_collision_count": 0}},
+            {"status": "FAIL", "failure_modes": ["ENVIRONMENT_COLLISION", "TERMINAL_POSITION_ERROR"], "candidate_id": "env-b",
+             "magnitude": 0.02, "critical_waypoint": 9, "critical_segment": 8,
+             "failure_margin": {"minimum_environment_clearance_m": -0.005, "position_error_excess_m": 5.0,
+                                "terminal_position_error_excess_m": 0.007, "native_two_state_robot_world_collision_count": 3}},
+        ],
+        "refinement_observations": [],
+    }]
+
+    taxonomy = {row["problem_category"]: row for row in build_stage4b_findings(axes)["taxonomy"]}
+    environment = taxonomy["ENVIRONMENT_COLLISION"]["worst_failure_margin_metric"]
+    terminal = taxonomy["TERMINAL_POSITION_ERROR"]["worst_failure_margin_metric"]
+
+    assert environment == {
+        "metric": "minimum_environment_clearance_m", "value": -0.02, "units": "m",
+        "candidate_id": "env-a", "axis_id": "translation:x:positive",
+        "critical_waypoint": 8, "critical_segment": 7,
+        "selection_rule": "most_negative_signed_clearance",
+    }
+    assert terminal == {
+        "metric": "terminal_position_error_excess_m", "value": 0.007, "units": "m",
+        "candidate_id": "env-b", "axis_id": "translation:x:positive",
+        "critical_waypoint": 9, "critical_segment": 8,
+        "selection_rule": "largest_category_specific_excess_or_count",
+    }
 
 
 def test_c1_fk_wall_normals_match_projected_authoritative_reference() -> None:
