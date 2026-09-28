@@ -1,0 +1,111 @@
+{
+  "PROJECT": "FAIRINO_FR5",
+  "STAGE": "P2-B3-C0",
+  "P2B3_C0_STATUS": "BLOCKED_BY_UPSTREAM_GEOMETRY_OR_ORDERING",
+  "ROOT_CAUSE_CLASSIFICATION": "GEOMETRIC_PATH_BACKTRACK_WITH_R0_WAYPOINT_ORDERING_MISMATCH",
+  "CORRESPONDENCE_PROJECTION_BACKSTEP": "OBSERVED_BUT_NOT_ROOT_CAUSE",
+  "GEOMETRIC_PATH_BACKTRACK": "CONFIRMED_IN_CACHED_R0_FK_TCP_SEQUENCE",
+  "SOURCE_BASE_COMMIT": "9949d39f63c949f5375bea5c938636c0bda17ca4",
+  "UPSTREAM_P2B2_SOURCE_BASE_COMMIT": "e7bb161cea7396e452584f5c4ee7f158be6a9ca5",
+  "EXECUTION_CODE_COMMIT": "700212dc4d62457a6d376d42443e931e13d3ccc9",
+  "P2B3_CODE_CHANGED": "NO",
+  "NO_CODE_CHANGE_REASON": "The cached R0 FK sequence confirms geometric path backtracking / waypoint ordering mismatch; an ordered mapper would hide rather than repair it.",
+  "LEGACY_CORRESPONDENCE_METHOD": "legacy_global_nearest",
+  "NEW_CORRESPONDENCE_METHOD": "NOT_IMPLEMENTED_BLOCKED_BY_UPSTREAM_GEOMETRY_OR_ORDERING",
+  "R0_WAYPOINT_COUNT": 181,
+  "LEGACY_BACKSTEP_COUNT": 1,
+  "ORDERED_BACKSTEP_COUNT": null,
+  "LEGACY_MIN_STATION_STEP_M": -0.13194315439053514,
+  "ORDERED_MIN_STATION_STEP_M": null,
+  "WP15_STATION_OLD": 0.3784216291250731,
+  "WP16_STATION_OLD": 0.24647847473453796,
+  "WP15_STATION_NEW": null,
+  "WP16_STATION_NEW": null,
+  "MAX_PROJECTION_DISTANCE_OLD_M": 0.2600014592375459,
+  "MAX_PROJECTION_DISTANCE_NEW_M": null,
+  "ROOT_CAUSE_EVIDENCE": {
+    "source_sample_indices_zero_based": [15, 16],
+    "archived_fk_waypoint_labels": [15, 16],
+    "actual_fk_tcp_positions_m": [
+      [0.34001710559835685, -0.10002707472475773, 0.19272832877813703],
+      [0.3372206673835598, -0.09999885081181688, 0.12825117677117917]
+    ],
+    "authoritative_target_tcp_positions_m": [
+      [0.3362557552125918, -0.09999999999999999, 0.12430902629080393],
+      [0.3372193605519271, -0.09999999999999999, 0.12823755059833702]
+    ],
+    "actual_fk_tcp_step_m": 0.06453777184104506,
+    "authoritative_target_tcp_step_m": 0.004044976944912522,
+    "same_index_fk_target_error_m": [0.06852261993399261, 0.0000137368493001079958],
+    "fk_tcp_open_path_global_projection": {
+      "sample_15_segment_index_zero_based": 24,
+      "sample_15_station_m": 0.12808643379925738,
+      "sample_16_segment_index_zero_based": 16,
+      "sample_16_station_m": 0.06339096204849282,
+      "station_step_m": -0.06469547175076457,
+      "max_fk_distance_to_open_tcp_path_m": 0.00014126918172561212
+    },
+    "legacy_wall_projection": {
+      "segment_indices_zero_based": [23, 15],
+      "projection_distances_m": [0.259978488421841, 0.259937000941561],
+      "station_m": [0.3784216291250731, 0.24647847473453796],
+      "normal_angle_change_deg": 14.61744865733728
+    },
+    "sample_16_candidate_distances": {
+      "global_best_segment_15_distance_m": 0.259937000941561,
+      "adjacent_runner_up_segment_16_distance_m": 0.2599406534149095,
+      "adjacent_runner_up_gap_m": 0.000003652473348492169,
+      "segment_23_distance_m": 0.2683866755991758,
+      "segment_23_gap_from_global_best_m": 0.0084496746583148,
+      "first_non_decreasing_candidate_segment_24_distance_m": 0.27165640130556473,
+      "first_non_decreasing_candidate_station_m": 0.3784216291250731,
+      "forced_order_distance_increase_over_global_best_m": 0.011719400364003707
+    },
+    "interpretation": "The FK sample sequence itself advances from the neighborhood of target path segment 24 back to segment 16. The globally nearest wall projection reports that reversal. The nearest later ordered wall match increases point-to-wall distance by 11.72 mm, so a monotone station assignment would conceal a real trajectory/order inconsistency rather than repair an ambiguous correspondence."
+  },
+  "LOCAL_WP14_WP17_DIAGNOSTIC": [
+    {"sample_index_zero_based": 14, "wall_segment_index_zero_based": 23, "wall_station_m": 0.3703864185823728, "wall_projection_distance_m": 0.25992052187286824, "tcp_path_segment_index_zero_based": 23, "tcp_path_station_m": 0.1195161329537601},
+    {"sample_index_zero_based": 15, "wall_segment_index_zero_based": 23, "wall_station_m": 0.3784216291250731, "wall_projection_distance_m": 0.259978488421841, "tcp_path_segment_index_zero_based": 24, "tcp_path_station_m": 0.12808643379925738},
+    {"sample_index_zero_based": 16, "wall_segment_index_zero_based": 15, "wall_station_m": 0.24647847473453796, "wall_projection_distance_m": 0.259937000941561, "tcp_path_segment_index_zero_based": 16, "tcp_path_station_m": 0.06339096204849282},
+    {"sample_index_zero_based": 17, "wall_segment_index_zero_based": 16, "wall_station_m": 0.2625231103325941, "wall_projection_distance_m": 0.25994184681955923, "tcp_path_segment_index_zero_based": 17, "tcp_path_station_m": 0.06800347471862009}
+  ],
+  "INPUT_TRAJECTORY_BYTE_IDENTITY": {
+    "status": "READ_ONLY_INPUTS; NO_TRAJECTORY_OR_TIMESTAMP_MODIFICATION",
+    "authoritative_pose_csv_sha256": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7",
+    "pre_ruckig_joint_trajectory_sha256": "3d2a4d51d8483b6632d44532459c004d7a86af589cc89adfaba4288fd1e6f3e7",
+    "post_ruckig_joint_trajectory_sha256": "a5b29daeb38dbc6fd4eed33324b6fa1a1597a81eea4f5d104c90e2695f57345a",
+    "published_clean_r0_reference_max_pre_ruckig_joint_delta_rad": 0.0,
+    "published_clean_r0_reference_max_post_ruckig_joint_delta_rad": 0.0,
+    "published_clean_r0_reference_max_post_ruckig_timestamp_delta_s": 0.0
+  },
+  "FK_INPUT_IDENTITY": {
+    "status": "ARCHIVED_R0_NOMINAL_FK_TRACE; BYTE_HASH_MATCHES_ARCHIVE_MANIFEST",
+    "drive_archive_id": "1Itbn-X_f61tew9PW2Xe-kIBxNlMM4lf6",
+    "archive_member": "INTERMEDIATE_EVIDENCE/b0_reference/nominal_fk_trace.csv",
+    "row_count": 181,
+    "waypoint_labels_match_row_order": true,
+    "sha256": "4d2097fc2a36da4c60d6c31883e46f2d8e8db8a97feec7a661ccf92bad0cadd4"
+  },
+  "RUCKIG_ARTIFACT_IDENTITY": {
+    "status": "PRE_AND_POST_RUCKIG_ARTIFACTS_READ_ONLY; NO_RUCKIG_REPLAY",
+    "pre_ruckig_artifact_sha256": "3d2a4d51d8483b6632d44532459c004d7a86af589cc89adfaba4288fd1e6f3e7",
+    "post_ruckig_artifact_sha256": "a5b29daeb38dbc6fd4eed33324b6fa1a1597a81eea4f5d104c90e2695f57345a"
+  },
+  "TARGETED_TEST_STATUS": "NOT_RUN_ROOT_CAUSE_REFUTES_CORRESPONDENCE_REPAIR_PRECONDITION",
+  "LEVEL1_STATUS": "NOT_RUN",
+  "TARGETED_REPLAY_STATUS": "CACHED_R0_ROOT_CAUSE_REPRODUCED; ORDERED_LEVEL2_BLOCKED_BY_GEOMETRIC_PATH_BACKTRACK",
+  "LEVEL2_STATUS": "BLOCKED_BY_UPSTREAM_WAYPOINT_ORDERING",
+  "LEVEL3_STATUS": "NOT_TRIGGERED",
+  "FULL_P2B2_CAMPAIGN_REPLAYED": "NO",
+  "VALIDATION_SCOPE": "Read-only reconstruction from the 181-row archived R0 nominal FK trace, authoritative 181-point TCP pose/normal input, and published R0 pre/post-Ruckig artifacts; no MoveIt2, FK, Ruckig, robustness campaign, or hardware execution was started.",
+  "ESCALATION_REASON": "NOT_REQUIRED",
+  "P2B3_C1_STARTED": "NO",
+  "P2B2_OLD_ARTIFACTS_BYTE_IDENTICAL": {
+    "docs/P2B2_README.md": "2a613b73467f1a219910de5a4203f5b2e8b9e013db31d138a3c43d034c73f825",
+    "outputs/p2b2_robustness_landscape.json": "0140c40a33014dbb0b1653c6b55164714617c5475f2c89654e4b2c14b74c1c66",
+    "outputs/p2b2_stage4_failure_taxonomy.json": "2b26d0dce211b6b1e3821c522c7e394e9e95f8980859c209e0fe2b769ad3be96",
+    "scripts/run_p2b2_robustness_remapping.py": "c3070ab5f139b2c2ec7db43a44626bd0780b0d9d17a2de32112c7eddafb8243d",
+    "tests/test_p2b2_robustness_remapping.py": "be97a2607825ebbe393f1638503da25969b35c6ea71124608f1cbd22e32c4989"
+  },
+  "NEXT_SCIENTIFIC_QUESTION": "Why does the frozen R0 trajectory waypoint labeled 15 lie on target path segment 24 before waypoint 16 returns to target path segment 16, and what upstream trajectory/waypoint identity or ordering defect produced this sequence? Resolve that source ordering before attempting ordered wall correspondence."
+}
