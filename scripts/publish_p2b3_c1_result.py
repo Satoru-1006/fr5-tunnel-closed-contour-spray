@@ -237,6 +237,31 @@ def validate_and_publish(
         if last_pass == "PASS" and first_fail == "FAIL":
             return "OLD_PASS_FAIL_BRACKET_MATCHED_SPOTCHECK_ONLY"
         return f"BRACKET_CLASSIFICATION_CHANGED:{last_pass}/{first_fail}"
+
+    compact_brackets: dict[str, Any] | None = None
+    if recheck is not None:
+        compact_brackets = {}
+        for axis_id, endpoints in recheck.get("measured_bracket_endpoints", {}).items():
+            compact_brackets[axis_id] = {}
+            for label in ("historical_last_pass", "historical_first_fail"):
+                row = endpoints.get(label, {})
+                measured = row.get("measured", {})
+                evidence = measured.get("evidence", {})
+                compact_brackets[axis_id][label] = {
+                    "magnitude": row.get("magnitude"),
+                    "expected_historical_status": row.get("expected_historical_status"),
+                    "measured_status": measured.get("status"),
+                    "dominant_failure_mode": measured.get("dominant_failure_mode"),
+                    "failure_modes": measured.get("failure_modes", []),
+                    "critical_waypoint": measured.get("critical_waypoint"),
+                    "evidence": {key: evidence.get(key) for key in (
+                        "terminal_position_error_m", "max_tcp_path_error_m", "max_tcp_path_error_waypoint",
+                        "max_spray_axis_normal_error_rad", "max_spray_axis_normal_error_waypoint",
+                        "joint_limit_margin_min_rad", "max_velocity_ratio", "max_acceleration_ratio", "max_jerk_ratio",
+                        "native_waypoint_world_collision_count", "native_waypoint_self_collision_count",
+                        "minimum_environment_clearance_m", "minimum_self_clearance_m", "clearance_acceptance_threshold",
+                        "collision_method", "strict_continuous_self_collision_ccd") if key in evidence},
+                }
     input_hashes = {str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else path.name: digest(path)
                     for path in (target_path, seed_path, baseline_pre_path, baseline_post_path)}
 
@@ -352,7 +377,7 @@ def validate_and_publish(
             "recheck_code_commit": recheck.get("recheck_code_commit"),
             "selected_axes": recheck.get("selected_axes"),
             "selected_case_count": recheck.get("selected_case_count"),
-            "measured_bracket_endpoints": recheck.get("measured_bracket_endpoints"),
+            "measured_bracket_endpoints": compact_brackets,
             "fresh_FK_crosscheck_max_position_delta_m": recheck.get("fresh_FK_crosscheck_max_position_delta_m"),
             "full_p2b2_campaign_replayed": recheck.get("full_p2b2_campaign_replayed"),
         },
