@@ -237730,8 +237730,9 @@
   "C1_WAYPOINT_COUNT": 181,
   "C2_ARTIFACT_PUBLISH_COMMIT": {
     "phase_1_execution_code_commit": "bb86d8f86a0bdb04948fee73155e78c47908c95a",
-    "phase_2_artifact_commit": "RESOLVE_AFTER_FIRST_CANONICAL_ARTIFACT_COMMIT; the artifact commit cannot contain its own Git object id",
-    "status": "TWO_PHASE_SELF_REFERENCE_SAFE"
+    "phase_2_first_canonical_artifact_commit": "e7ebc2a625d8bc8881e5865514e95ee9ee920de0",
+    "phase_2_resolution_commit_is_a_later_commit_to_avoid_self_reference": true,
+    "status": "RESOLVED_IN_SECOND_PHASE"
   },
   "C2_EXECUTION_CODE_COMMIT": "bb86d8f86a0bdb04948fee73155e78c47908c95a",
   "C2_POSTPROCESSING_CODE_COMMIT": "001843d3828efd86755267110f751e683e95fb62",
