@@ -1,4 +1,6 @@
 {
+  "ARTIFACT_PUBLISH_COMMIT": "6ab3b8c702e7bcba9dcc90d9c087e5de44f823a3",
+  "ARTIFACT_PUBLISH_COMMIT_URL": "https://github.com/Satoru-1006/fr5-tunnel-closed-contour-spray/commit/6ab3b8c702e7bcba9dcc90d9c087e5de44f823a3",
   "C1_NOMINAL_SHA256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
   "C1_WAYPOINT_COUNT": 181,
   "C2_CANONICAL_IDENTITY": {
@@ -19,24 +21,47 @@
   "FAIRINO_SOURCE_COMMIT": "60755d44d521a5ad6bee8494cc19522f8801aa20",
   "FOREIGN_PROJECT_REFERENCE_COUNT": 0,
   "FROZEN_INPUTS_MODIFIED": "NO",
-  "GITHUB_PUSH": "NOT_RUN",
+  "GITHUB_BRANCH_URL": "https://github.com/Satoru-1006/fr5-tunnel-closed-contour-spray/tree/codex/fr5-p2b3-c3-physical-uncertainty-se3-20261001",
+  "GITHUB_CI": "NOT_AVAILABLE_NO_WORKFLOW_RUNS_OR_STATUS_CHECKS",
+  "GITHUB_CI_NOTE": "No GitHub Actions runs or commit status checks were returned for the artifact commit; local validation is recorded separately.",
+  "GITHUB_PUSH": "PASS",
   "GITHUB_REPOSITORY": "Satoru-1006/fr5-tunnel-closed-contour-spray",
-  "GOOGLE_DRIVE_UPLOAD": "NOT_RUN",
+  "GOOGLE_DRIVE_C3_FOLDER": {
+    "core_folder_id": "19p7Ln1L2dUFA9WoRoL7NXFA7cwHa4pfl",
+    "core_url": "https://drive.google.com/drive/folders/19p7Ln1L2dUFA9WoRoL7NXFA7cwHa4pfl",
+    "folder_id": "1OnOGBw2rs87nUJSIII09Dnfl5UtHKyCA",
+    "url": "https://drive.google.com/drive/folders/1OnOGBw2rs87nUJSIII09Dnfl5UtHKyCA"
+  },
+  "GOOGLE_DRIVE_FILES": {
+    "P2B3_C3_README.md": {
+      "file_id": "1oNOIlWkhaTCFcHn8jCtKFgZWoWV6BbFW",
+      "url": "https://drive.google.com/file/d/1oNOIlWkhaTCFcHn8jCtKFgZWoWV6BbFW/view?usp=drivesdk"
+    },
+    "p2b3_c3_result.json": {
+      "file_id": "186tS5wNvN3AQB3ZNJ9JLVnosnNgJYFkH",
+      "url": "https://drive.google.com/file/d/186tS5wNvN3AQB3ZNJ9JLVnosnNgJYFkH/view?usp=drivesdk"
+    },
+    "p2b3_c3_uncertainty_semantics.csv": {
+      "file_id": "1Ipa1GyDnjnH1uR3wUw0xEAoXMlFRmby9",
+      "url": "https://drive.google.com/file/d/1Ipa1GyDnjnH1uR3wUw0xEAoXMlFRmby9/view?usp=drivesdk"
+    }
+  },
+  "GOOGLE_DRIVE_UPLOAD": "PASS",
   "LEGACY_TCP_SEMANTICS_EXPLICIT": "YES",
   "MOVEIT2_ENVIRONMENT": "MoveIt2 Jazzy MoveItPy PlanningSceneMonitor with active FCL collision environment",
   "NATIVE_SMOKE": "PASS",
   "NORMALIZATION_FAIL_CLOSED": "PASS",
   "NORMALIZED_MARGIN_STATUS": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
-  "P2B3_C3_STATUS": "INCOMPLETE_DELIVERY",
+  "P2B3_C3_STATUS": "COMPLETE",
   "PARENT_BASE_VERIFIED": "YES",
   "PARENT_BRANCH": "codex/fr5-p2b3-c2-robustness-transfer-20260928",
   "PARENT_COMMIT": "fff39145a1e9dcd59fb1d180fe2cf182444820fe",
   "PROJECT": "FAIRINO_FR5",
   "PROJECT_IDENTITY": "FAIRINO_FR5",
-  "PROJECT_INDEX_UPDATED": "NOT_RUN",
+  "PROJECT_INDEX_UPDATED": "PASS",
   "PYTHON_VERSION": "3.12.1",
   "REGRESSION_TESTS": "PASS",
-  "REMOTE_SHA_VERIFIED": "NOT_RUN",
+  "REMOTE_SHA_VERIFIED": "PASS",
   "ROS2_DISTRO": "jazzy",
   "SCENE_PROPAGATION": "PASS",
   "SCENE_PROPAGATION_TESTED": "YES",
@@ -48,7 +73,7 @@
   "TEST_PASSED": 70,
   "TEST_TOTAL": 70,
   "UNCERTAINTY_ONTOLOGY_IMPLEMENTED": "YES",
-  "WORKTREE_CLEAN": "NOT_VERIFIED",
+  "WORKTREE_CLEAN": "YES",
   "WORKTREE_CLEAN_AT_RESULT_GENERATION": "YES",
   "WORKTREE_CLEAN_AT_START": "YES",
   "c2_semantic_reinterpretation": [
@@ -2527,7 +2552,7 @@
     "strict_continuous_ccd": "NOT_AVAILABLE",
     "waypoint_count": 181
   },
-  "next_gate_recommendation": "Independent review of the C3 implementation, then acquire a traceable FR5 registration bound/distribution before authorizing a separate bounded registration-margin campaign.",
+  "next_gate_recommendation": "Independent review of C3 code and evidence; independently review the saturated collision observation and approximate wall geometry; acquire a traceable FR5 registration bound or measured distribution before authorizing a separate bounded registration-margin campaign.",
   "normalization_rule": "eta_i = rho_i / b_i only when a positive bound is supported by MEASURED, MANUFACTURER, or PROJECT_CONFIG evidence; ASSUMED and LITERATURE cannot support an FR5 physical normalization claim.",
   "physical_uncertainty_evidence_inventory": {
     "evidence_boundary": "The C2 README explicitly retains calibrated TCP uncertainty as unresolved and base-transform axes as NOT_AVAILABLE. Search results found no FR5 measured registration, repeatability, tracking, reconstruction, or TCP-calibration bound.",

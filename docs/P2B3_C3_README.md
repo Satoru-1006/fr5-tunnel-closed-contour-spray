@@ -1,7 +1,7 @@
 # P2-B3-C3 — Physical Uncertainty Semantics and SE(3) Registration Stress
 
 - **Project:** FAIRINO FR5 tunnel complex-surface spraying
-- **Stage status:** `INCOMPLETE_DELIVERY`
+- **Stage status:** `COMPLETE`
 - **Parent branch:** `codex/fr5-p2b3-c2-robustness-transfer-20260928`
 - **Parent commit:** `fff39145a1e9dcd59fb1d180fe2cf182444820fe`
 - **Execution code commit:** `61cf00c661bc03c2edf2e251f97ebdd13349ad4f`
