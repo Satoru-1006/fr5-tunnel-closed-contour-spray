@@ -1,0 +1,4967 @@
+{
+  "acm": {
+    "allowed_pair_count": 24,
+    "api": "PlanningScene.allowed_collision_matrix -> AllowedCollisionMatrix.get_entry(name1,name2)",
+    "queried_pair_count": 35721,
+    "scope": "all ordered pairs among URDF robot links and current authoritative world-object IDs",
+    "sha256": "02975b55c25b52d8bb7d77bdbaf05db1ef5f1d58278575fa4fb298e1a3f35661",
+    "status": "AVAILABLE",
+    "universe_name_count": 189
+  },
+  "builder": "ros2_moveit_bridge.plan_closed_contour_moveit.build_wall_collision_objects",
+  "canonicalization": {
+    "float_encoding": "finite IEEE-754 values rounded to 12 significant decimal digits",
+    "object_order": "ascending object id; primitive order retained",
+    "quaternion": "normalized xyzw with first nonzero component positive; q and -q canonicalize identically"
+  },
+  "collision_backend": "MoveIt2 Jazzy MoveItPy PlanningSceneMonitor / FCL",
+  "collision_objects": {
+    "count": 181,
+    "ordered": [
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_000",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055767358918,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.472675301345,
+                -0.1,
+                -0.145374101125
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_001",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673747013,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                4.40079216442e-16,
+                1.0
+              ],
+              "position_xyz": [
+                0.485745815715,
+                -0.1,
+                -0.135030147825
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_002",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673872633,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.498333556441,
+                -0.1,
+                -0.12411181274
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_003",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673966207,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.510416521549,
+                -0.1,
+                -0.112643516572
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_004",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674026862,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.521973413067,
+                -0.1,
+                -0.100649664574
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_005",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674054413,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.532983472834,
+                -0.1,
+                -0.0881546837162
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_006",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674069376,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.543426412014,
+                -0.1,
+                -0.0751831474418
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_007",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674030939,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.553282096084,
+                -0.1,
+                -0.0617604170447
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_008",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673904615,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.562530968416,
+                -0.1,
+                -0.047911087221
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_009",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673694505,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.571153196061,
+                -0.1,
+                -0.0336582855221
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_010",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673397371,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -1.11022302463e-16,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.57912744585,
+                -0.1,
+                -0.0190250328587
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_011",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673014327,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.586430799267,
+                -0.1,
+                -0.00403469844458
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_012",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557672548051,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.593038746427,
+                -0.1,
+                0.0112885169033
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_013",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557672002975,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.598925270526,
+                -0.1,
+                0.0269190695015
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_014",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055767233482,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.604066730588,
+                -0.1,
+                0.0428285008952
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_015",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673694278,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.608451076802,
+                -0.1,
+                0.0589522305423
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_016",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674979632,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.612092612808,
+                -0.1,
+                0.0752146400591
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_017",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557676176773,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.615024231344,
+                -0.1,
+                0.091575152385
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_018",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557677268967,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.617280202749,
+                -0.1,
+                0.107998938966
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_019",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557678249214,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.61889497377,
+                -0.1,
+                0.124456459829
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_020",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557679118581,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.619902258843,
+                -0.1,
+                0.140922908048
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_021",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682025563,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.620348612699,
+                -0.1,
+                0.157377578485
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_022",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557685541253,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.620351009291,
+                -0.1,
+                0.173696820249
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_023",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557686983702,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.62010723695,
+                -0.1,
+                0.189763903733
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_024",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768635101,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.619826821865,
+                -0.1,
+                0.205579147162
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_025",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768518611,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.619697228898,
+                -0.1,
+                0.22114437943
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_026",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557686555078,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.619782161936,
+                -0.1,
+                0.236583423719
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_027",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557687032067,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.619998800308,
+                -0.1,
+                0.252180081014
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_028",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557686565517,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.620218001154,
+                -0.1,
+                0.26794634306
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_029",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557685343208,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.620307685159,
+                -0.1,
+                0.283882979329
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_030",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557684898887,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.620161179906,
+                -0.1,
+                0.299967282955
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_031",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557684526664,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.61972458163,
+                -0.1,
+                0.316090334559
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_032",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557684116737,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.618971659897,
+                -0.1,
+                0.332231774879
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_033",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557683668403,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.617876755659,
+                -0.1,
+                0.348384230761
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_034",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768318237,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.616413922451,
+                -0.1,
+                0.364538632709
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_035",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682660839,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.614557099688,
+                -0.1,
+                0.380684023094
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_036",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682170837,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.612280658168,
+                -0.1,
+                0.396807424316
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_037",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682184528,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.609567132274,
+                -0.1,
+                0.412890393982
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_038",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768224874,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.606417405396,
+                -0.1,
+                0.428894052662
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_039",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682306713,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.602837158134,
+                -0.1,
+                0.444803251068
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_040",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768235808,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.598831708302,
+                -0.1,
+                0.46060739645
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_041",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768240261,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.594406314658,
+                -0.1,
+                0.476296120092
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_042",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682440121,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.589566158629,
+                -0.1,
+                0.491859242237
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_043",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682470477,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.58431633122,
+                -0.1,
+                0.507286736738
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_044",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682493578,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.578661824844,
+                -0.1,
+                0.522568695832
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_045",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682509361,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.572607529833,
+                -0.1,
+                0.537695295403
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_046",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682517789,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.566158235409,
+                -0.1,
+                0.552656761059
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_047",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682518854,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.559318634898,
+                -0.1,
+                0.567443335306
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_048",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682512635,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.552093335014,
+                -0.1,
+                0.582045246097
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_049",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682499133,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.544486869051,
+                -0.1,
+                0.596452677031
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_050",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682478316,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.536503713855,
+                -0.1,
+                0.61065573944
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_051",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682459277,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.528148351145,
+                -0.1,
+                0.624644472287
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_052",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682489935,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                -4.40054815646e-16,
+                1.0
+              ],
+              "position_xyz": [
+                0.519426327917,
+                -0.1,
+                0.638408731476
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_053",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682519372,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.510345835296,
+                -0.1,
+                0.651937208245
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_054",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682542974,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.500914385179,
+                -0.1,
+                0.665221317723
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_055",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682560625,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.491139248328,
+                -0.1,
+                0.678252899376
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_056",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682572239,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.481027631979,
+                -0.1,
+                0.691023856805
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_057",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682577759,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.470586687428,
+                -0.1,
+                0.70352613127
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_058",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682577156,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.459823521053,
+                -0.1,
+                0.715751677125
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_059",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682570425,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.448745208544,
+                -0.1,
+                0.727692439419
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_060",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768255759,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.437358812143,
+                -0.1,
+                0.739340333885
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_061",
+        "primitives": [
+          {
+            "dimensions": [
+              0.05576825387,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.425671400665,
+                -0.1,
+                0.750687229566
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_062",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682513834,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.413690072117,
+                -0.1,
+                0.761724934316
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_063",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682483104,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                -4.4005483471e-16,
+                1.0
+              ],
+              "position_xyz": [
+                0.40142197869,
+                -0.1,
+                0.772445183423
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_064",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682446557,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.388874353937,
+                -0.1,
+                0.782839631625
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_065",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768240441,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.376054541869,
+                -0.1,
+                0.792899848801
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_066",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682374061,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.362970081741,
+                -0.1,
+                0.802617395944
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_067",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682417909,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.349630367456,
+                -0.1,
+                0.811984220861
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_068",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768245962,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.336048711927,
+                -0.1,
+                0.820992440993
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_069",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682494746,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.32223581695,
+                -0.1,
+                0.829637423877
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_070",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682523152,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                2.77555756156e-17,
+                -4.40054722945e-16,
+                1.0
+              ],
+              "position_xyz": [
+                0.30820191917,
+                -0.1,
+                0.837914856747
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_071",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682544739,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.293957117907,
+                -0.1,
+                0.845820459758
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_072",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682559438,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.279511393641,
+                -0.1,
+                0.853349958936
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_073",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682567209,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                2.77555756156e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.264874629243,
+                -0.1,
+                0.86049906246
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_074",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682568038,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.250056633634,
+                -0.1,
+                0.867263440377
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_075",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682561956,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.235067167555,
+                -0.1,
+                0.873638707841
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_076",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682549007,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.219915971164,
+                -0.1,
+                0.879620411983
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_077",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682529163,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.20461279319,
+                -0.1,
+                0.885204022532
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_078",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682502496,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.189167421364,
+                -0.1,
+                0.890384926308
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_079",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682469097,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                2.77555756156e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.173589713853,
+                -0.1,
+                0.895158425762
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_080",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682429096,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                2.77555756156e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.157889631419,
+                -0.1,
+                0.899519741702
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_081",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682402228,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -2.77555756156e-17,
+                -4.40055060417e-16,
+                1.0
+              ],
+              "position_xyz": [
+                0.142077294614,
+                -0.1,
+                0.90346412952
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_082",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682440873,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.126164472522,
+                -0.1,
+                0.906987828655
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_083",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682476318,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                1.38777878078e-17,
+                -4.4005485365e-16,
+                1.0
+              ],
+              "position_xyz": [
+                0.110165986039,
+                -0.1,
+                0.910088646604
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_084",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682505865,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                1.38777878078e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.0940932927992,
+                -0.1,
+                0.912766156039
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_085",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682529384,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                6.93889390391e-18,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.0779574554528,
+                -0.1,
+                0.915020031908
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_086",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682546774,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                6.93889390391e-18,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.0617694225877,
+                -0.1,
+                0.916849955639
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_087",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682557967,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.0455400528644,
+                -0.1,
+                0.918255599133
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_088",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682562921,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.029280140388,
+                -0.1,
+                0.919236612665
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_089",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682561621,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                1.73472347598e-18,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                0.013000440969,
+                -0.1,
+                0.919792616653
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_090",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682554068,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -4.33680868994e-19,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.00328830105212,
+                -0.1,
+                0.919923197324
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_091",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682540289,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -3.46944695195e-18,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.0195753257371,
+                -0.1,
+                0.919627906261
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_092",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682520338,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.0358498305543,
+                -0.1,
+                0.918906263847
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_093",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682494296,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -6.93889390391e-18,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.052100943772,
+                -0.1,
+                0.917757766633
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_094",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682462274,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -1.38777878078e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.0683176985716,
+                -0.1,
+                0.916181898635
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_095",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682424422,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.0844890082272,
+                -0.1,
+                0.9141781466
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_096",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682404905,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -1.38777878078e-17,
+                -4.40055052946e-16,
+                1.0
+              ],
+              "position_xyz": [
+                -0.100603667203,
+                -0.1,
+                0.9117461603
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_097",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682447178,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.116649139668,
+                -0.1,
+                0.908887281966
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_098",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682484325,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                -4.40054831304e-16,
+                1.0
+              ],
+              "position_xyz": [
+                -0.132611098772,
+                -0.1,
+                0.905605378623
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_099",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682514817,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.148478970593,
+                -0.1,
+                0.901904522325
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_100",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682538541,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -2.77555756156e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.164242489719,
+                -0.1,
+                0.897788696884
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_101",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682555418,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.179891490684,
+                -0.1,
+                0.893261810323
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_102",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682565396,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.19541587612,
+                -0.1,
+                0.888327691057
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_103",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682568502,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                2.77555756156e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.210805585442,
+                -0.1,
+                0.88299008828
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_104",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682564696,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.22605056435,
+                -0.1,
+                0.877252676403
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_105",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768255396,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.241140735432,
+                -0.1,
+                0.871119063411
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_106",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682536317,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.256065970159,
+                -0.1,
+                0.864592803036
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_107",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682511821,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.270816062541,
+                -0.1,
+                0.857677410636
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_108",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682480554,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.285380704754,
+                -0.1,
+                0.850376382707
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_109",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682442629,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.299749465039,
+                -0.1,
+                0.842693219949
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_110",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682398199,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                -4.4005507166e-16,
+                1.0
+              ],
+              "position_xyz": [
+                -0.313911768231,
+                -0.1,
+                0.834631453804
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_111",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682378462,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.327856983028,
+                -0.1,
+                0.826194839746
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_112",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682422925,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.341573666365,
+                -0.1,
+                0.817389582615
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_113",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682462641,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.355049937102,
+                -0.1,
+                0.808224968306
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_114",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682496616,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.368277621163,
+                -0.1,
+                0.798708955932
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_115",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682524734,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.38124878492,
+                -0.1,
+                0.788849368567
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_116",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682546905,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.393955602042,
+                -0.1,
+                0.778653951172
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_117",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682563031,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                -4.40054611653e-16,
+                1.0
+              ],
+              "position_xyz": [
+                -0.406390324423,
+                -0.1,
+                0.768130374082
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_118",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682573047,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.418545254869,
+                -0.1,
+                0.757286240215
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_119",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682576916,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.430412721805,
+                -0.1,
+                0.74612909575
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_120",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682574626,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.441985056228,
+                -0.1,
+                0.734666444019
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_121",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682566192,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.453254571123,
+                -0.1,
+                0.722905762385
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_122",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682551655,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.464213543554,
+                -0.1,
+                0.710854521863
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_123",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682531084,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.474854199678,
+                -0.1,
+                0.698520209285
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_124",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682504576,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -1.11022302463e-16,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.485168702872,
+                -0.1,
+                0.685910351766
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_125",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682472264,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.495149145261,
+                -0.1,
+                0.673032543265
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_126",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682460468,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.504787684251,
+                -0.1,
+                0.659894572174
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_127",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682488162,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                -4.40054820594e-16,
+                1.0
+              ],
+              "position_xyz": [
+                -0.514076551892,
+                -0.1,
+                0.646506284881
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_128",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682508965,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.523008737223,
+                -0.1,
+                0.632879302934
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_129",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682522636,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.531579142348,
+                -0.1,
+                0.619023340821
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_130",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682529158,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -1.11022302463e-16,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.539782675806,
+                -0.1,
+                0.604947979364
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_131",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682528576,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.547614204622,
+                -0.1,
+                0.590662722593
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_132",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682520814,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.555068535428,
+                -0.1,
+                0.576177023421
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_133",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682505874,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.56214039918,
+                -0.1,
+                0.561500311452
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_134",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682483794,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.568824439617,
+                -0.1,
+                0.546642022657
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_135",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055768245464,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.575115205616,
+                -0.1,
+                0.531611630644
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_136",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682418509,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.581007147638,
+                -0.1,
+                0.516418679282
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_137",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682375539,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.586494618455,
+                -0.1,
+                0.501072816383
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_138",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682325906,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.591571878405,
+                -0.1,
+                0.485583828144
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_139",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682269834,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.596233105405,
+                -0.1,
+                0.469961674025
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_140",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682207599,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.600472409984,
+                -0.1,
+                0.454216521665
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_141",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682265873,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.604284695021,
+                -0.1,
+                0.438358964312
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_142",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682494479,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.607668594542,
+                -0.1,
+                0.422407848419
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_143",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682713999,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.610628906655,
+                -0.1,
+                0.40638586793
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_144",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557682923085,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.613174613736,
+                -0.1,
+                0.390305734069
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_145",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557683120869,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.615314848865,
+                -0.1,
+                0.374179202217
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_146",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557683306808,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -1.11022302463e-16,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.617058769025,
+                -0.1,
+                0.358017171732
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_147",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557683480689,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.6184154578,
+                -0.1,
+                0.341829732658
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_148",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557683642641,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.619393841422,
+                -0.1,
+                0.325626217716
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_149",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557684355745,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.620007695026,
+                -0.1,
+                0.309415363042
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_150",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557685534277,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.620298964748,
+                -0.1,
+                0.293246116644
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_151",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557686375413,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                1.11022302463e-16,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.620343670724,
+                -0.1,
+                0.277175379097
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_152",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557686876149,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.620226575409,
+                -0.1,
+                0.261206477473
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_153",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557687037651,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -1.66533453694e-16,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.620030831769,
+                -0.1,
+                0.245339806423
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_154",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557686861634,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.619837904001,
+                -0.1,
+                0.229574509341
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_155",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557686348925,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.619727635052,
+                -0.1,
+                0.213909856648
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_156",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557686025644,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.619772797849,
+                -0.1,
+                0.198346378489
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_157",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557687019671,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.619960061557,
+                -0.1,
+                0.182815920078
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_158",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557685720915,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.620141949387,
+                -0.1,
+                0.167040986653
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_159",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557681936263,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.620103649537,
+                -0.1,
+                0.150992175564
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_160",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557676168595,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -1.11022302463e-16,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.619618512711,
+                -0.1,
+                0.134677429869
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_161",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674997836,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.618498644074,
+                -0.1,
+                0.118145974009
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_162",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674648913,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -1.11022302463e-16,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.616671024145,
+                -0.1,
+                0.101626485975
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_163",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674223072,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.614125882469,
+                -0.1,
+                0.0851899356037
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_164",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673769868,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.610854700166,
+                -0.1,
+                0.0688674656692
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_165",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673758194,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.606852830573,
+                -0.1,
+                0.0526934422387
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_166",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673764085,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.602127391064,
+                -0.1,
+                0.0367147347944
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_167",
+        "primitives": [
+          {
+            "dimensions": [
+              0.055767371457,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.596688155734,
+                -0.1,
+                0.0209649200516
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_168",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673610051,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.590544249111,
+                -0.1,
+                0.00547462888645
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_169",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673451593,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.583704663196,
+                -0.1,
+                -0.00972512221162
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_170",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673241072,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.576178436419,
+                -0.1,
+                -0.0246027204391
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_171",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673037922,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.567975025554,
+                -0.1,
+                -0.0391258687736
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_172",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673320125,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.559109240405,
+                -0.1,
+                -0.0532615550005
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_173",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673615906,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.549611187414,
+                -0.1,
+                -0.0669700105195
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_174",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557673854652,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.539508475071,
+                -0.1,
+                -0.0802268537331
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_175",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674033802,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.528826554808,
+                -0.1,
+                -0.0930111973411
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_176",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674151576,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.51758997093,
+                -0.1,
+                -0.105302687735
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_177",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674208414,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.505822429815,
+                -0.1,
+                -0.117081175792
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_178",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674202939,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                -5.55111512313e-17,
+                4.40077943923e-16,
+                1.0
+              ],
+              "position_xyz": [
+                -0.493546927401,
+                -0.1,
+                -0.128326424196
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "horseshoe_wall_179",
+        "primitives": [
+          {
+            "dimensions": [
+              0.0557674134859,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                -0.480785927391,
+                -0.1,
+                -0.139017855147
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      },
+      {
+        "frame_id": "base_link",
+        "id": "tunnel_floor",
+        "primitives": [
+          {
+            "dimensions": [
+              1.24080939524,
+              1.1,
+              0.04
+            ],
+            "pose": {
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_xyz": [
+                3.23287498741e-05,
+                -0.1,
+                -0.22
+              ]
+            },
+            "type": "BOX"
+          }
+        ]
+      }
+    ]
+  },
+  "effective_parameters": {
+    "collision_check_stride": 1,
+    "collision_method": "adaptive_discrete_interpolation",
+    "include_bottom_closure": false,
+    "include_tunnel_floor": true,
+    "open_path": true,
+    "segment_stride": 1,
+    "stand_off_m": 0.26,
+    "tcp_points_to_wall": true,
+    "tunnel_floor_z_m": -0.2,
+    "wall_thickness_m": 0.04,
+    "y_thickness_m": 1.1
+  },
+  "expected_c1_baseline": {
+    "collision_count": 0,
+    "sampled_state_count": 858,
+    "waypoint_count": 181
+  },
+  "frame_id": "base_link",
+  "project": "FAIRINO_FR5",
+  "robot_padding_scale": {
+    "reason": "PlanningScene and RobotModel Python bindings expose no padding or scale accessor",
+    "status": "NOT_AVAILABLE"
+  },
+  "runtime_api_surface": {
+    "planning_scene_acm_padding_world_methods": [
+      "allowed_collision_matrix",
+      "process_planning_scene_world"
+    ],
+    "planning_scene_type": "moveit.core.planning_scene.PlanningScene",
+    "robot_model_padding_collision_methods": []
+  },
+  "sampling": {
+    "collision_check_stride": 1,
+    "maximum_joint_interpolation_step_deg": 0.5,
+    "policy": "adaptive_discrete_interpolation",
+    "waypoint_count": 181
+  },
+  "schema_version": "p2b3-c4-authoritative-scene-v1",
+  "semantics": {
+    "bottom_closure_included": false,
+    "floor_included": true,
+    "floor_z_m": -0.2,
+    "open_path": true,
+    "tcp_points_to_wall": true
+  },
+  "source_c1": {
+    "execution_code_commit": "cb2464153a101b9deccba7902e6350aea3fc7f62",
+    "nominal_trajectory_sha256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+    "source_git_blobs": {
+      "ros2_moveit_bridge/plan_closed_contour_moveit.py": "84ef8e23f898c5d2c8991eb3ec51fa307dfce4c4",
+      "scripts/run_p2b3_c1_r0.py": "3d84cbbe591354aa22d74a33f3f7abf17b66b177"
+    },
+    "stage": "P2-B3-C1",
+    "target_tcp_csv_sha256": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7"
+  },
+  "stage": "P2-B3-C4"
+}

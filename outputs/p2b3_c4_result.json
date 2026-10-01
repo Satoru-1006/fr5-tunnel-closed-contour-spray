@@ -1,0 +1,2218 @@
+{
+  "P2B3_C4_STATUS": "PASS",
+  "c1_input_identities": {
+    "c1_fk_trace_sha256": "ed8cffa87dae845df0dcc3cf50f88225e3f72b1fa425acce6def08e7ee60acee",
+    "c1_post_ruckig_sha256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+    "c1_result_sha256": "94285355a9de12891e9263db80ea3ef0a415c528b3d24c349ab0396db5c5544f",
+    "derived_reference_urdf_sha256": "b9d20cd51aa7088b2bab5083b4919473f0e0ec94c4b0d87d4111ca5cfa270096",
+    "joint_limits_sha256": "55b55eec2a8f73a26dd7198d1555c2531b08320b5641a4b18275b5a691bcc276",
+    "srdf_sha256": "0d6ca01d4667cb8f4772a8a26d5e83e1098c604d1cac0ef3739cb3d495c3e182",
+    "target_tcp_csv_sha256": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7"
+  },
+  "c1_scene_source_blobs": {
+    "ros2_moveit_bridge/plan_closed_contour_moveit.py": "84ef8e23f898c5d2c8991eb3ec51fa307dfce4c4",
+    "scripts/run_p2b3_c1_r0.py": "3d84cbbe591354aa22d74a33f3f7abf17b66b177"
+  },
+  "case_cap": 16,
+  "case_count": 12,
+  "cases": [
+    {
+      "amplitude": 0.001,
+      "axis": "x",
+      "case_id": "registration_translation_x_positive",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "translation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": false,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0010000000000000009
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.001
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": 1,
+      "surface_normal_count_changed": 0,
+      "surface_normal_sample_base": [
+        0.585483279652007,
+        7.169865443186115E-17,
+        -0.8106844819335879
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "translation_base_m": [
+        0.001,
+        0.0,
+        0.0
+      ],
+      "units": "m",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.001,
+      "axis": "x",
+      "case_id": "registration_translation_x_negative",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "translation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": false,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -0.0010000000000000009
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -0.001
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": -1,
+      "surface_normal_count_changed": 0,
+      "surface_normal_sample_base": [
+        0.585483279652007,
+        7.169865443186115E-17,
+        -0.8106844819335879
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "translation_base_m": [
+        -0.001,
+        0.0,
+        0.0
+      ],
+      "units": "m",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.001,
+      "axis": "y",
+      "case_id": "registration_translation_y_positive",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "translation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": false,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0010000000000000009
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.001
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": 1,
+      "surface_normal_count_changed": 0,
+      "surface_normal_sample_base": [
+        0.585483279652007,
+        7.169865443186115E-17,
+        -0.8106844819335879
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "translation_base_m": [
+        0.0,
+        0.001,
+        0.0
+      ],
+      "units": "m",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.001,
+      "axis": "y",
+      "case_id": "registration_translation_y_negative",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "translation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": false,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.0010000000000000009
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.001
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": -1,
+      "surface_normal_count_changed": 0,
+      "surface_normal_sample_base": [
+        0.585483279652007,
+        7.169865443186115E-17,
+        -0.8106844819335879
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "translation_base_m": [
+        0.0,
+        -0.001,
+        0.0
+      ],
+      "units": "m",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.001,
+      "axis": "z",
+      "case_id": "registration_translation_z_positive",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "translation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": false,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0010000000000000009
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.001
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": 1,
+      "surface_normal_count_changed": 0,
+      "surface_normal_sample_base": [
+        0.585483279652007,
+        7.169865443186115E-17,
+        -0.8106844819335879
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "translation_base_m": [
+        0.0,
+        0.0,
+        0.001
+      ],
+      "units": "m",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.001,
+      "axis": "z",
+      "case_id": "registration_translation_z_negative",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "translation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": false,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          -0.0010000000000000009
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          -0.001
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": -1,
+      "surface_normal_count_changed": 0,
+      "surface_normal_sample_base": [
+        0.585483279652007,
+        7.169865443186115E-17,
+        -0.8106844819335879
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "translation_base_m": [
+        0.0,
+        0.0,
+        -0.001
+      ],
+      "units": "m",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.0017453292519943296,
+      "axis": "x",
+      "case_id": "registration_rotation_x_positive",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "rotation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": true,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.9999984769132877,
+          -0.0017453283658983088,
+          0.0
+        ],
+        [
+          0.0,
+          0.0017453283658983088,
+          0.9999984769132877,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.9999984769132877,
+          -0.0017453283658983088,
+          0.0
+        ],
+        [
+          0.0,
+          0.0017453283658983088,
+          0.9999984769132877,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0017453292519943296,
+        0.0,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": 1,
+      "surface_normal_count_changed": 181,
+      "surface_normal_sample_base": [
+        0.585483279652007,
+        0.0014149106221123377,
+        -0.8106832471908256
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "transformed_normal_sample": [
+        0.585483279652007,
+        0.0014149106221123377,
+        -0.8106832471908256
+      ],
+      "translation_base_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "units": "rad",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.0017453292519943296,
+      "axis": "x",
+      "case_id": "registration_rotation_x_negative",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "rotation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": true,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.9999984769132877,
+          0.0017453283658983088,
+          0.0
+        ],
+        [
+          0.0,
+          -0.0017453283658983088,
+          0.9999984769132877,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.9999984769132877,
+          0.0017453283658983088,
+          0.0
+        ],
+        [
+          0.0,
+          -0.0017453283658983088,
+          0.9999984769132877,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        -0.0017453292519943296,
+        0.0,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": -1,
+      "surface_normal_count_changed": 181,
+      "surface_normal_sample_base": [
+        0.585483279652007,
+        -0.0014149106221121941,
+        -0.8106832471908256
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "transformed_normal_sample": [
+        0.585483279652007,
+        -0.0014149106221121941,
+        -0.8106832471908256
+      ],
+      "translation_base_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "units": "rad",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.0017453292519943296,
+      "axis": "y",
+      "case_id": "registration_rotation_y_positive",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "rotation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": true,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          0.9999984769132877,
+          0.0,
+          0.0017453283658983088,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0017453283658983088,
+          0.0,
+          0.9999984769132877,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          0.9999984769132877,
+          0.0,
+          0.0017453283658983088,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0017453283658983088,
+          0.0,
+          0.9999984769132877,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0017453292519943296,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": 1,
+      "surface_normal_count_changed": 181,
+      "surface_normal_sample_base": [
+        0.5840674772880912,
+        7.169865443186115E-17,
+        -0.8117051077665615
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "transformed_normal_sample": [
+        0.5840674772880912,
+        7.169865443186115E-17,
+        -0.8117051077665615
+      ],
+      "translation_base_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "units": "rad",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.0017453292519943296,
+      "axis": "y",
+      "case_id": "registration_rotation_y_negative",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "rotation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": true,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          0.9999984769132877,
+          0.0,
+          -0.0017453283658983088,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0017453283658983088,
+          0.0,
+          0.9999984769132877,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          0.9999984769132877,
+          0.0,
+          -0.0017453283658983088,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0017453283658983088,
+          0.0,
+          0.9999984769132877,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        -0.0017453292519943296,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": -1,
+      "surface_normal_count_changed": 181,
+      "surface_normal_sample_base": [
+        0.5868972985323158,
+        7.169865443186115E-17,
+        -0.8096613866150898
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "transformed_normal_sample": [
+        0.5868972985323158,
+        7.169865443186115E-17,
+        -0.8096613866150898
+      ],
+      "translation_base_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "units": "rad",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.0017453292519943296,
+      "axis": "z",
+      "case_id": "registration_rotation_z_positive",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "rotation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": true,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          0.9999984769132877,
+          -0.0017453283658983088,
+          0.0,
+          0.0
+        ],
+        [
+          0.0017453283658983088,
+          0.9999984769132877,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          0.9999984769132877,
+          -0.0017453283658983088,
+          0.0,
+          0.0
+        ],
+        [
+          0.0017453283658983088,
+          0.9999984769132877,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0,
+        0.0017453292519943296
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": 1,
+      "surface_normal_count_changed": 181,
+      "surface_normal_sample_base": [
+        0.5854823879102035,
+        0.0010218605757358916,
+        -0.8106844819335879
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "transformed_normal_sample": [
+        0.5854823879102035,
+        0.0010218605757358916,
+        -0.8106844819335879
+      ],
+      "translation_base_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "units": "rad",
+      "world_object_count": 181
+    },
+    {
+      "amplitude": 0.0017453292519943296,
+      "axis": "z",
+      "case_id": "registration_rotation_z_negative",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "rotation",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "status": "NOT_RUN",
+        "waypoints_compared": 0
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": true,
+      "object_pose_count_changed": 181,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          0.9999984769132877,
+          0.0017453283658983088,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0017453283658983088,
+          0.9999984769132877,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          0.9999984769132877,
+          0.0017453283658983088,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0017453283658983088,
+          0.9999984769132877,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0,
+        -0.0017453292519943296
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "sign": -1,
+      "surface_normal_count_changed": 181,
+      "surface_normal_sample_base": [
+        0.5854823879102035,
+        -0.001021860575735748,
+        -0.8106844819335879
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 181,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "transformed_normal_sample": [
+        0.5854823879102035,
+        -0.001021860575735748,
+        -0.8106844819335879
+      ],
+      "translation_base_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "units": "rad",
+      "world_object_count": 181
+    }
+  ],
+  "clearance_claim": "NO_PHYSICAL_CLEARANCE_OR_CONTINUOUS_CLEARANCE_CLAIM",
+  "collision_method": "adaptive_discrete_interpolation",
+  "collision_response_summary": {
+    "full_scene_collision_samples": 0,
+    "full_scene_samples": 10296,
+    "interpretation": "No sampled collision was observed in these engineering smoke cases; this does not establish clearance, continuous safety, or a registration margin.",
+    "per_case_collision_sample_counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "self_collision_samples": 0,
+    "status": "NO_COLLISIONS_OBSERVED"
+  },
+  "fcl_distance_status": "AVAILABLE_BOUNDED_SMOKE",
+  "frozen_trajectory": {
+    "joint_count": 6,
+    "q_unchanged": true,
+    "timestamps_unchanged": true,
+    "waypoint_count": 181
+  },
+  "hardware_validation": "NOT_RUN",
+  "legacy_c3_distance_reinterpretation": {
+    "corrected_status": "NOT_AVAILABLE_SENTINEL",
+    "old_label": "AVAILABLE",
+    "raw_value_m": -1.0,
+    "reason": "MoveIt CollisionResult.distance=-1.0 is a sentinel in the recorded colliding C3 run, not a physical distance or penetration depth.",
+    "sentinel_rejected": true
+  },
+  "native_backend": "MoveIt2 Jazzy MoveItPy PlanningSceneMonitor with active FCL collision environment",
+  "native_scene_propagation_tested": "YES",
+  "native_smoke_interpretation": "Engineering scene-propagation smoke only; nonzero amplitudes are not physical uncertainty bounds and do not form normalized margins.",
+  "nominal_zero_fk_regression": {
+    "max_position_delta_m": 0.0,
+    "max_tool_z_delta": 0.0,
+    "status": "PASS",
+    "tolerance_position_m": 1E-06,
+    "tolerance_tool_z": 1E-06,
+    "waypoints_compared": 181
+  },
+  "phase": "D_NONZERO_ENGINEERING_SMOKE",
+  "physical_registration_margin": "NOT_RUN",
+  "project": "FAIRINO_FR5",
+  "registration_convention": {
+    "composition": "T_base_entity_actual = DeltaT_base_left @ T_base_entity_nominal",
+    "nominal_transform": "T_base_entity_nominal maps each workpiece-attached entity into base_link",
+    "parameterization": "direct base-frame translation in meters plus base-frame rotation vector in radians; not an SE(3) twist with coupled translational exponential coordinates",
+    "perturbation_transform": "DeltaT_base = [[Exp([phi_base]x), t_base], [0,1]]",
+    "quaternion_convention": "right-handed rotation matrix; ROS quaternion order x,y,z,w",
+    "rotation_frame": "base_link",
+    "rotation_origin": "base_link origin",
+    "translation_frame": "base_link"
+  },
+  "registration_margin_readiness": "READY",
+  "scene_drift_root_cause": {
+    "c1_authoritative_parameters": {
+      "collision_check_stride": 1,
+      "collision_method": "adaptive_discrete_interpolation",
+      "include_bottom_closure": false,
+      "include_tunnel_floor": true,
+      "open_path": true,
+      "segment_stride": 1,
+      "stand_off_m": 0.26,
+      "tcp_points_to_wall": true,
+      "tunnel_floor_z_m": -0.2,
+      "wall_thickness_m": 0.04,
+      "y_thickness_m": 1.1
+    },
+    "c3_historical_builder_parameters": {
+      "execution_code_commit": "61cf00c661bc03c2edf2e251f97ebdd13349ad4f",
+      "frame_id": "base_link",
+      "include_bottom_closure": false,
+      "include_tunnel_floor": true,
+      "open_path": true,
+      "segment_stride": 4,
+      "source_path": "ros2_moveit_bridge/p2b3_c3_native_smoke.py",
+      "stand_off": 0.18,
+      "tcp_points_to_wall": false,
+      "tunnel_floor_z": -0.2,
+      "wall_thickness": 0.025,
+      "y_thickness": 0.08
+    },
+    "c3_old_scene_object_count": 46,
+    "c3_old_zero_collision_samples": 858,
+    "c3_old_zero_sample_count": 858,
+    "c4_zero_collision_samples": 0,
+    "causal_scope": "A zero-collision C4 replay with the authoritative C1 contract strongly attributes the C3 saturation conflict to scene mismatch; individual C3 parameters were not isolated in a one-factor experiment.",
+    "classification": "C3_NOMINAL_SCENE_SOURCE_MISMATCH"
+  },
+  "scene_equivalence": {
+    "difference_count": 0,
+    "differences": [],
+    "status": "PASS"
+  },
+  "scene_geometry": {
+    "bottom_closure_included": false,
+    "builder": "ros2_moveit_bridge.plan_closed_contour_moveit.build_wall_collision_objects",
+    "collision_check_stride": 1,
+    "collision_method": "adaptive_discrete_interpolation",
+    "collision_object_count": 181,
+    "floor_included": true,
+    "floor_z_m": -0.2,
+    "frame_id": "base_link",
+    "geometry_interpretation": "Existing project thin-box tunnel approximation derived from frozen open-arch target poses and normals; not a calibrated workpiece surface reconstruction.",
+    "include_bottom_closure": false,
+    "include_tunnel_floor": true,
+    "object_ids": [
+      "horseshoe_wall_000",
+      "horseshoe_wall_001",
+      "horseshoe_wall_002",
+      "horseshoe_wall_003",
+      "horseshoe_wall_004",
+      "horseshoe_wall_005",
+      "horseshoe_wall_006",
+      "horseshoe_wall_007",
+      "horseshoe_wall_008",
+      "horseshoe_wall_009",
+      "horseshoe_wall_010",
+      "horseshoe_wall_011",
+      "horseshoe_wall_012",
+      "horseshoe_wall_013",
+      "horseshoe_wall_014",
+      "horseshoe_wall_015",
+      "horseshoe_wall_016",
+      "horseshoe_wall_017",
+      "horseshoe_wall_018",
+      "horseshoe_wall_019",
+      "horseshoe_wall_020",
+      "horseshoe_wall_021",
+      "horseshoe_wall_022",
+      "horseshoe_wall_023",
+      "horseshoe_wall_024",
+      "horseshoe_wall_025",
+      "horseshoe_wall_026",
+      "horseshoe_wall_027",
+      "horseshoe_wall_028",
+      "horseshoe_wall_029",
+      "horseshoe_wall_030",
+      "horseshoe_wall_031",
+      "horseshoe_wall_032",
+      "horseshoe_wall_033",
+      "horseshoe_wall_034",
+      "horseshoe_wall_035",
+      "horseshoe_wall_036",
+      "horseshoe_wall_037",
+      "horseshoe_wall_038",
+      "horseshoe_wall_039",
+      "horseshoe_wall_040",
+      "horseshoe_wall_041",
+      "horseshoe_wall_042",
+      "horseshoe_wall_043",
+      "horseshoe_wall_044",
+      "horseshoe_wall_045",
+      "horseshoe_wall_046",
+      "horseshoe_wall_047",
+      "horseshoe_wall_048",
+      "horseshoe_wall_049",
+      "horseshoe_wall_050",
+      "horseshoe_wall_051",
+      "horseshoe_wall_052",
+      "horseshoe_wall_053",
+      "horseshoe_wall_054",
+      "horseshoe_wall_055",
+      "horseshoe_wall_056",
+      "horseshoe_wall_057",
+      "horseshoe_wall_058",
+      "horseshoe_wall_059",
+      "horseshoe_wall_060",
+      "horseshoe_wall_061",
+      "horseshoe_wall_062",
+      "horseshoe_wall_063",
+      "horseshoe_wall_064",
+      "horseshoe_wall_065",
+      "horseshoe_wall_066",
+      "horseshoe_wall_067",
+      "horseshoe_wall_068",
+      "horseshoe_wall_069",
+      "horseshoe_wall_070",
+      "horseshoe_wall_071",
+      "horseshoe_wall_072",
+      "horseshoe_wall_073",
+      "horseshoe_wall_074",
+      "horseshoe_wall_075",
+      "horseshoe_wall_076",
+      "horseshoe_wall_077",
+      "horseshoe_wall_078",
+      "horseshoe_wall_079",
+      "horseshoe_wall_080",
+      "horseshoe_wall_081",
+      "horseshoe_wall_082",
+      "horseshoe_wall_083",
+      "horseshoe_wall_084",
+      "horseshoe_wall_085",
+      "horseshoe_wall_086",
+      "horseshoe_wall_087",
+      "horseshoe_wall_088",
+      "horseshoe_wall_089",
+      "horseshoe_wall_090",
+      "horseshoe_wall_091",
+      "horseshoe_wall_092",
+      "horseshoe_wall_093",
+      "horseshoe_wall_094",
+      "horseshoe_wall_095",
+      "horseshoe_wall_096",
+      "horseshoe_wall_097",
+      "horseshoe_wall_098",
+      "horseshoe_wall_099",
+      "horseshoe_wall_100",
+      "horseshoe_wall_101",
+      "horseshoe_wall_102",
+      "horseshoe_wall_103",
+      "horseshoe_wall_104",
+      "horseshoe_wall_105",
+      "horseshoe_wall_106",
+      "horseshoe_wall_107",
+      "horseshoe_wall_108",
+      "horseshoe_wall_109",
+      "horseshoe_wall_110",
+      "horseshoe_wall_111",
+      "horseshoe_wall_112",
+      "horseshoe_wall_113",
+      "horseshoe_wall_114",
+      "horseshoe_wall_115",
+      "horseshoe_wall_116",
+      "horseshoe_wall_117",
+      "horseshoe_wall_118",
+      "horseshoe_wall_119",
+      "horseshoe_wall_120",
+      "horseshoe_wall_121",
+      "horseshoe_wall_122",
+      "horseshoe_wall_123",
+      "horseshoe_wall_124",
+      "horseshoe_wall_125",
+      "horseshoe_wall_126",
+      "horseshoe_wall_127",
+      "horseshoe_wall_128",
+      "horseshoe_wall_129",
+      "horseshoe_wall_130",
+      "horseshoe_wall_131",
+      "horseshoe_wall_132",
+      "horseshoe_wall_133",
+      "horseshoe_wall_134",
+      "horseshoe_wall_135",
+      "horseshoe_wall_136",
+      "horseshoe_wall_137",
+      "horseshoe_wall_138",
+      "horseshoe_wall_139",
+      "horseshoe_wall_140",
+      "horseshoe_wall_141",
+      "horseshoe_wall_142",
+      "horseshoe_wall_143",
+      "horseshoe_wall_144",
+      "horseshoe_wall_145",
+      "horseshoe_wall_146",
+      "horseshoe_wall_147",
+      "horseshoe_wall_148",
+      "horseshoe_wall_149",
+      "horseshoe_wall_150",
+      "horseshoe_wall_151",
+      "horseshoe_wall_152",
+      "horseshoe_wall_153",
+      "horseshoe_wall_154",
+      "horseshoe_wall_155",
+      "horseshoe_wall_156",
+      "horseshoe_wall_157",
+      "horseshoe_wall_158",
+      "horseshoe_wall_159",
+      "horseshoe_wall_160",
+      "horseshoe_wall_161",
+      "horseshoe_wall_162",
+      "horseshoe_wall_163",
+      "horseshoe_wall_164",
+      "horseshoe_wall_165",
+      "horseshoe_wall_166",
+      "horseshoe_wall_167",
+      "horseshoe_wall_168",
+      "horseshoe_wall_169",
+      "horseshoe_wall_170",
+      "horseshoe_wall_171",
+      "horseshoe_wall_172",
+      "horseshoe_wall_173",
+      "horseshoe_wall_174",
+      "horseshoe_wall_175",
+      "horseshoe_wall_176",
+      "horseshoe_wall_177",
+      "horseshoe_wall_178",
+      "horseshoe_wall_179",
+      "tunnel_floor"
+    ],
+    "open_path": true,
+    "segment_stride": 1,
+    "stand_off_m": 0.26,
+    "tcp_points_to_wall": true,
+    "tunnel_floor_z_m": -0.2,
+    "wall_thickness_m": 0.04,
+    "y_thickness_m": 1.1
+  },
+  "scene_manifest_sha256": "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669",
+  "scene_parameter_drift": {
+    "differences": [
+      {
+        "c1_authoritative": 0.26,
+        "c3_observed": 0.18,
+        "parameter": "stand_off_m"
+      },
+      {
+        "c1_authoritative": true,
+        "c3_observed": false,
+        "parameter": "tcp_points_to_wall"
+      },
+      {
+        "c1_authoritative": 0.04,
+        "c3_observed": 0.025,
+        "parameter": "wall_thickness_m"
+      },
+      {
+        "c1_authoritative": 1.1,
+        "c3_observed": 0.08,
+        "parameter": "y_thickness_m"
+      },
+      {
+        "c1_authoritative": 1,
+        "c3_observed": 4,
+        "parameter": "segment_stride"
+      }
+    ],
+    "status": "DRIFT_FOUND"
+  },
+  "scene_parameter_drift_found": true,
+  "schema_version": "p2b3-c4-native-smoke-v1",
+  "stage": "P2-B3-C4",
+  "status": "PASS",
+  "phase_c_identity": {
+    "status": "IDENTITY_GATE_PASS_PHASE_D_PENDING",
+    "zero_transform_equivalence": {
+      "checks": {
+        "all_scene_objects_applied": true,
+        "collision_count": true,
+        "fk_regression": true,
+        "q_identity": true,
+        "sampled_state_count": true,
+        "scene_equivalence": true,
+        "surface_normal_identity": true,
+        "target_pose_identity": true,
+        "timestamp_identity": true,
+        "trajectory_sha256": true,
+        "waypoint_count": true
+      },
+      "failed_checks": [],
+      "status": "PASS"
+    },
+    "scene_equivalence": {
+      "difference_count": 0,
+      "differences": [],
+      "status": "PASS"
+    },
+    "scene_manifest_sha256": "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669",
+    "scene_apply_success_count": 181,
+    "scene_object_count": 181,
+    "baseline": {
+      "amplitude": 0.0,
+      "case_id": "registration_zero",
+      "collision_contacts_mapping_available": true,
+      "collision_method": "adaptive_discrete_interpolation",
+      "collision_request_distance_property_available": true,
+      "collision_result_distance_property_available": true,
+      "contact_point_total": 0,
+      "family": "zero",
+      "fcl_distance_diagnostics": {
+        "available_count": 858,
+        "interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+        "minimum_reported_full_scene_distance_m": 0.016622079818704765,
+        "minimum_robot_world_distance_m": null,
+        "sample_count": 858,
+        "sentinel_count": 0,
+        "status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+        "unavailable_count": 0
+      },
+      "fcl_distance_interpretation": "full-scene sampled model distance only; not isolated to robot-world pairs and not a continuous or physical clearance guarantee",
+      "fcl_distance_status": "AVAILABLE_SAMPLED_MODEL_DISTANCE",
+      "first_collision": null,
+      "fk_regression": {
+        "max_position_delta_m": 0.0,
+        "max_tool_z_delta": 0.0,
+        "status": "PASS",
+        "tolerance_position_m": 1E-06,
+        "tolerance_tool_z": 1E-06,
+        "waypoints_compared": 181
+      },
+      "full_scene_collision_sample_count": 0,
+      "interpretation": "zero identity control",
+      "joint_states_unchanged": true,
+      "maximum_contacts_in_one_sample": 0,
+      "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+      "minimum_reported_fcl_distance_m": 0.016622079818704765,
+      "minimum_robot_world_distance_m": null,
+      "normal_rotation_applied": false,
+      "object_pose_count_changed": 0,
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_binding": "moveit.core.planning_scene.PlanningScene",
+      "planning_scene_collision_distance_methods": [
+        "allowed_collision_matrix",
+        "apply_collision_object",
+        "check_collision",
+        "check_collision_unpadded",
+        "check_self_collision",
+        "process_attached_collision_object",
+        "remove_all_collision_objects"
+      ],
+      "realized_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "requested_transform_base": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "robot_model_padding_collision_methods": [],
+      "rotation_vector_base_rad": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sample_count": 858,
+      "scene_apply_success_count": 181,
+      "self_collision_sample_count": 0,
+      "surface_normal_count_changed": 0,
+      "surface_normal_sample_base": [
+        0.585483279652007,
+        7.169865443186115E-17,
+        -0.8106844819335879
+      ],
+      "surface_normals_match_requested_rotation": true,
+      "target_pose_count_changed": 0,
+      "target_poses_match_requested_transform": true,
+      "timestamps_unchanged": true,
+      "translation_base_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "units": "1",
+      "world_object_count": 181
+    }
+  },
+  "authoritative_scene_contract": {
+    "schema_version": "p2b3-c4-authoritative-scene-v1",
+    "manifest_path": "outputs/p2b3_c4_authoritative_scene_manifest.json",
+    "canonical_sha256": "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669",
+    "file_sha256": "ae6963513e897ecc0de555724fd00b9e1e8700efd4ed704e87d95799e2c1fc9e",
+    "frame_id": "base_link",
+    "builder": "ros2_moveit_bridge.plan_closed_contour_moveit.build_wall_collision_objects",
+    "effective_parameters": {
+      "collision_check_stride": 1,
+      "collision_method": "adaptive_discrete_interpolation",
+      "include_bottom_closure": false,
+      "include_tunnel_floor": true,
+      "open_path": true,
+      "segment_stride": 1,
+      "stand_off_m": 0.26,
+      "tcp_points_to_wall": true,
+      "tunnel_floor_z_m": -0.2,
+      "wall_thickness_m": 0.04,
+      "y_thickness_m": 1.1
+    },
+    "semantics": {
+      "bottom_closure_included": false,
+      "floor_included": true,
+      "floor_z_m": -0.2,
+      "open_path": true,
+      "tcp_points_to_wall": true
+    },
+    "collision_backend": "MoveIt2 Jazzy MoveItPy PlanningSceneMonitor / FCL",
+    "collision_object_count": 181,
+    "acm": {
+      "allowed_pair_count": 24,
+      "api": "PlanningScene.allowed_collision_matrix -> AllowedCollisionMatrix.get_entry(name1,name2)",
+      "queried_pair_count": 35721,
+      "scope": "all ordered pairs among URDF robot links and current authoritative world-object IDs",
+      "sha256": "02975b55c25b52d8bb7d77bdbaf05db1ef5f1d58278575fa4fb298e1a3f35661",
+      "status": "AVAILABLE",
+      "universe_name_count": 189
+    },
+    "robot_padding_scale": {
+      "reason": "PlanningScene and RobotModel Python bindings expose no padding or scale accessor",
+      "status": "NOT_AVAILABLE"
+    },
+    "runtime_api_surface": {
+      "planning_scene_acm_padding_world_methods": [
+        "allowed_collision_matrix",
+        "process_planning_scene_world"
+      ],
+      "planning_scene_type": "moveit.core.planning_scene.PlanningScene",
+      "robot_model_padding_collision_methods": []
+    },
+    "sampling": {
+      "collision_check_stride": 1,
+      "maximum_joint_interpolation_step_deg": 0.5,
+      "policy": "adaptive_discrete_interpolation",
+      "waypoint_count": 181
+    },
+    "expected_c1_baseline": {
+      "collision_count": 0,
+      "sampled_state_count": 858,
+      "waypoint_count": 181
+    }
+  },
+  "focused_tests": {
+    "focused_c4_and_c3_regression_status": "PASS",
+    "total": 52,
+    "passed": 52,
+    "failed": 0,
+    "command": "python -m pytest -q tests/test_p2b3_c4_scene_contract.py tests/test_p2b3_c3_physical_uncertainty.py"
+  },
+  "provenance": {
+    "github_repository": "Satoru-1006/fr5-tunnel-closed-contour-spray",
+    "github_branch": "codex/fr5-p2b3-c4-authoritative-scene-equivalence-20261002",
+    "parent_commit": "8a60e699951da62e4ca69fe28c5a201096f677b1",
+    "phase_c_code_tree_commit": "82759fa957dc0765797131949ce3abff7456229e",
+    "execution_code_commit": "ebef4cb538928c2212988ec1a6456bdde75c811a",
+    "artifact_publish_commit": "RECORDED_IN_LATER_DRIVE_PROJECT_INDEX",
+    "final_delivery_commit": "RECORDED_IN_LATER_DRIVE_PROJECT_INDEX",
+    "c1_nominal_trajectory_sha256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+    "fairino_source_commit": "60755d44d521a5ad6bee8494cc19522f8801aa20"
+  },
+  "AUTHORITATIVE_SCENE_EQUIVALENCE": "PASS",
+  "ZERO_TRANSFORM_EQUIVALENCE": "PASS",
+  "ZERO_BASELINE_COLLISION_COUNT": 0,
+  "C1_EXPECTED_COLLISION_COUNT": 0,
+  "SAMPLED_STATE_COUNT": 858,
+  "WAYPOINT_COUNT": 181,
+  "CLEARANCE_DIAGNOSTIC_STATUS": "AVAILABLE_SAMPLED_FULL_SCENE_MODEL_DISTANCE_ONLY",
+  "PAIR_AWARE_COLLISION_DIAGNOSTIC": {
+    "status": "NOT_AVAILABLE_NO_VERIFIED_ROBOT_WORLD_PAIR_QUERY",
+    "full_scene_collision_boolean": "AVAILABLE",
+    "contacts_mapping": "AVAILABLE",
+    "contact_pair": "NOT_AVAILABLE_NO_COLLISION_CONTACTS",
+    "nearest_pair": "NOT_AVAILABLE",
+    "minimum_robot_world_distance_m": null,
+    "nearest_points": "NOT_AVAILABLE_CONTACT_POINT_SEMANTICS_UNVERIFIED",
+    "penetration_depth": "NOT_AVAILABLE_NO_VERIFIED_SIGNED_DEPTH_FIELD"
+  },
+  "SENTINEL_DISTANCE_REJECTED": true,
+  "NONZERO_ENGINEERING_SMOKE": "COMPLETE_12_CASES",
+  "REGISTRATION_MARGIN_CAMPAIGN": "NOT_RUN",
+  "PHYSICAL_REGISTRATION_BOUND": "UNAVAILABLE_NO_MEASURED_FR5_BOUND",
+  "PHYSICAL_NORMALIZED_MARGIN": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+  "STRICT_CONTINUOUS_CCD": "NOT_AVAILABLE",
+  "HARDWARE_VALIDATED": "NOT_RUN",
+  "TEST_TOTAL": 52,
+  "TEST_PASSED": 52,
+  "TEST_FAILED": 0
+}
