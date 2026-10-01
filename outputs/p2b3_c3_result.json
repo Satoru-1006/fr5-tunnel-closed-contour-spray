@@ -1,0 +1,2798 @@
+{
+  "C1_NOMINAL_SHA256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+  "C1_WAYPOINT_COUNT": 181,
+  "C2_CANONICAL_IDENTITY": {
+    "artifact_publish_commit": {
+      "phase_1_execution_code_commit": "bb86d8f86a0bdb04948fee73155e78c47908c95a",
+      "phase_2_first_canonical_artifact_commit": "e7ebc2a625d8bc8881e5865514e95ee9ee920de0",
+      "phase_2_resolution_commit_is_a_later_commit_to_avoid_self_reference": true,
+      "status": "RESOLVED_IN_SECOND_PHASE"
+    },
+    "execution_code_commit": "bb86d8f86a0bdb04948fee73155e78c47908c95a",
+    "frozen_baseline_performance_status": "MEASURED_FAILURES_PRESENT",
+    "measurement_pipeline_status": "PASS",
+    "postprocessing_code_commit": "001843d3828efd86755267110f751e683e95fb62",
+    "result_sha256": "bd00f361025e92a0039b7e9aff3e9263f04424085031e27dd222993404ac70c3"
+  },
+  "EXECUTION_BRANCH": "codex/fr5-p2b3-c3-physical-uncertainty-se3-20261001",
+  "EXECUTION_CODE_COMMIT": "61cf00c661bc03c2edf2e251f97ebdd13349ad4f",
+  "FAIRINO_SOURCE_COMMIT": "60755d44d521a5ad6bee8494cc19522f8801aa20",
+  "FOREIGN_PROJECT_REFERENCE_COUNT": 0,
+  "FROZEN_INPUTS_MODIFIED": "NO",
+  "GITHUB_PUSH": "NOT_RUN",
+  "GITHUB_REPOSITORY": "Satoru-1006/fr5-tunnel-closed-contour-spray",
+  "GOOGLE_DRIVE_UPLOAD": "NOT_RUN",
+  "LEGACY_TCP_SEMANTICS_EXPLICIT": "YES",
+  "MOVEIT2_ENVIRONMENT": "MoveIt2 Jazzy MoveItPy PlanningSceneMonitor with active FCL collision environment",
+  "NATIVE_SMOKE": "PASS",
+  "NORMALIZATION_FAIL_CLOSED": "PASS",
+  "NORMALIZED_MARGIN_STATUS": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+  "P2B3_C3_STATUS": "INCOMPLETE_DELIVERY",
+  "PARENT_BASE_VERIFIED": "YES",
+  "PARENT_BRANCH": "codex/fr5-p2b3-c2-robustness-transfer-20260928",
+  "PARENT_COMMIT": "fff39145a1e9dcd59fb1d180fe2cf182444820fe",
+  "PROJECT": "FAIRINO_FR5",
+  "PROJECT_IDENTITY": "FAIRINO_FR5",
+  "PROJECT_INDEX_UPDATED": "NOT_RUN",
+  "PYTHON_VERSION": "3.12.1",
+  "REGRESSION_TESTS": "PASS",
+  "REMOTE_SHA_VERIFIED": "NOT_RUN",
+  "ROS2_DISTRO": "jazzy",
+  "SCENE_PROPAGATION": "PASS",
+  "SCENE_PROPAGATION_TESTED": "YES",
+  "SE3_REGISTRATION_OPERATOR_IMPLEMENTED": "YES",
+  "STAGE": "P2-B3-C3",
+  "SURFACE_NORMAL_PROPAGATION_TESTED": "PASS",
+  "SYNTHETIC_KNOWN_ANSWER_TESTS": "PASS",
+  "TEST_FAILED": 0,
+  "TEST_PASSED": 70,
+  "TEST_TOTAL": 70,
+  "UNCERTAINTY_ONTOLOGY_IMPLEMENTED": "YES",
+  "WORKTREE_CLEAN": "NOT_VERIFIED",
+  "WORKTREE_CLEAN_AT_RESULT_GENERATION": "YES",
+  "WORKTREE_CLEAN_AT_START": "YES",
+  "c2_semantic_reinterpretation": [
+    {
+      "classification": {
+        "historical_axis_id": "joint:j1:positive",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j1:positive",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "POSITIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.012496918696787597",
+        "last_pass": "0.012496149134702692",
+        "margin": "0.012496533915745144",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "5",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j1:negative",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j1:negative",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "NEGATIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.012497023976439139",
+        "last_pass": "0.012496329195543134",
+        "margin": "0.012496676585991136",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "6",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j2:positive",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j2:positive",
+        "critical_segment": "",
+        "critical_waypoint": "90",
+        "direction": "POSITIVE",
+        "failure_mode": "TCP_PATH_DEVIATION",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.012296121837859946",
+        "last_pass": "0.012295431160904497",
+        "margin": "0.012295776499382221",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "3",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j2:negative",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j2:negative",
+        "critical_segment": "",
+        "critical_waypoint": "90",
+        "direction": "NEGATIVE",
+        "failure_mode": "TCP_PATH_DEVIATION",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.012296201960083233",
+        "last_pass": "0.012295381447474125",
+        "margin": "0.012295791703778678",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "4",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j3:positive",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j3:positive",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "POSITIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.007212975400190721",
+        "last_pass": "0.007212123809234382",
+        "margin": "0.007212549604712551",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "1",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j3:negative",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j3:negative",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "NEGATIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.007213003181174694",
+        "last_pass": "0.007212391391252626",
+        "margin": "0.00721269728621366",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "2",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j4:positive",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j4:positive",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "POSITIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.02205264016613119",
+        "last_pass": "0.022052000959169853",
+        "margin": "0.022052320562650524",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "8",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j4:negative",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j4:negative",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "NEGATIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.022052333200166637",
+        "last_pass": "0.022051530771915413",
+        "margin": "0.022051931986041023",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "7",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j5:positive",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j5:positive",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "POSITIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.0266680144048481",
+        "last_pass": "0.026667302669429356",
+        "margin": "0.026667658537138726",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "10",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j5:negative",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j5:negative",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "NEGATIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "0.026668032172488268",
+        "last_pass": "0.026667149855460228",
+        "margin": "0.02666759101397425",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "9",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j6:positive",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j6:positive",
+        "critical_segment": "",
+        "critical_waypoint": "0",
+        "direction": "POSITIVE",
+        "failure_mode": "JOINT_LIMIT_FAILURE",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "2.811699746291067",
+        "last_pass": "2.811699065455335",
+        "margin": "2.8116994058732008",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "11",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "joint:j6:negative",
+        "physical_interpretation": "deterministic joint-state offset stress; not a measured tracking distribution",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "JOINT_STATE_ERROR"
+      },
+      "historical_raw_row": {
+        "axis_id": "joint:j6:negative",
+        "critical_segment": "",
+        "critical_waypoint": "0",
+        "direction": "NEGATIVE",
+        "failure_mode": "JOINT_LIMIT_FAILURE",
+        "failure_region_count": "1",
+        "family": "JOINT_STATE",
+        "first_fail": "3.2969013687680393",
+        "last_pass": "3.296900570443731",
+        "margin": "3.2969009696058853",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "12",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_rotation:x:positive",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_rotation:x:positive",
+        "critical_segment": "",
+        "critical_waypoint": "172",
+        "direction": "POSITIVE",
+        "failure_mode": "SPRAY_AXIS_NORMAL_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_ROTATION",
+        "first_fail": "0.15748869422292583",
+        "last_pass": "0.1574318801196708",
+        "margin": "0.1574602871712983",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "1",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_rotation:x:negative",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_rotation:x:negative",
+        "critical_segment": "",
+        "critical_waypoint": "171",
+        "direction": "NEGATIVE",
+        "failure_mode": "SPRAY_AXIS_NORMAL_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_ROTATION",
+        "first_fail": "0.15748869422292583",
+        "last_pass": "0.1574318801196708",
+        "margin": "0.1574602871712983",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "2",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_rotation:y:positive",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_rotation:y:positive",
+        "critical_segment": "",
+        "critical_waypoint": "1",
+        "direction": "POSITIVE",
+        "failure_mode": "SPRAY_AXIS_NORMAL_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_ROTATION",
+        "first_fail": "0.16004532886940187",
+        "last_pass": "0.15998851476614687",
+        "margin": "0.16001692181777438",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "4",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_rotation:y:negative",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_rotation:y:negative",
+        "critical_segment": "",
+        "critical_waypoint": "0",
+        "direction": "NEGATIVE",
+        "failure_mode": "SPRAY_AXIS_NORMAL_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_ROTATION",
+        "first_fail": "0.15993170066289186",
+        "last_pass": "0.15987488655963683",
+        "margin": "0.15990329361126435",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "3",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_rotation:z:positive",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_rotation:z:positive",
+        "critical_segment": "",
+        "critical_waypoint": "",
+        "direction": "POSITIVE",
+        "failure_mode": "",
+        "failure_region_count": "0",
+        "family": "TCP_ROTATION",
+        "first_fail": "",
+        "last_pass": "",
+        "margin": "",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "",
+        "search_completeness": "FULL_COARSE_DOMAIN_SAMPLED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_rotation:z:negative",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_rotation:z:negative",
+        "critical_segment": "",
+        "critical_waypoint": "",
+        "direction": "NEGATIVE",
+        "failure_mode": "",
+        "failure_region_count": "0",
+        "family": "TCP_ROTATION",
+        "first_fail": "",
+        "last_pass": "",
+        "margin": "",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "",
+        "search_completeness": "FULL_COARSE_DOMAIN_SAMPLED",
+        "unit_family": "rad",
+        "units": "rad"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_translation:x:positive",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_translation:x:positive",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "POSITIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_TRANSLATION",
+        "first_fail": "0.004",
+        "last_pass": "0.0039921875",
+        "margin": "0.0039960937500000005",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "1",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "m",
+        "units": "m"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_translation:x:negative",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_translation:x:negative",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "NEGATIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_TRANSLATION",
+        "first_fail": "0.004",
+        "last_pass": "0.0039921875",
+        "margin": "0.0039960937500000005",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "2",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "m",
+        "units": "m"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_translation:y:positive",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_translation:y:positive",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "POSITIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_TRANSLATION",
+        "first_fail": "0.004",
+        "last_pass": "0.0039921875",
+        "margin": "0.0039960937500000005",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "3",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "m",
+        "units": "m"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_translation:y:negative",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_translation:y:negative",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "NEGATIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_TRANSLATION",
+        "first_fail": "0.004",
+        "last_pass": "0.0039921875",
+        "margin": "0.0039960937500000005",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "4",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "m",
+        "units": "m"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_translation:z:positive",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_translation:z:positive",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "POSITIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_TRANSLATION",
+        "first_fail": "0.004",
+        "last_pass": "0.0039921875",
+        "margin": "0.0039960937500000005",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "5",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "m",
+        "units": "m"
+      }
+    },
+    {
+      "classification": {
+        "historical_axis_id": "tcp_tcp_translation:z:negative",
+        "physical_interpretation": "target pose comparison perturbation; not physical TCP execution or calibration error",
+        "physical_source": "ASSUMED",
+        "raw_historical_value_status": "PRESERVED_UNCHANGED",
+        "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+      },
+      "historical_raw_row": {
+        "axis_id": "tcp_tcp_translation:z:negative",
+        "critical_segment": "",
+        "critical_waypoint": "180",
+        "direction": "NEGATIVE",
+        "failure_mode": "TERMINAL_POSITION_ERROR",
+        "failure_region_count": "1",
+        "family": "TCP_TRANSLATION",
+        "first_fail": "0.004",
+        "last_pass": "0.0039921875",
+        "margin": "0.0039960937500000005",
+        "non_monotonic_failure_region_observed": "False",
+        "rank_within_family_and_unit": "6",
+        "search_completeness": "ALL_OBSERVED_TRANSITIONS_REFINED",
+        "unit_family": "m",
+        "units": "m"
+      }
+    }
+  ],
+  "c2_transfer_comparison_identity": {
+    "raw_rows_modified": false,
+    "row_count": 24,
+    "sha256": "0dc390079b057f72761041dea50b1227bdf57392d0c9bfeb81e1e1c9d8c40a9e"
+  },
+  "claim_boundaries": {
+    "CALIBRATED_REGISTRATION_DISTRIBUTION": "NOT_AVAILABLE",
+    "CALIBRATED_TCP_UNCERTAINTY": "NOT_AVAILABLE",
+    "COATING_QUALITY_CERTIFIED": "NO",
+    "GLOBAL_ROBUSTNESS_PROVEN": "NO",
+    "HARDWARE_SAFETY_CERTIFIED": "NO",
+    "HARDWARE_VALIDATED": "NO",
+    "PHYSICAL_FAILURE_PROBABILITY": "NOT_AVAILABLE",
+    "PHYSICAL_NORMALIZED_MARGIN": "NOT_AVAILABLE",
+    "STRICT_CONTINUOUS_CCD": "NOT_AVAILABLE"
+  },
+  "current_capability_matrix": {
+    "base_workpiece_registration_error": {
+      "native_scene_propagation": "YES",
+      "operator_capability": "IMPLEMENTED_ENGINEERING_PROPAGATION; PHYSICAL_BOUND_UNKNOWN",
+      "physical_bound_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "semantic_class": "BASE_WORKPIECE_REGISTRATION_ERROR"
+    },
+    "execution_tracking_error": {
+      "native_scene_propagation": "NOT_APPLICABLE",
+      "operator_capability": "NOT_AVAILABLE",
+      "physical_bound_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "semantic_class": "EXECUTION_TRACKING_ERROR"
+    },
+    "joint_state_error": {
+      "native_scene_propagation": "NOT_APPLICABLE",
+      "operator_capability": "AVAILABLE_DETERMINISTIC_STRESS_OPERATOR",
+      "physical_bound_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "semantic_class": "JOINT_STATE_ERROR"
+    },
+    "surface_reconstruction_error": {
+      "native_scene_propagation": "NOT_APPLICABLE",
+      "operator_capability": "NOT_AVAILABLE",
+      "physical_bound_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "semantic_class": "SURFACE_RECONSTRUCTION_ERROR"
+    },
+    "target_pose_geometric_perturbation": {
+      "native_scene_propagation": "NOT_APPLICABLE",
+      "operator_capability": "AVAILABLE_DETERMINISTIC_STRESS_OPERATOR",
+      "physical_bound_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION"
+    },
+    "tcp_calibration_error": {
+      "native_scene_propagation": "NOT_APPLICABLE",
+      "operator_capability": "NOT_AVAILABLE",
+      "physical_bound_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "semantic_class": "TCP_CALIBRATION_ERROR"
+    }
+  },
+  "frozen_input_identities": {
+    "c1_fk_trace": {
+      "path": "D:\\fr5-p2b3-c2-20260928\\c1_r0_replay\\strict_replay\\moveit_fk_tcp_trace.csv",
+      "sha256": "ed8cffa87dae845df0dcc3cf50f88225e3f72b1fa425acce6def08e7ee60acee",
+      "size_bytes": 51523,
+      "status": "AVAILABLE"
+    },
+    "c1_post_ruckig_nominal": {
+      "path": "outputs/p2b3_c2_c1_nominal_post_ruckig.csv",
+      "sha256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+      "size_bytes": 94996,
+      "status": "AVAILABLE"
+    },
+    "c1_readme": {
+      "path": "docs/P2B3_C1_README.md",
+      "sha256": "4db2da391981eab1e3141a7304ad6baac52f27872de88cb1ae630033acb9b3bc",
+      "size_bytes": 7249,
+      "status": "AVAILABLE"
+    },
+    "c1_result": {
+      "path": "outputs/p2b3_c1_result.json",
+      "sha256": "94285355a9de12891e9263db80ea3ef0a415c528b3d24c349ab0396db5c5544f",
+      "size_bytes": 13154,
+      "status": "AVAILABLE"
+    },
+    "c1_seed_joint_csv": {
+      "path": "outputs/internal_wiper_moveit_inputs/open_arch_seed_joints.csv",
+      "sha256": "c568a6f49d6bfe170049774283b03b6576b950646dd79c449fb2e61c83034cba",
+      "size_bytes": 21248,
+      "status": "AVAILABLE"
+    },
+    "c1_target_pose_csv": {
+      "path": "outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv",
+      "sha256": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7",
+      "size_bytes": 37369,
+      "status": "AVAILABLE"
+    },
+    "c2_axis_margin_profile": {
+      "path": "outputs/p2b3_c2_axis_margin_profile.csv",
+      "sha256": "60a19ed1a3fe975323fc041331c32b8ec99f292430fcfa6db1d236bf6cbda689",
+      "size_bytes": 4384,
+      "status": "AVAILABLE"
+    },
+    "c2_canonical_result": {
+      "path": "outputs/p2b3_c2_result.json",
+      "sha256": "bd00f361025e92a0039b7e9aff3e9263f04424085031e27dd222993404ac70c3",
+      "size_bytes": 13602740,
+      "status": "AVAILABLE"
+    },
+    "c2_readme": {
+      "path": "docs/P2B3_C2_README.md",
+      "sha256": "5abc2510b3110677db7c6c05d1a8607fea6ec90e3c65b557efcf3a24da1b7627",
+      "size_bytes": 8618,
+      "status": "AVAILABLE"
+    },
+    "c2_transfer_comparison": {
+      "path": "outputs/p2b3_c2_transfer_comparison.csv",
+      "sha256": "0dc390079b057f72761041dea50b1227bdf57392d0c9bfeb81e1e1c9d8c40a9e",
+      "size_bytes": 21403,
+      "status": "AVAILABLE"
+    },
+    "derived_reference_urdf": {
+      "path": "outputs/p2b2_inputs/derived_reference_robot_model.urdf",
+      "sha256": "b9d20cd51aa7088b2bab5083b4919473f0e0ec94c4b0d87d4111ca5cfa270096",
+      "size_bytes": 10247,
+      "status": "AVAILABLE"
+    },
+    "joint_limits_config": {
+      "path": "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml",
+      "sha256": "55b55eec2a8f73a26dd7198d1555c2531b08320b5641a4b18275b5a691bcc276",
+      "size_bytes": 1070,
+      "status": "AVAILABLE"
+    },
+    "spray_tcp_srdf": {
+      "path": "ros2_moveit_bridge/config/fairino5_v6_spray_tcp.srdf",
+      "sha256": "0d6ca01d4667cb8f4772a8a26d5e83e1098c604d1cac0ef3739cb3d495c3e182",
+      "size_bytes": 2023,
+      "status": "AVAILABLE"
+    }
+  },
+  "generated_at_utc": "2026-10-01T12:13:33+00:00",
+  "limitations": [
+    "No FR5 measured registration, TCP calibration, joint tracking, or surface reconstruction uncertainty bound was found in the searched project records.",
+    "Nonzero smoke amplitudes are engineering propagation checks and are not physical uncertainty bounds.",
+    "C3 wall boxes are the existing project thin-box approximation, not a calibrated surface reconstruction.",
+    "Collision observations are adaptive_discrete_interpolation and do not establish strict continuous collision detection.",
+    "MoveIt FCL sampled distance is not a physical or continuous positive-clearance certificate.",
+    "Hardware validation, calibrated TCP uncertainty, hardware tracking, physical failure probability, coating quality, and hardware safety certification remain unavailable or not run."
+  ],
+  "native_smoke": {
+    "c1_input_identities": {
+      "c1_fk_trace_sha256": "ed8cffa87dae845df0dcc3cf50f88225e3f72b1fa425acce6def08e7ee60acee",
+      "c1_post_ruckig_sha256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+      "c1_result_sha256": "94285355a9de12891e9263db80ea3ef0a415c528b3d24c349ab0396db5c5544f",
+      "derived_reference_urdf_sha256": "b9d20cd51aa7088b2bab5083b4919473f0e0ec94c4b0d87d4111ca5cfa270096",
+      "joint_limits_sha256": "55b55eec2a8f73a26dd7198d1555c2531b08320b5641a4b18275b5a691bcc276",
+      "srdf_sha256": "0d6ca01d4667cb8f4772a8a26d5e83e1098c604d1cac0ef3739cb3d495c3e182",
+      "target_tcp_csv_sha256": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7"
+    },
+    "case_cap": 16,
+    "case_count": 13,
+    "cases": [
+      {
+        "amplitude": 0.0,
+        "case_id": "registration_zero",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "zero",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "max_position_delta_m": 0.0,
+          "max_tool_z_delta": 0.0,
+          "status": "PASS",
+          "tolerance_position_m": 1e-06,
+          "tolerance_tool_z": 1e-06,
+          "waypoints_compared": 181
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "zero identity control",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": false,
+        "object_pose_count_changed": 0,
+        "realized_transform_base": [
+          [
+            1.0000000000000004,
+            0.0,
+            0.0,
+            -8.326672684688674e-17
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0000000000000004,
+            -1.1102230246251565e-16
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "surface_normal_count_changed": 0,
+        "surface_normal_sample_base": [
+          0.585483279652007,
+          7.169865443186115e-17,
+          -0.8106844819335879
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 0,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "translation_base_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "units": "1",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.001,
+        "axis": "x",
+        "case_id": "registration_translation_x_positive",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "translation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": false,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            1.0000000000000004,
+            0.0,
+            0.0,
+            0.0009999999999999176
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0000000000000004,
+            -1.1102230246251565e-16
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            0.001
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": 1,
+        "surface_normal_count_changed": 0,
+        "surface_normal_sample_base": [
+          0.585483279652007,
+          7.169865443186115e-17,
+          -0.8106844819335879
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "translation_base_m": [
+          0.001,
+          0.0,
+          0.0
+        ],
+        "units": "m",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.001,
+        "axis": "x",
+        "case_id": "registration_translation_x_negative",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "translation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": false,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            1.0000000000000004,
+            0.0,
+            0.0,
+            -0.0010000000000000842
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0000000000000004,
+            -1.1102230246251565e-16
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            -0.001
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": -1,
+        "surface_normal_count_changed": 0,
+        "surface_normal_sample_base": [
+          0.585483279652007,
+          7.169865443186115e-17,
+          -0.8106844819335879
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "translation_base_m": [
+          -0.001,
+          0.0,
+          0.0
+        ],
+        "units": "m",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.001,
+        "axis": "y",
+        "case_id": "registration_translation_y_positive",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "translation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": false,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            1.0000000000000004,
+            0.0,
+            0.0,
+            -8.326672684688674e-17
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0010000000000000009
+          ],
+          [
+            0.0,
+            0.0,
+            1.0000000000000004,
+            -1.1102230246251565e-16
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.001
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": 1,
+        "surface_normal_count_changed": 0,
+        "surface_normal_sample_base": [
+          0.585483279652007,
+          7.169865443186115e-17,
+          -0.8106844819335879
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "translation_base_m": [
+          0.0,
+          0.001,
+          0.0
+        ],
+        "units": "m",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.001,
+        "axis": "y",
+        "case_id": "registration_translation_y_negative",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "translation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": false,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            1.0000000000000004,
+            0.0,
+            0.0,
+            -8.326672684688674e-17
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            -0.0010000000000000009
+          ],
+          [
+            0.0,
+            0.0,
+            1.0000000000000004,
+            -1.1102230246251565e-16
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            -0.001
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": -1,
+        "surface_normal_count_changed": 0,
+        "surface_normal_sample_base": [
+          0.585483279652007,
+          7.169865443186115e-17,
+          -0.8106844819335879
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "translation_base_m": [
+          0.0,
+          -0.001,
+          0.0
+        ],
+        "units": "m",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.001,
+        "axis": "z",
+        "case_id": "registration_translation_z_positive",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "translation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": false,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            1.0000000000000004,
+            0.0,
+            0.0,
+            -8.326672684688674e-17
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0000000000000004,
+            0.0009999999999998899
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.001
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": 1,
+        "surface_normal_count_changed": 0,
+        "surface_normal_sample_base": [
+          0.585483279652007,
+          7.169865443186115e-17,
+          -0.8106844819335879
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "translation_base_m": [
+          0.0,
+          0.0,
+          0.001
+        ],
+        "units": "m",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.001,
+        "axis": "z",
+        "case_id": "registration_translation_z_negative",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "translation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": false,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            1.0000000000000004,
+            0.0,
+            0.0,
+            -8.326672684688674e-17
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0000000000000004,
+            -0.001000000000000112
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            -0.001
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": -1,
+        "surface_normal_count_changed": 0,
+        "surface_normal_sample_base": [
+          0.585483279652007,
+          7.169865443186115e-17,
+          -0.8106844819335879
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "translation_base_m": [
+          0.0,
+          0.0,
+          -0.001
+        ],
+        "units": "m",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.0017453292519943296,
+        "axis": "x",
+        "case_id": "registration_rotation_x_positive",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "rotation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": true,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            1.0000000000000004,
+            0.0,
+            0.0,
+            -8.326672684688674e-17
+          ],
+          [
+            0.0,
+            0.9999984769132877,
+            -0.0017453283658983095,
+            0.0
+          ],
+          [
+            -2.220446049250313e-16,
+            0.001745328365898309,
+            0.9999984769132881,
+            -5.551115123125783e-17
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.9999984769132877,
+            -0.0017453283658983088,
+            0.0
+          ],
+          [
+            0.0,
+            0.0017453283658983088,
+            0.9999984769132877,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0017453292519943296,
+          0.0,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": 1,
+        "surface_normal_count_changed": 181,
+        "surface_normal_sample_base": [
+          0.585483279652007,
+          0.0014149106221123377,
+          -0.8106832471908256
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "transformed_normal_sample": [
+          0.585483279652007,
+          0.0014149106221123377,
+          -0.8106832471908256
+        ],
+        "translation_base_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "units": "rad",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.0017453292519943296,
+        "axis": "x",
+        "case_id": "registration_rotation_x_negative",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "rotation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": true,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            1.0000000000000004,
+            0.0,
+            0.0,
+            -8.326672684688674e-17
+          ],
+          [
+            0.0,
+            0.9999984769132877,
+            0.0017453283658983095,
+            0.0
+          ],
+          [
+            -2.220446049250313e-16,
+            -0.001745328365898309,
+            0.9999984769132881,
+            -5.551115123125783e-17
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.9999984769132877,
+            0.0017453283658983088,
+            0.0
+          ],
+          [
+            0.0,
+            -0.0017453283658983088,
+            0.9999984769132877,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          -0.0017453292519943296,
+          0.0,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": -1,
+        "surface_normal_count_changed": 181,
+        "surface_normal_sample_base": [
+          0.585483279652007,
+          -0.0014149106221121941,
+          -0.8106832471908256
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "transformed_normal_sample": [
+          0.585483279652007,
+          -0.0014149106221121941,
+          -0.8106832471908256
+        ],
+        "translation_base_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "units": "rad",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.0017453292519943296,
+        "axis": "y",
+        "case_id": "registration_rotation_y_positive",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "rotation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": true,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            0.9999984769132881,
+            0.0,
+            0.0017453283658981356,
+            -5.551115123125783e-17
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            -0.0017453283658981356,
+            0.0,
+            0.9999984769132881,
+            -1.1102230246251565e-16
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            0.9999984769132877,
+            0.0,
+            0.0017453283658983088,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            -0.0017453283658983088,
+            0.0,
+            0.9999984769132877,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0017453292519943296,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": 1,
+        "surface_normal_count_changed": 181,
+        "surface_normal_sample_base": [
+          0.5840674772880912,
+          7.169865443186115e-17,
+          -0.8117051077665615
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "transformed_normal_sample": [
+          0.5840674772880912,
+          7.169865443186115e-17,
+          -0.8117051077665615
+        ],
+        "translation_base_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "units": "rad",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.0017453292519943296,
+        "axis": "y",
+        "case_id": "registration_rotation_y_negative",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "rotation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": true,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            0.9999984769132884,
+            0.0,
+            -0.0017453283658985241,
+            -8.326672684688674e-17
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0017453283658985241,
+            0.0,
+            0.9999984769132884,
+            -1.6653345369377348e-16
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            0.9999984769132877,
+            0.0,
+            -0.0017453283658983088,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0017453283658983088,
+            0.0,
+            0.9999984769132877,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          -0.0017453292519943296,
+          0.0
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": -1,
+        "surface_normal_count_changed": 181,
+        "surface_normal_sample_base": [
+          0.5868972985323158,
+          7.169865443186115e-17,
+          -0.8096613866150898
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "transformed_normal_sample": [
+          0.5868972985323158,
+          7.169865443186115e-17,
+          -0.8096613866150898
+        ],
+        "translation_base_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "units": "rad",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.0017453292519943296,
+        "axis": "z",
+        "case_id": "registration_rotation_z_positive",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "rotation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": true,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            0.9999984769132881,
+            -0.001745328365898309,
+            2.220446049250313e-16,
+            -1.3877787807814457e-16
+          ],
+          [
+            0.0017453283658983095,
+            0.9999984769132877,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0000000000000004,
+            -1.1102230246251565e-16
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            0.9999984769132877,
+            -0.0017453283658983088,
+            0.0,
+            0.0
+          ],
+          [
+            0.0017453283658983088,
+            0.9999984769132877,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0,
+          0.0017453292519943296
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": 1,
+        "surface_normal_count_changed": 181,
+        "surface_normal_sample_base": [
+          0.5854823879102035,
+          0.0010218605757358916,
+          -0.8106844819335879
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "transformed_normal_sample": [
+          0.5854823879102035,
+          0.0010218605757358916,
+          -0.8106844819335879
+        ],
+        "translation_base_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "units": "rad",
+        "world_object_count": 46
+      },
+      {
+        "amplitude": 0.0017453292519943296,
+        "axis": "z",
+        "case_id": "registration_rotation_z_negative",
+        "collision_method": "adaptive_discrete_interpolation",
+        "contact_point_total": 858,
+        "family": "rotation",
+        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "fcl_distance_status": "AVAILABLE",
+        "fk_regression": {
+          "status": "NOT_RUN",
+          "waypoints_compared": 0
+        },
+        "full_scene_collision_sample_count": 858,
+        "interpretation": "engineering propagation smoke only; not an FR5 physical uncertainty bound",
+        "joint_states_unchanged": true,
+        "maximum_contacts_in_one_sample": 1,
+        "maximum_joint_interpolation_step_rad": 0.008726646259971648,
+        "minimum_reported_fcl_distance_m": -1.0,
+        "normal_rotation_applied": true,
+        "object_pose_count_changed": 46,
+        "realized_transform_base": [
+          [
+            0.9999984769132881,
+            0.001745328365898309,
+            2.220446049250313e-16,
+            -1.3877787807814457e-16
+          ],
+          [
+            -0.0017453283658983095,
+            0.9999984769132877,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0000000000000004,
+            -1.1102230246251565e-16
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "requested_transform_base": [
+          [
+            0.9999984769132877,
+            0.0017453283658983088,
+            0.0,
+            0.0
+          ],
+          [
+            -0.0017453283658983088,
+            0.9999984769132877,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "rotation_vector_base_rad": [
+          0.0,
+          0.0,
+          -0.0017453292519943296
+        ],
+        "sample_count": 858,
+        "scene_apply_success_count": 46,
+        "self_collision_sample_count": 0,
+        "sign": -1,
+        "surface_normal_count_changed": 181,
+        "surface_normal_sample_base": [
+          0.5854823879102035,
+          -0.001021860575735748,
+          -0.8106844819335879
+        ],
+        "surface_normals_match_requested_rotation": true,
+        "target_pose_count_changed": 181,
+        "target_poses_match_requested_transform": true,
+        "timestamps_unchanged": true,
+        "transformed_normal_sample": [
+          0.5854823879102035,
+          -0.001021860575735748,
+          -0.8106844819335879
+        ],
+        "translation_base_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "units": "rad",
+        "world_object_count": 46
+      }
+    ],
+    "clearance_claim": "NO_PHYSICAL_CLEARANCE_OR_CONTINUOUS_CLEARANCE_CLAIM",
+    "collision_method": "adaptive_discrete_interpolation",
+    "collision_response_summary": {
+      "full_scene_collision_samples": 11154,
+      "full_scene_samples": 11154,
+      "interpretation": "The bounded binary collision metric is saturated for this scene/path smoke and cannot rank registration directions; retain every observed collision as model-only evidence for independent geometry review.",
+      "per_case_collision_sample_counts": [
+        858,
+        858,
+        858,
+        858,
+        858,
+        858,
+        858,
+        858,
+        858,
+        858,
+        858,
+        858,
+        858
+      ],
+      "self_collision_samples": 0,
+      "status": "SATURATED_ALL_CASES"
+    },
+    "fcl_distance_status": "AVAILABLE_BOUNDED_SMOKE",
+    "frozen_trajectory": {
+      "joint_count": 6,
+      "q_unchanged": true,
+      "timestamps_unchanged": true,
+      "waypoint_count": 181
+    },
+    "hardware_validation": "NOT_RUN",
+    "launcher": {
+      "distribution": "Ubuntu-24.04-D",
+      "ros_distro": "jazzy",
+      "subprocess_timeout_seconds": 600,
+      "wsl_exit_code": 0
+    },
+    "native_backend": "MoveIt2 Jazzy MoveItPy PlanningSceneMonitor with active FCL collision environment",
+    "native_scene_propagation_tested": "YES",
+    "native_smoke_interpretation": "Engineering scene-propagation smoke only; nonzero amplitudes are not physical uncertainty bounds and do not form normalized margins.",
+    "nominal_world_collision_object_diagnostic": {
+      "colliding_objects": [
+        {
+          "object_id": "horseshoe_wall_000",
+          "probe_waypoint_indices": [
+            0,
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_001",
+          "probe_waypoint_indices": [
+            0,
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_002",
+          "probe_waypoint_indices": [
+            0,
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_003",
+          "probe_waypoint_indices": [
+            0,
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_004",
+          "probe_waypoint_indices": [
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_005",
+          "probe_waypoint_indices": [
+            0,
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_006",
+          "probe_waypoint_indices": [
+            0,
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_009",
+          "probe_waypoint_indices": [
+            0
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_010",
+          "probe_waypoint_indices": [
+            0
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_011",
+          "probe_waypoint_indices": [
+            0
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_012",
+          "probe_waypoint_indices": [
+            0
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_013",
+          "probe_waypoint_indices": [
+            0
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_014",
+          "probe_waypoint_indices": [
+            0
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_015",
+          "probe_waypoint_indices": [
+            0
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_016",
+          "probe_waypoint_indices": [
+            0
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_017",
+          "probe_waypoint_indices": [
+            0
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_018",
+          "probe_waypoint_indices": [
+            0,
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_019",
+          "probe_waypoint_indices": [
+            0,
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_020",
+          "probe_waypoint_indices": [
+            90
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_021",
+          "probe_waypoint_indices": [
+            90,
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_022",
+          "probe_waypoint_indices": [
+            90,
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_023",
+          "probe_waypoint_indices": [
+            90,
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_024",
+          "probe_waypoint_indices": [
+            90,
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_025",
+          "probe_waypoint_indices": [
+            90,
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_026",
+          "probe_waypoint_indices": [
+            90,
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_027",
+          "probe_waypoint_indices": [
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_028",
+          "probe_waypoint_indices": [
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_029",
+          "probe_waypoint_indices": [
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_038",
+          "probe_waypoint_indices": [
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_039",
+          "probe_waypoint_indices": [
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_041",
+          "probe_waypoint_indices": [
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_042",
+          "probe_waypoint_indices": [
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_043",
+          "probe_waypoint_indices": [
+            180
+          ]
+        },
+        {
+          "object_id": "horseshoe_wall_044",
+          "probe_waypoint_indices": [
+            180
+          ]
+        }
+      ],
+      "interpretation": "Model-only identification at three representative frozen waypoints; not physical contact localization or continuous proof.",
+      "method": "single_world_object_vs_frozen_nominal_waypoint_probe",
+      "non_colliding_object_count": 12,
+      "status": "COMPLETED",
+      "tested_object_count": 46,
+      "tested_waypoint_indices": [
+        0,
+        90,
+        180
+      ]
+    },
+    "nominal_zero_fk_regression": {
+      "max_position_delta_m": 0.0,
+      "max_tool_z_delta": 0.0,
+      "status": "PASS",
+      "tolerance_position_m": 1e-06,
+      "tolerance_tool_z": 1e-06,
+      "waypoints_compared": 181
+    },
+    "physical_registration_bound": "UNKNOWN",
+    "project": "FAIRINO_FR5",
+    "registration_convention": {
+      "composition": "T_base_entity_actual = DeltaT_base_left @ T_base_entity_nominal",
+      "nominal_transform": "T_base_entity_nominal maps each workpiece-attached entity into base_link",
+      "parameterization": "direct base-frame translation in meters plus base-frame rotation vector in radians; not an SE(3) twist with coupled translational exponential coordinates",
+      "perturbation_transform": "DeltaT_base = [[Exp([phi_base]x), t_base], [0,1]]",
+      "quaternion_convention": "right-handed rotation matrix; ROS quaternion order x,y,z,w",
+      "rotation_frame": "base_link",
+      "rotation_origin": "base_link origin",
+      "translation_frame": "base_link"
+    },
+    "scene_geometry": {
+      "bottom_closure_included": false,
+      "builder": "ros2_moveit_bridge.plan_closed_contour_moveit.build_wall_collision_objects",
+      "collision_object_count": 46,
+      "floor_included": true,
+      "floor_z_m": -0.2,
+      "frame_id": "base_link",
+      "geometry_interpretation": "Existing project thin-box tunnel approximation derived from frozen open-arch target poses and normals; not a calibrated workpiece surface reconstruction.",
+      "object_ids": [
+        "horseshoe_wall_000",
+        "horseshoe_wall_001",
+        "horseshoe_wall_002",
+        "horseshoe_wall_003",
+        "horseshoe_wall_004",
+        "horseshoe_wall_005",
+        "horseshoe_wall_006",
+        "horseshoe_wall_007",
+        "horseshoe_wall_008",
+        "horseshoe_wall_009",
+        "horseshoe_wall_010",
+        "horseshoe_wall_011",
+        "horseshoe_wall_012",
+        "horseshoe_wall_013",
+        "horseshoe_wall_014",
+        "horseshoe_wall_015",
+        "horseshoe_wall_016",
+        "horseshoe_wall_017",
+        "horseshoe_wall_018",
+        "horseshoe_wall_019",
+        "horseshoe_wall_020",
+        "horseshoe_wall_021",
+        "horseshoe_wall_022",
+        "horseshoe_wall_023",
+        "horseshoe_wall_024",
+        "horseshoe_wall_025",
+        "horseshoe_wall_026",
+        "horseshoe_wall_027",
+        "horseshoe_wall_028",
+        "horseshoe_wall_029",
+        "horseshoe_wall_030",
+        "horseshoe_wall_031",
+        "horseshoe_wall_032",
+        "horseshoe_wall_033",
+        "horseshoe_wall_034",
+        "horseshoe_wall_035",
+        "horseshoe_wall_036",
+        "horseshoe_wall_037",
+        "horseshoe_wall_038",
+        "horseshoe_wall_039",
+        "horseshoe_wall_040",
+        "horseshoe_wall_041",
+        "horseshoe_wall_042",
+        "horseshoe_wall_043",
+        "horseshoe_wall_044",
+        "tunnel_floor"
+      ],
+      "open_path": true,
+      "segment_stride": 4,
+      "stand_off_m": 0.18,
+      "wall_thickness_m": 0.025,
+      "y_thickness_m": 0.08
+    },
+    "schema_version": "p2b3-c3-native-smoke-v1",
+    "stage": "P2-B3-C3",
+    "status": "PASS",
+    "strict_continuous_ccd": "NOT_AVAILABLE",
+    "waypoint_count": 181
+  },
+  "next_gate_recommendation": "Independent review of the C3 implementation, then acquire a traceable FR5 registration bound/distribution before authorizing a separate bounded registration-margin campaign.",
+  "normalization_rule": "eta_i = rho_i / b_i only when a positive bound is supported by MEASURED, MANUFACTURER, or PROJECT_CONFIG evidence; ASSUMED and LITERATURE cannot support an FR5 physical normalization claim.",
+  "physical_uncertainty_evidence_inventory": {
+    "evidence_boundary": "The C2 README explicitly retains calibrated TCP uncertainty as unresolved and base-transform axes as NOT_AVAILABLE. Search results found no FR5 measured registration, repeatability, tracking, reconstruction, or TCP-calibration bound.",
+    "github_repository": {
+      "branch": "codex/fr5-p2b3-c2-robustness-transfer-20260928",
+      "commit": "fff39145a1e9dcd59fb1d180fe2cf182444820fe",
+      "evidence": [
+        {
+          "finding": "calibrated TCP accuracy is not established",
+          "path": "docs/P2B3_C1_README.md"
+        },
+        {
+          "finding": "calibrated TCP uncertainty remains unresolved",
+          "path": "docs/P2B3_C2_README.md"
+        },
+        {
+          "finding": "calibrated_tcp_uncertainty is NOT_AVAILABLE",
+          "path": "outputs/p2b3_c2_result.json"
+        }
+      ],
+      "measured_uncertainty_records_found": [],
+      "repository": "Satoru-1006/fr5-tunnel-closed-contour-spray",
+      "search_terms": [
+        "TCP calibration",
+        "tracking error",
+        "repeatability",
+        "registration error",
+        "pose measurement uncertainty",
+        "surface reconstruction uncertainty"
+      ],
+      "searched_paths": [
+        "docs/P2B3_C1_README.md",
+        "docs/P2B3_C2_README.md",
+        "outputs/p2b3_c1_result.json",
+        "outputs/p2b3_c2_result.json",
+        "ros2_moveit_bridge/config",
+        "src"
+      ]
+    },
+    "measurement_records_found": [],
+    "project_root": {
+      "folder_id": "1dsMTZAaPLGDDT3CBJFS0E8f2av9kn2-R",
+      "url": "https://drive.google.com/drive/folders/1dsMTZAaPLGDDT3CBJFS0E8f2av9kn2-R"
+    },
+    "search_terms": [
+      "FR5 calibration",
+      "TCP calibration",
+      "FR5 joint tracking error",
+      "FR5 repeatability",
+      "FR5 pose measurement uncertainty",
+      "FR5 registration repeatability"
+    ],
+    "searched_fr5_scope": [
+      {
+        "folder": "00_PROJECT_CORE",
+        "folder_id": "1Jk-RbNr-pxCeq-pSurpDw7esFFC1E9NP",
+        "inspection": "direct-child listing and relevant project contract/configuration documents"
+      },
+      {
+        "folder": "P2-B3-C2/CORE",
+        "folder_id": "11UdHScufz6WT6v7ZltYwOS_KmX3gfLux",
+        "inspection": "direct-child listing and canonical C2 README"
+      },
+      {
+        "file_id": "1CcaieZ_X5SOs6W1pBlRIaCU4VUgYKtps",
+        "folder": "PROJECT_INDEX.md",
+        "inspection": "existing stage history and source pointers"
+      }
+    ]
+  },
+  "registration_se3_convention": {
+    "composition": "T_base_entity_actual = DeltaT_base_left @ T_base_entity_nominal",
+    "nominal_transform": "T_base_entity_nominal maps each workpiece-attached entity into base_link",
+    "parameterization": "direct base-frame translation in meters plus base-frame rotation vector in radians; not an SE(3) twist with coupled translational exponential coordinates",
+    "perturbation_transform": "DeltaT_base = [[Exp([phi_base]x), t_base], [0,1]]",
+    "quaternion_convention": "right-handed rotation matrix; ROS quaternion order x,y,z,w",
+    "rotation_frame": "base_link",
+    "rotation_origin": "base_link origin",
+    "translation_frame": "base_link"
+  },
+  "schema_version": "p2b3-c3-physical-uncertainty-result-v1",
+  "synthetic_tests": {
+    "failed": 0,
+    "known_answer_coverage": [
+      "schema and enum validation",
+      "legacy C2 axis classification",
+      "zero identity",
+      "translation known answer",
+      "positive and negative 90-degree rotation known answers",
+      "normal propagation",
+      "inverse consistency",
+      "rotation orthonormality and quaternion normalization",
+      "frozen q and timestamps",
+      "invalid frame rejection",
+      "NaN/Inf rejection",
+      "valid and unavailable normalization",
+      "foreign-project-reference guard"
+    ],
+    "passed": 70,
+    "skipped": 0,
+    "status": "PASS",
+    "total": 70
+  },
+  "uncertainty_contract_schema": "p2b3-c3-uncertainty-semantics-v1",
+  "uncertainty_ontology": [
+    {
+      "capability_status": "AVAILABLE_DETERMINISTIC_STRESS_OPERATOR",
+      "changes_collision_world": false,
+      "changes_joint_state": true,
+      "changes_surface_geometry": false,
+      "changes_surface_normals": false,
+      "changes_target_pose": false,
+      "composition_convention": "direct deterministic joint-state offset; no pose composition",
+      "coordinate_frame": "joint coordinates j1..j6, radians",
+      "fixed_entities": [
+        "target pose specification",
+        "workpiece surface geometry",
+        "collision world"
+      ],
+      "normalization_bound": null,
+      "normalization_bound_source": "UNKNOWN",
+      "normalization_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "perturbed_entity": "robot joint state q",
+      "physical_interpretation": "C2 uniform joint-state offsets are deterministic software stresses, not a measured tracking distribution or hardware probability.",
+      "physical_source": "ASSUMED",
+      "requires_hardware_data": true,
+      "requires_reik": false,
+      "requires_retiming": false,
+      "semantic_class": "JOINT_STATE_ERROR",
+      "uncertainty_id": "joint_state_error",
+      "units": "rad"
+    },
+    {
+      "capability_status": "AVAILABLE_DETERMINISTIC_STRESS_OPERATOR",
+      "changes_collision_world": false,
+      "changes_joint_state": false,
+      "changes_surface_geometry": false,
+      "changes_surface_normals": false,
+      "changes_target_pose": true,
+      "composition_convention": "C2 axis operator convention; historical raw axis id and value are preserved",
+      "coordinate_frame": "base_link for translation axes; target TCP for local rotation axes",
+      "fixed_entities": [
+        "robot joint state q",
+        "workpiece collision geometry",
+        "surface reconstruction"
+      ],
+      "normalization_bound": null,
+      "normalization_bound_source": "UNKNOWN",
+      "normalization_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "perturbed_entity": "target TCP pose specification",
+      "physical_interpretation": "Changes the geometric target used for comparison; does not represent TCP execution error, calibration error, or workpiece registration.",
+      "physical_source": "ASSUMED",
+      "requires_hardware_data": false,
+      "requires_reik": false,
+      "requires_retiming": false,
+      "semantic_class": "TARGET_POSE_GEOMETRIC_PERTURBATION",
+      "uncertainty_id": "target_pose_geometric_perturbation",
+      "units": "m or rad, according to historical C2 axis"
+    },
+    {
+      "capability_status": "NOT_AVAILABLE",
+      "changes_collision_world": false,
+      "changes_joint_state": false,
+      "changes_surface_geometry": false,
+      "changes_surface_normals": false,
+      "changes_target_pose": true,
+      "composition_convention": "not implemented; no transform is inferred",
+      "coordinate_frame": "base_link",
+      "fixed_entities": [
+        "robot base",
+        "workpiece registration",
+        "nominal joint trajectory"
+      ],
+      "normalization_bound": null,
+      "normalization_bound_source": "UNKNOWN",
+      "normalization_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "perturbed_entity": "flange-to-TCP calibration transform",
+      "physical_interpretation": "A calibrated TCP error distribution or bound was not found in the FR5 records searched for C3.",
+      "physical_source": "UNKNOWN",
+      "requires_hardware_data": true,
+      "requires_reik": true,
+      "requires_retiming": false,
+      "semantic_class": "TCP_CALIBRATION_ERROR",
+      "uncertainty_id": "tcp_calibration_error",
+      "units": "m and rad"
+    },
+    {
+      "capability_status": "IMPLEMENTED_ENGINEERING_PROPAGATION; PHYSICAL_BOUND_UNKNOWN",
+      "changes_collision_world": true,
+      "changes_joint_state": false,
+      "changes_surface_geometry": true,
+      "changes_surface_normals": true,
+      "changes_target_pose": true,
+      "composition_convention": "T_base_entity_actual = DeltaT_base_left @ T_base_entity_nominal",
+      "coordinate_frame": "base_link",
+      "fixed_entities": [
+        "robot base",
+        "robot model",
+        "nominal q trajectory",
+        "nominal timestamps"
+      ],
+      "normalization_bound": null,
+      "normalization_bound_source": "UNKNOWN",
+      "normalization_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "perturbed_entity": "workpiece-attached geometry, surface normals, and process reference poses",
+      "physical_interpretation": "Post-plan relative registration mismatch: the robot executes frozen q while all workpiece-attached quantities are left-composed by one base-frame SE(3) delta.",
+      "physical_source": "UNKNOWN",
+      "requires_hardware_data": true,
+      "requires_reik": false,
+      "requires_retiming": false,
+      "semantic_class": "BASE_WORKPIECE_REGISTRATION_ERROR",
+      "uncertainty_id": "base_workpiece_registration_error",
+      "units": "translation m; axis-angle rotation rad"
+    },
+    {
+      "capability_status": "NOT_AVAILABLE",
+      "changes_collision_world": true,
+      "changes_joint_state": false,
+      "changes_surface_geometry": true,
+      "changes_surface_normals": true,
+      "changes_target_pose": true,
+      "composition_convention": "not implemented; available open-arch targets are not a calibrated reconstruction uncertainty model",
+      "coordinate_frame": "base_link",
+      "fixed_entities": [
+        "robot base",
+        "nominal joint trajectory"
+      ],
+      "normalization_bound": null,
+      "normalization_bound_source": "UNKNOWN",
+      "normalization_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "perturbed_entity": "reconstructed workpiece surface and surface normals",
+      "physical_interpretation": "A surface reconstruction error model and physical bound are unavailable; the C3 wall boxes remain the existing project geometry approximation.",
+      "physical_source": "UNKNOWN",
+      "requires_hardware_data": true,
+      "requires_reik": false,
+      "requires_retiming": false,
+      "semantic_class": "SURFACE_RECONSTRUCTION_ERROR",
+      "uncertainty_id": "surface_reconstruction_error",
+      "units": "m and rad"
+    },
+    {
+      "capability_status": "NOT_AVAILABLE",
+      "changes_collision_world": false,
+      "changes_joint_state": true,
+      "changes_surface_geometry": false,
+      "changes_surface_normals": false,
+      "changes_target_pose": false,
+      "composition_convention": "not implemented; no controller or hardware trace is available",
+      "coordinate_frame": "joint coordinates j1..j6 and controller time",
+      "fixed_entities": [
+        "target pose specification",
+        "workpiece geometry"
+      ],
+      "normalization_bound": null,
+      "normalization_bound_source": "UNKNOWN",
+      "normalization_status": "NOT_AVAILABLE_PHYSICAL_BOUNDS_MISSING",
+      "perturbed_entity": "executed robot joint state and timestamps",
+      "physical_interpretation": "No controller or hardware tracking trace was available for C3.",
+      "physical_source": "UNKNOWN",
+      "requires_hardware_data": true,
+      "requires_reik": false,
+      "requires_retiming": false,
+      "semantic_class": "EXECUTION_TRACKING_ERROR",
+      "uncertainty_id": "execution_tracking_error",
+      "units": "rad and s"
+    }
+  ]
+}
