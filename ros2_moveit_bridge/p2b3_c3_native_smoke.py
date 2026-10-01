@@ -29,6 +29,18 @@ from src.physical_uncertainty import (  # noqa: E402
     transform_pose_array_xyzw,
     transform_surface_normals,
 )
+from p2b3_c4_scene_contract import (  # noqa: E402
+    assess_zero_transform_gate,
+    build_scene_manifest,
+    canonical_quaternion_xyzw,
+    compare_scene_manifests,
+    extract_c1_scene_contract,
+    fingerprint_active_scene_semantics,
+    manifest_sha256,
+    scene_objects_from_moveit,
+    validate_phase_d_identity_gate,
+    verify_frozen_c1_source_blobs,
+)
 
 
 GROUP = "fairino5_v6_group"
@@ -132,6 +144,58 @@ def collision_samples(q: np.ndarray, times: np.ndarray) -> Iterable[tuple[np.nda
             yield left + fraction * (right - left), float(times[index] + fraction * (times[index + 1] - times[index]))
 
 
+def collision_samples_with_context(q: np.ndarray, times: np.ndarray) -> Iterable[tuple[np.ndarray, float, dict[str, Any]]]:
+    """Return the same adaptive discrete samples with stable waypoint/segment labels."""
+    sample_index = 0
+    yield np.array(q[0], copy=True), float(times[0]), {
+        "sample_index": sample_index, "waypoint_index": 0, "segment_start_waypoint": 0,
+        "segment_end_waypoint": 0, "segment_fraction": 0.0,
+    }
+    sample_index += 1
+    for index, (left, right) in enumerate(zip(q[:-1], q[1:])):
+        steps = max(1, int(math.ceil(float(np.max(np.abs(right - left))) / MAX_JOINT_STEP_RAD)))
+        for substep in range(1, steps + 1):
+            fraction = substep / steps
+            yield left + fraction * (right - left), float(times[index] + fraction * (times[index + 1] - times[index])), {
+                "sample_index": sample_index, "waypoint_index": index + 1 if substep == steps else None,
+                "segment_start_waypoint": index, "segment_end_waypoint": index + 1,
+                "segment_fraction": fraction,
+            }
+            sample_index += 1
+
+
+def _first_contact_summary(result: Any) -> dict[str, Any]:
+    try:
+        contacts = result.contacts
+    except Exception as exc:  # MoveItPy contact conversion varies by binding build.
+        return {"status": "NOT_AVAILABLE", "reason": f"contact_map_access_error:{type(exc).__name__}"}
+    if not hasattr(contacts, "items"):
+        return {"status": "NOT_AVAILABLE", "reason": "contacts_binding_is_not_a_mapping"}
+    for pair, entries in contacts.items():
+        try:
+            first = entries[0] if len(entries) else None
+        except Exception:
+            first = None
+        try:
+            pair_contact_count = len(entries)
+        except Exception:
+            pair_contact_count = None
+        fields: list[str] = []
+        if first is not None:
+            fields = sorted(name for name in dir(first) if not name.startswith("_"))
+        pair_items = list(pair) if isinstance(pair, (tuple, list)) else [pair]
+        return {
+            "status": "AVAILABLE",
+            "pair": [str(item) for item in pair_items],
+            "contact_count_for_pair": pair_contact_count,
+            "contact_record_type": type(first).__name__ if first is not None else None,
+            "exposed_contact_fields": fields,
+            "nearest_points": {"status": "NOT_AVAILABLE", "reason": "no verified point field semantics in active binding"},
+            "penetration_depth": {"status": "NOT_AVAILABLE", "reason": "no verified signed-depth field semantics in active binding"},
+        }
+    return {"status": "AVAILABLE_NO_CONTACTS", "pair": None}
+
+
 def apply_world(moveit: Any, objects: list[Any]) -> list[bool]:
     monitor = moveit.get_planning_scene_monitor()
     results: list[bool] = []
@@ -141,6 +205,37 @@ def apply_world(moveit: Any, objects: list[Any]) -> list[bool]:
             applied = scene.apply_collision_object(obj)
             results.append(applied is not False)
     return results
+
+
+def summarize_collision_response(case_results: list[dict[str, Any]]) -> dict[str, Any]:
+    counts = [int(item["full_scene_collision_sample_count"]) for item in case_results]
+    sample_counts = [int(item["sample_count"]) for item in case_results]
+    total_collisions = sum(counts)
+    total_samples = sum(sample_counts)
+    self_collisions = sum(int(item["self_collision_sample_count"]) for item in case_results)
+    if not case_results or any(samples <= 0 for samples in sample_counts):
+        status = "NOT_RUN_OR_INCOMPLETE"
+        interpretation = "At least one case lacks completed collision samples; no aggregate response classification is available."
+    elif all(collisions == samples for collisions, samples in zip(counts, sample_counts)):
+        status = "SATURATED_ALL_CASES"
+        interpretation = "Every sampled state collided in every case; the bounded binary collision metric cannot rank registration directions."
+    elif all(collisions == 0 for collisions in counts):
+        status = "NO_COLLISIONS_OBSERVED"
+        interpretation = "No sampled collision was observed in these engineering smoke cases; this does not establish clearance, continuous safety, or a registration margin."
+    elif len(set(counts)) > 1:
+        status = "COLLISION_COUNTS_VARY_BY_CASE"
+        interpretation = "Sampled collision counts vary across cases; retain the model-only counts without interpreting them as physical robustness or a margin."
+    else:
+        status = "UNIFORM_PARTIAL_COLLISIONS"
+        interpretation = "Each case has the same partial sampled collision count; the bounded binary metric does not distinguish the cases."
+    return {
+        "status": status,
+        "full_scene_collision_samples": total_collisions,
+        "full_scene_samples": total_samples,
+        "self_collision_samples": self_collisions,
+        "per_case_collision_sample_counts": counts,
+        "interpretation": interpretation,
+    }
 
 
 def evaluate_scene(moveit: Any, q: np.ndarray, times: np.ndarray, *, compare_fk: tuple[np.ndarray, np.ndarray] | None = None) -> dict[str, Any]:
@@ -156,17 +251,35 @@ def evaluate_scene(moveit: Any, q: np.ndarray, times: np.ndarray, *, compare_fk:
     request.joint_model_group_name = GROUP
     request.contacts = True
     request.distance = True
-    request.max_contacts = 1
-    request.max_contacts_per_pair = 1
+    request.max_contacts = 12
+    request.max_contacts_per_pair = 2
     full_collisions = 0
     self_collisions = 0
     distance_values: list[float] = []
     contact_point_total = 0
     maximum_contacts_in_one_sample = 0
     sample_count = 0
+    first_collision: dict[str, Any] | None = None
+    scene_distance_methods: list[str] = []
+    scene_semantics_methods: list[str] = []
+    robot_model_semantics_methods: list[str] = []
+    scene_type = "unavailable"
+    result_contact_map_available: bool | None = None
     monitor = moveit.get_planning_scene_monitor()
     with monitor.read_only() as scene:
-        for q_sample, _time_s in collision_samples(q, times):
+        scene_type = f"{type(scene).__module__}.{type(scene).__qualname__}"
+        scene_distance_methods = sorted(
+            name for name in dir(scene) if "distance" in name.lower() or "collision" in name.lower()
+        )
+        scene_semantics_methods = sorted(
+            name for name in dir(scene)
+            if any(token in name.lower() for token in ("allowed", "padding", "scale", "acm", "world", "detector"))
+        )
+        robot_model_semantics_methods = sorted(
+            name for name in dir(model)
+            if any(token in name.lower() for token in ("padding", "scale", "link_model", "collision"))
+        )
+        for q_sample, _time_s, context in collision_samples_with_context(q, times):
             state.set_joint_group_positions(GROUP, q_sample.tolist())
             state.update()
             full_result = CollisionResult()
@@ -174,14 +287,22 @@ def evaluate_scene(moveit: Any, q: np.ndarray, times: np.ndarray, *, compare_fk:
             scene.check_collision(request, full_result, state)
             scene.check_self_collision(request, self_result, state)
             full_collisions += int(bool(full_result.collision))
+            if full_result.collision and first_collision is None:
+                first_collision = {
+                    **context,
+                    "collision": True,
+                    "contact_count": int(full_result.contact_count),
+                    "contact_diagnostic": _first_contact_summary(full_result),
+                }
             self_collisions += int(bool(self_result.collision))
             contact_point_total += int(full_result.contact_count)
             maximum_contacts_in_one_sample = max(maximum_contacts_in_one_sample, int(full_result.contact_count))
             raw_distance = float(full_result.distance)
-            if math.isfinite(raw_distance):
-                distance_values.append(raw_distance)
-            elif math.isnan(raw_distance):
-                raise RuntimeError("native_fcl_distance_returned_nan")
+            distance_values.append(raw_distance)
+            try:
+                result_contact_map_available = hasattr(full_result.contacts, "items")
+            except Exception:
+                result_contact_map_available = False
             sample_count += 1
     if compare_fk is not None:
         positions: list[np.ndarray] = []
@@ -211,7 +332,9 @@ def evaluate_scene(moveit: Any, q: np.ndarray, times: np.ndarray, *, compare_fk:
         }
     else:
         fk_report = {"status": "NOT_RUN", "waypoints_compared": 0}
-    distances_available = len(distance_values) == sample_count
+    from p2b3_c4_scene_contract import aggregate_reported_distances
+
+    distance_summary = aggregate_reported_distances(distance_values)
     return {
         "sample_count": sample_count,
         "collision_method": COLLISION_METHOD,
@@ -220,9 +343,19 @@ def evaluate_scene(moveit: Any, q: np.ndarray, times: np.ndarray, *, compare_fk:
         "self_collision_sample_count": self_collisions,
         "contact_point_total": contact_point_total,
         "maximum_contacts_in_one_sample": maximum_contacts_in_one_sample,
-        "minimum_reported_fcl_distance_m": float(min(distance_values)) if distances_available and distance_values else None,
-        "fcl_distance_status": "AVAILABLE" if distances_available and distance_values else "NOT_AVAILABLE",
-        "fcl_distance_interpretation": "MoveIt2 CollisionResult.distance from the active PlanningScene; sampled full-scene distance, not a continuous or physical safety clearance claim",
+        "minimum_reported_fcl_distance_m": distance_summary["minimum_reported_full_scene_distance_m"],
+        "minimum_robot_world_distance_m": None,
+        "fcl_distance_status": distance_summary["status"],
+        "fcl_distance_diagnostics": distance_summary,
+        "fcl_distance_interpretation": distance_summary["interpretation"],
+        "planning_scene_binding": scene_type,
+        "planning_scene_collision_distance_methods": scene_distance_methods,
+        "planning_scene_acm_padding_world_methods": scene_semantics_methods,
+        "robot_model_padding_collision_methods": robot_model_semantics_methods,
+        "collision_request_distance_property_available": hasattr(request, "distance"),
+        "collision_result_distance_property_available": hasattr(CollisionResult(), "distance"),
+        "collision_contacts_mapping_available": result_contact_map_available,
+        "first_collision": first_collision,
         "fk_regression": fk_report,
     }
 
@@ -279,27 +412,44 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     import rclpy
     from ros2_moveit_bridge.plan_closed_contour_moveit import build_wall_collision_objects
 
+    c1_result = json.loads(args.c1_result.read_text(encoding="utf-8"))
+    c1_runner = ROOT / "scripts" / "run_p2b3_c1_r0.py"
+    planner_source = ROOT / "ros2_moveit_bridge" / "plan_closed_contour_moveit.py"
+    source_blobs = verify_frozen_c1_source_blobs(ROOT, str(c1_result.get("C1_EXECUTION_CODE_COMMIT", "")))
+    scene_contract = extract_c1_scene_contract(
+        c1_result,
+        c1_runner.read_text(encoding="utf-8"),
+        planner_source.read_text(encoding="utf-8"),
+    )
     times, q, target_pose_values, normals, frozen_fk, identities = read_c1_inputs(args)
     nominal_pose_refs = apply_registration_to_trajectory(target_pose_values, normals, q, times, np.eye(4))
     base_objects = build_wall_collision_objects(
         target_poses=pose_messages(target_pose_values),
         target_normals=normals,
-        stand_off=0.18,
-        frame_id=BASE_FRAME,
-        wall_thickness=0.025,
-        y_thickness=0.08,
-        segment_stride=4,
-        include_bottom_closure=False,
-        open_path=True,
-        tcp_points_to_wall=False,
-        include_tunnel_floor=True,
-        tunnel_floor_z=-0.20,
+        stand_off=scene_contract.parameters["stand_off_m"],
+        frame_id=scene_contract.frame_id,
+        wall_thickness=scene_contract.parameters["wall_thickness_m"],
+        y_thickness=scene_contract.parameters["y_thickness_m"],
+        segment_stride=scene_contract.parameters["segment_stride"],
+        include_bottom_closure=scene_contract.parameters["include_bottom_closure"],
+        open_path=scene_contract.parameters["open_path"],
+        tcp_points_to_wall=scene_contract.parameters["tcp_points_to_wall"],
+        include_tunnel_floor=scene_contract.parameters["include_tunnel_floor"],
+        tunnel_floor_z=scene_contract.parameters["tunnel_floor_z_m"],
     )
     if not base_objects or any(obj.header.frame_id != BASE_FRAME for obj in base_objects):
         raise RuntimeError("native_scene_builder_returned_no_base_frame_objects")
     identities_in_world = [str(obj.id) for obj in base_objects]
     if len(set(identities_in_world)) != len(identities_in_world):
         raise RuntimeError("native_scene_object_ids_not_unique")
+    source_scene_manifest = build_scene_manifest(scene_contract, scene_objects_from_moveit(base_objects))
+    source_scene_manifest["source_c1"]["source_git_blobs"] = source_blobs
+    source_scene_manifest["source_c1"]["target_tcp_csv_sha256"] = identities["target_tcp_csv_sha256"]
+    manifest_path = getattr(args, "scene_manifest", None)
+    if manifest_path is not None:
+        expected_scene_manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
+    else:
+        expected_scene_manifest = source_scene_manifest
 
     moveit_config = (
         MoveItConfigsBuilder("fairino5_v6_robot", package_name="fairino5_v6_moveit2_config")
@@ -319,9 +469,19 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     }
     rclpy.init(args=None)
     global _MOVEIT_KEEPALIVE
-    _MOVEIT_KEEPALIVE = MoveItPy(node_name="p2b3_c3_native_smoke", config_dict=config_dict)
+    _MOVEIT_KEEPALIVE = MoveItPy(node_name="p2b3_c4_native_smoke", config_dict=config_dict)
     moveit = _MOVEIT_KEEPALIVE
-    collision_object_diagnostic = diagnose_world_collision_objects(moveit, q, times, base_objects)
+    initially_applied = apply_world(moveit, base_objects)
+    if not all(initially_applied) or len(initially_applied) != len(base_objects):
+        raise RuntimeError("planning_scene_rejected_authoritative_base_world")
+    scene_semantics = fingerprint_active_scene_semantics(moveit, identities_in_world, args.urdf)
+    source_scene_manifest["acm"] = scene_semantics["acm"]
+    source_scene_manifest["robot_padding_scale"] = scene_semantics["robot_padding_scale"]
+    source_scene_manifest["runtime_api_surface"] = scene_semantics["api_surface"]
+    scene_comparison = compare_scene_manifests(expected_scene_manifest, source_scene_manifest)
+    effective_manifest_sha = manifest_sha256(expected_scene_manifest)
+    if scene_comparison.get("status") != "PASS":
+        raise RuntimeError("active_moveit_scene_contract_mismatch:" + json.dumps(scene_comparison, sort_keys=True))
     cases = [{
             "case_id": "registration_zero",
             "family": "zero",
@@ -333,8 +493,26 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         }] + six_dof_directional_smoke()
     if len(cases) > MAX_NATIVE_CASES:
         raise RuntimeError("native_smoke_case_cap_exceeded")
+    phase = getattr(args, "phase", "gated")
+    identity_case, nonzero_cases = cases[0], cases[1:]
+    if phase == "identity":
+        cases = [identity_case]
+    elif phase == "smoke":
+        gate_path = getattr(args, "identity_gate_json", None)
+        if gate_path is None or not Path(gate_path).is_file():
+            raise RuntimeError("phase_d_requires_phase_c_identity_gate_file")
+        identity_gate_record = json.loads(Path(gate_path).read_text(encoding="utf-8"))
+        baseline_result = validate_phase_d_identity_gate(identity_gate_record, effective_manifest_sha)
+        zero_transform_gate = identity_gate_record["zero_transform_equivalence"]
+        cases = nonzero_cases
+    elif phase == "gated":
+        cases = [identity_case, *nonzero_cases]
+    else:
+        raise RuntimeError(f"unknown_native_phase:{phase}")
     case_results: list[dict[str, Any]] = []
-    baseline_result: dict[str, Any] | None = None
+    if phase != "smoke":
+        baseline_result = None
+        zero_transform_gate = None
     for case in cases:
         delta = registration_transform(case["translation_base_m"], case["rotation_vector_base_rad"])
         trajectory = apply_registration_to_trajectory(target_pose_values, normals, q, times, delta)
@@ -399,6 +577,86 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         if case["family"] == "zero":
             baseline_result = case_result
         case_results.append(case_result)
+        if case["family"] == "zero":
+            target_pose_values_actual = trajectory["tcp_poses_xyz_quat_xyzw"]
+            position_change = float(np.max(np.linalg.norm(target_pose_values_actual[:, :3] - target_pose_values[:, :3], axis=1)))
+            quaternion_change = max(
+                max(abs(a - b) for a, b in zip(canonical_quaternion_xyzw(actual[3:7]), canonical_quaternion_xyzw(expected[3:7])))
+                for actual, expected in zip(target_pose_values_actual, target_pose_values)
+            )
+            target_pose_max_change = max(position_change, float(quaternion_change))
+            normal_max_change = float(np.max(np.linalg.norm(trajectory["surface_normals_base"] - normals, axis=1)))
+            zero_transform_gate = assess_zero_transform_gate(
+                scene_contract,
+                trajectory_sha256=identities["c1_post_ruckig_sha256"],
+                waypoint_count=len(q),
+                sampled_state_count=int(scene_metrics["sample_count"]),
+                collision_count=int(scene_metrics["full_scene_collision_sample_count"]),
+                fk_status=str(scene_metrics["fk_regression"]["status"]),
+                q_unchanged=bool(np.array_equal(trajectory["joint_states"], q)),
+                timestamps_unchanged=bool(np.array_equal(trajectory["timestamps_s"], times)),
+                target_pose_max_change=target_pose_max_change,
+                normal_max_change=normal_max_change,
+                scene_comparison=scene_comparison,
+                all_objects_applied=(sum(applied) == len(base_objects)),
+            )
+            gate_record = {
+                "project": "FAIRINO_FR5",
+                "stage": getattr(args, "stage", "P2-B3-C3"),
+                "zero_transform_equivalence": zero_transform_gate,
+                "scene_equivalence": scene_comparison,
+                "scene_manifest_sha256": effective_manifest_sha,
+                "scene_apply_success_count": sum(applied),
+                "scene_object_count": len(base_objects),
+                "baseline": case_result,
+            }
+            gate_path = getattr(args, "identity_gate_json", None)
+            if gate_path is not None:
+                Path(gate_path).parent.mkdir(parents=True, exist_ok=True)
+                Path(gate_path).write_text(json.dumps(gate_record, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
+            if zero_transform_gate["status"] != "PASS":
+                return {
+                    "schema_version": "p2b3-c4-native-smoke-v1",
+                    "project": "FAIRINO_FR5",
+                    "stage": getattr(args, "stage", "P2-B3-C3"),
+                    "status": "BLOCKED_ZERO_TRANSFORM_EQUIVALENCE",
+                    "native_scene_propagation_tested": "NO",
+                    "collision_method": COLLISION_METHOD,
+                    "strict_continuous_ccd": "NOT_AVAILABLE",
+                    "hardware_validation": "NOT_RUN",
+                    "physical_registration_bound": "UNKNOWN",
+                    "c1_input_identities": identities,
+                    "c1_scene_source_blobs": source_blobs,
+                    "scene_manifest_sha256": effective_manifest_sha,
+                    "scene_equivalence": scene_comparison,
+                    "zero_transform_equivalence": zero_transform_gate,
+                    "zero_baseline": case_result,
+                    "nonzero_engineering_smoke": "NOT_RUN_ZERO_GATE_FAILED",
+                    "registration_margin_campaign": "NOT_RUN",
+                    "scene_geometry": {"collision_object_count": len(base_objects), "object_ids": identities_in_world, **dict(scene_contract.parameters)},
+                }
+            if phase == "identity":
+                return {
+                    "schema_version": "p2b3-c4-native-smoke-v1",
+                    "project": "FAIRINO_FR5",
+                    "stage": getattr(args, "stage", "P2-B3-C3"),
+                    "phase": "C_IDENTITY_ONLY",
+                    "status": "IDENTITY_GATE_PASS_PHASE_D_PENDING",
+                    "native_scene_propagation_tested": "YES",
+                    "collision_method": COLLISION_METHOD,
+                    "strict_continuous_ccd": "NOT_AVAILABLE",
+                    "hardware_validation": "NOT_RUN",
+                    "physical_registration_bound": "UNKNOWN",
+                    "c1_input_identities": identities,
+                    "c1_scene_source_blobs": source_blobs,
+                    "scene_manifest_sha256": effective_manifest_sha,
+                    "scene_equivalence": scene_comparison,
+                    "zero_transform_equivalence": zero_transform_gate,
+                    "zero_baseline": case_result,
+                    "nonzero_engineering_smoke": "NOT_RUN_PHASE_C_ONLY",
+                    "registration_margin_campaign": "NOT_RUN",
+                    "scene_geometry": {"collision_object_count": len(base_objects), "object_ids": identities_in_world, **dict(scene_contract.parameters)},
+                }
     all_updates_realized = all(
         item["joint_states_unchanged"] and item["timestamps_unchanged"] and item["scene_apply_success_count"] == item["world_object_count"]
         and item["target_poses_match_requested_transform"] and item["surface_normals_match_requested_rotation"]
@@ -408,19 +666,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     )
     fk_pass = bool(baseline_result and baseline_result["fk_regression"]["status"] == "PASS")
     all_collision_queries_completed = all(item["sample_count"] > 0 for item in case_results)
-    status = "PASS" if all_updates_realized and fk_pass and all_collision_queries_completed else "INCOMPLETE_NATIVE_VALIDATION"
-    total_scene_samples = sum(item["sample_count"] for item in case_results)
-    total_scene_collisions = sum(item["full_scene_collision_sample_count"] for item in case_results)
-    collision_counts = [item["full_scene_collision_sample_count"] for item in case_results]
-    collision_response_status = (
-        "SATURATED_ALL_CASES"
-        if all(item["full_scene_collision_sample_count"] == item["sample_count"] for item in case_results)
-        else "DISTINGUISHES_AT_LEAST_ONE_CASE"
-    )
+    status = "PASS" if all_updates_realized and fk_pass and all_collision_queries_completed and zero_transform_gate and zero_transform_gate["status"] == "PASS" else "INCOMPLETE_NATIVE_VALIDATION"
+    collision_response_summary = summarize_collision_response(case_results)
     return {
-            "schema_version": "p2b3-c3-native-smoke-v1",
+            "schema_version": "p2b3-c4-native-smoke-v1",
             "project": "FAIRINO_FR5",
-            "stage": "P2-B3-C3",
+            "stage": getattr(args, "stage", "P2-B3-C3"),
             "status": status,
             "native_backend": "MoveIt2 Jazzy MoveItPy PlanningSceneMonitor with active FCL collision environment",
             "native_scene_propagation_tested": "YES" if all_updates_realized and all_collision_queries_completed else "NO",
@@ -430,22 +681,26 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "physical_registration_bound": "UNKNOWN",
             "frozen_trajectory": {"waypoint_count": len(q), "joint_count": q.shape[1], "timestamps_unchanged": True, "q_unchanged": True},
             "c1_input_identities": identities,
-        "scene_geometry": {
+        "c1_scene_source_blobs": source_blobs,
+            "scene_manifest_sha256": effective_manifest_sha,
+            "scene_equivalence": scene_comparison,
+            "zero_transform_equivalence": zero_transform_gate,
+            "zero_baseline_collision_count": baseline_result["full_scene_collision_sample_count"] if baseline_result else None,
+            "c1_expected_collision_count": scene_contract.expected_collision_count,
+            "phase": "D_NONZERO_ENGINEERING_SMOKE" if phase == "smoke" else "GATED_ALL_CASES",
+            "nonzero_engineering_smoke": "COMPLETE_12_CASES" if phase == "smoke" and len(case_results) == 12 else "NOT_RUN_OR_INCOMPLETE",
+            "registration_margin_campaign": "NOT_RUN",
+            "scene_geometry": {
                 "builder": "ros2_moveit_bridge.plan_closed_contour_moveit.build_wall_collision_objects",
-                "frame_id": BASE_FRAME,
+                "frame_id": scene_contract.frame_id,
                 "collision_object_count": len(base_objects),
                 "object_ids": identities_in_world,
-                "stand_off_m": 0.18,
-                "wall_thickness_m": 0.025,
-                "y_thickness_m": 0.08,
-                "segment_stride": 4,
-                "open_path": True,
-                "bottom_closure_included": False,
-                "floor_included": True,
-                "floor_z_m": -0.20,
-            "geometry_interpretation": "Existing project thin-box tunnel approximation derived from frozen open-arch target poses and normals; not a calibrated workpiece surface reconstruction.",
+                **dict(scene_contract.parameters),
+                "bottom_closure_included": scene_contract.parameters["include_bottom_closure"],
+                "floor_included": scene_contract.parameters["include_tunnel_floor"],
+                "floor_z_m": scene_contract.parameters["tunnel_floor_z_m"],
+                "geometry_interpretation": "Existing project thin-box tunnel approximation derived from frozen open-arch target poses and normals; not a calibrated workpiece surface reconstruction.",
         },
-        "nominal_world_collision_object_diagnostic": collision_object_diagnostic,
             "registration_convention": {
                 "nominal_transform": "T_base_entity_nominal maps each workpiece-attached entity into base_link",
                 "perturbation_transform": "DeltaT_base = [[Exp([phi_base]x), t_base], [0,1]]",
@@ -461,15 +716,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "waypoint_count": len(q),
             "cases": case_results,
             "nominal_zero_fk_regression": baseline_result["fk_regression"] if baseline_result else {"status": "NOT_RUN"},
-            "fcl_distance_status": "AVAILABLE_BOUNDED_SMOKE" if all(item["fcl_distance_status"] == "AVAILABLE" for item in case_results) else "NOT_AVAILABLE",
-            "collision_response_summary": {
-                "status": collision_response_status,
-                "full_scene_collision_samples": total_scene_collisions,
-                "full_scene_samples": total_scene_samples,
-                "self_collision_samples": sum(item["self_collision_sample_count"] for item in case_results),
-                "per_case_collision_sample_counts": collision_counts,
-                "interpretation": "The bounded binary collision metric is saturated for this scene/path smoke and cannot rank registration directions; retain every observed collision as model-only evidence for independent geometry review.",
-            },
+            "fcl_distance_status": (
+                "AVAILABLE_BOUNDED_SMOKE"
+                if all(item["fcl_distance_status"] == "AVAILABLE_SAMPLED_MODEL_DISTANCE" for item in case_results)
+                else "PARTIAL_NOT_AVAILABLE"
+                if any(item["fcl_distance_status"] == "PARTIAL_NOT_AVAILABLE" for item in case_results)
+                else "NOT_AVAILABLE"
+            ),
+            "collision_response_summary": collision_response_summary,
             "clearance_claim": "NO_PHYSICAL_CLEARANCE_OR_CONTINUOUS_CLEARANCE_CLAIM",
             "native_smoke_interpretation": "Engineering scene-propagation smoke only; nonzero amplitudes are not physical uncertainty bounds and do not form normalized margins.",
     }
@@ -485,6 +739,9 @@ def main() -> int:
     parser.add_argument("--srdf", type=Path, required=True)
     parser.add_argument("--joint-limits", type=Path, required=True)
     parser.add_argument("--output-json", type=Path, required=True)
+    parser.add_argument("--scene-manifest", type=Path)
+    parser.add_argument("--identity-gate-json", type=Path)
+    parser.add_argument("--stage", default="P2-B3-C3")
     args = parser.parse_args()
     exit_code = 2
     try:
@@ -494,7 +751,7 @@ def main() -> int:
         result = {
             "schema_version": "p2b3-c3-native-smoke-v1",
             "project": "FAIRINO_FR5",
-            "stage": "P2-B3-C3",
+            "stage": args.stage,
             "status": "INCOMPLETE_NATIVE_VALIDATION",
             "native_scene_propagation_tested": "NO",
             "reason": f"native_exception:{type(exc).__name__}:{exc}",
