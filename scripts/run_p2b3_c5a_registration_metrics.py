@@ -38,6 +38,9 @@ C4_MANIFEST = ROOT / "outputs/p2b3_c4_authoritative_scene_manifest.json"
 URDF = ROOT / "outputs/p2b2_inputs/derived_reference_robot_model.urdf"
 SRDF = ROOT / "ros2_moveit_bridge/config/fairino5_v6_spray_tcp.srdf"
 JOINT_LIMITS = ROOT / "ros2_moveit_bridge/config/joint_limits_with_jerk.yaml"
+FAIRINO_SOURCE_COMMIT = "60755d44d521a5ad6bee8494cc19522f8801aa20"
+FAIRINO_URDF_SHA256 = "923a4d2f754162dadc9a6b0bcbe5b4caf9a32ccd31c479e72ed690febe211b4e"
+FAIRINO_CONTROL_SHA256 = "9296111525fa892d63c700b37d58bd0e9b4a2f7d9713ff3d00bd95b56b5d08b5"
 GROUP = "fairino5_v6_group"
 TCP_LINK = "spray_tcp_link"
 
@@ -76,6 +79,20 @@ def git(*args: str) -> str:
     return completed.stdout.strip()
 
 
+def git_at(directory: Path, *args: str) -> str:
+    try:
+        completed = subprocess.run(["git", "-C", str(directory), *args], text=True, encoding="utf-8", capture_output=True)
+        if completed.returncode == 0:
+            return completed.stdout.strip()
+    except OSError:
+        pass
+    windows_root = subprocess.run(["wslpath", "-w", str(directory)], check=True, text=True, encoding="utf-8", capture_output=True).stdout.strip()
+    completed = subprocess.run(["git.exe", "-C", windows_root, *args], text=True, encoding="utf-8", capture_output=True)
+    if completed.returncode:
+        raise RuntimeError(f"git_at_{args[0]}_failed:{completed.stderr.strip()}")
+    return completed.stdout.strip()
+
+
 def require_clean_execution_tree() -> dict[str, str]:
     branch, head = git("branch", "--show-current"), git("rev-parse", "HEAD")
     ancestry_base, dirty = git("merge-base", PARENT, "HEAD"), git("status", "--porcelain")
@@ -84,7 +101,20 @@ def require_clean_execution_tree() -> dict[str, str]:
     return {"branch": branch, "execution_code_commit": head, "parent_commit": ancestry_base, "clean_at_start": True}
 
 
-def require_inputs() -> dict[str, Any]:
+def verify_fairino_source(directory: Path) -> dict[str, str]:
+    remote = git_at(directory, "remote", "get-url", "origin")
+    commit = git_at(directory, "rev-parse", "HEAD")
+    dirty = git_at(directory, "status", "--porcelain")
+    urdf = directory / "fairino_description/urdf/fairino5_v6.urdf"
+    control = directory / "fairino5_v6_moveit2_config/config/fairino5_v6_robot.ros2_control.xacro"
+    if ("FAIR-INNOVATION/frcobot_ros2" not in remote or commit != FAIRINO_SOURCE_COMMIT or dirty or
+            sha256(urdf) != FAIRINO_URDF_SHA256 or sha256(control) != FAIRINO_CONTROL_SHA256):
+        raise RuntimeError(f"FAIRINO_vendor_source_identity_mismatch:remote={remote}:commit={commit}:dirty={bool(dirty)}")
+    return {"remote": remote, "commit": commit, "clean": "YES", "urdf_sha256": FAIRINO_URDF_SHA256,
+            "moveit_control_xacro_sha256": FAIRINO_CONTROL_SHA256}
+
+
+def require_inputs(fairino_source_identity: dict[str, str]) -> dict[str, Any]:
     paths = (C1_RESULT, C1_TRAJECTORY, C1_TARGET, C1_FK, C1_LINEAGE, C4_RESULT, C4_MANIFEST, URDF, SRDF, JOINT_LIMITS)
     missing = [str(path) for path in paths if not path.is_file() or not path.stat().st_size]
     if missing:
@@ -124,6 +154,7 @@ def require_inputs() -> dict[str, Any]:
         "urdf_sha256": sha256(URDF),
         "srdf_sha256": sha256(SRDF),
         "joint_limits_yaml_sha256": sha256(JOINT_LIMITS),
+        "fairino_vendor_source": fairino_source_identity,
         "c1_stand_off_m": float(c4["scene_geometry"]["stand_off_m"]),
         "c4_acm_sha256": c4.get("authoritative_scene_contract", {}).get("acm", {}).get("sha256")
             or "02975b55c25b52d8bb7d77bdbaf05db1ef5f1d58278575fa4fb298e1a3f35661",
@@ -175,12 +206,17 @@ def write_q_only(path: Path, rows: list[dict[str, str]]) -> tuple[np.ndarray, np
 
 def run_c4_identity(scratch: Path, timeout_s: int) -> dict[str, Any]:
     result_path, gate_path = scratch / "c4_identity_result.json", scratch / "c4_identity_gate.json"
-    command = [sys.executable, str(ROOT / "ros2_moveit_bridge/p2b3_c4_native_smoke.py"),
-               "--trajectory-csv", str(C1_TRAJECTORY), "--target-csv", str(C1_TARGET),
-               "--c1-fk-trace", str(C1_FK), "--c1-result", str(C1_RESULT), "--urdf", str(URDF),
-               "--srdf", str(SRDF), "--joint-limits", str(JOINT_LIMITS), "--scene-manifest", str(C4_MANIFEST),
-               "--identity-gate-json", str(gate_path), "--output-json", str(result_path), "--phase", "identity"]
-    command_logged(command, ROOT, scratch / "c4_identity.log", timeout_s)
+    command_args = [sys.executable, str(ROOT / "ros2_moveit_bridge/p2b3_c4_native_smoke.py"),
+                    "--trajectory-csv", str(C1_TRAJECTORY), "--target-csv", str(C1_TARGET),
+                    "--c1-fk-trace", str(C1_FK), "--c1-result", str(C1_RESULT), "--urdf", str(URDF),
+                    "--srdf", str(SRDF), "--joint-limits", str(JOINT_LIMITS), "--scene-manifest", str(C4_MANIFEST),
+                    "--identity-gate-json", str(gate_path), "--output-json", str(result_path), "--phase", "identity"]
+    command = " && ".join([
+        f"source {shlex.quote(str(scratch / 'fairino_install/setup.bash'))}",
+        f"source {shlex.quote(str(scratch / 'bridge_install/setup.bash'))}",
+        shlex.join(command_args),
+    ])
+    bash_logged(command, ROOT, scratch / "c4_identity.log", timeout_s)
     identity = read_json(result_path)
     if identity.get("status") != "IDENTITY_GATE_PASS_PHASE_D_PENDING" or identity.get("scene_equivalence", {}).get("status") != "PASS":
         raise RuntimeError("C4_independent_identity_replay_failed")
@@ -189,6 +225,29 @@ def run_c4_identity(scratch: Path, timeout_s: int) -> dict[str, Any]:
     if identity.get("scene_manifest_sha256") != "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669":
         raise RuntimeError("C4_identity_replay_scene_sha_mismatch")
     return identity
+
+
+def build_moveit_runtime(scratch: Path, fairino_source: Path, timeout_s: int) -> None:
+    vendor_build = " ".join([
+        "colcon --log-base", shlex.quote(str(scratch / "vendor_colcon_log")),
+        "build --base-paths", shlex.quote(str(fairino_source / "fairino_description")),
+        shlex.quote(str(fairino_source / "fairino5_v6_moveit2_config")),
+        "--build-base", shlex.quote(str(scratch / "vendor_build")),
+        "--install-base", shlex.quote(str(scratch / "fairino_install")),
+        "--packages-select fairino_description fairino5_v6_moveit2_config --event-handlers console_direct+",
+        "--cmake-args -DPython3_EXECUTABLE=/usr/bin/python3 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_TESTING=OFF",
+    ])
+    bash_logged(vendor_build, ROOT, scratch / "vendor_build.log", timeout_s)
+    bridge_build = " && ".join([
+        f"source {shlex.quote(str(scratch / 'fairino_install/setup.bash'))}",
+        "colcon --log-base " + shlex.quote(str(scratch / "bridge_colcon_log")) +
+        " build --base-paths " + shlex.quote(str(ROOT / "ros2_moveit_bridge")) +
+        " --build-base " + shlex.quote(str(scratch / "bridge_build")) +
+        " --install-base " + shlex.quote(str(scratch / "bridge_install")) +
+        " --packages-select fr5_tunnel_moveit_bridge --event-handlers console_direct+" +
+        " --cmake-args -DPython3_EXECUTABLE=/usr/bin/python3 -DPYTHON_EXECUTABLE=/usr/bin/python3",
+    ])
+    bash_logged(bridge_build, ROOT, scratch / "bridge_build.log", timeout_s)
 
 
 def build_native(scratch: Path, timeout_s: int) -> None:
@@ -447,6 +506,7 @@ def assemble_cases(
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scratch", type=Path, required=True, help="New external scratch directory on D:")
+    parser.add_argument("--fairino-source", type=Path, required=True, help="Authenticated FAIRINO source checkout")
     parser.add_argument("--timeout-seconds", type=int, default=5400)
     parser.add_argument("--build-timeout-seconds", type=int, default=1800)
     parser.add_argument("--output-json", type=Path, required=True)
@@ -455,8 +515,10 @@ def main() -> int:
     if scratch.exists():
         raise RuntimeError(f"scratch_directory_must_not_exist:{scratch}")
     tree = require_clean_execution_tree()
-    identities = require_inputs()
+    fairino_identity = verify_fairino_source(args.fairino_source.resolve())
+    identities = require_inputs(fairino_identity)
     scratch.mkdir(parents=True)
+    build_moveit_runtime(scratch, args.fairino_source.resolve(), args.build_timeout_seconds)
     c4_identity = run_c4_identity(scratch, args.timeout_seconds)
     c1_rows = read_csv(C1_TRAJECTORY)
     q, times = write_q_only(scratch / "c1_q_only_validation.csv", c1_rows)
