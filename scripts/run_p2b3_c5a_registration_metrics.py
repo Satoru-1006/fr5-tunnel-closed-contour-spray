@@ -63,7 +63,14 @@ def read_csv(path: Path) -> list[dict[str, str]]:
 
 
 def git(*args: str) -> str:
-    completed = subprocess.run(["git", *args], cwd=ROOT, text=True, encoding="utf-8", capture_output=True)
+    try:
+        completed = subprocess.run(["git", *args], cwd=ROOT, text=True, encoding="utf-8", capture_output=True)
+        if completed.returncode == 0:
+            return completed.stdout.strip()
+    except OSError:
+        pass
+    windows_root = subprocess.run(["wslpath", "-w", str(ROOT)], check=True, text=True, encoding="utf-8", capture_output=True).stdout.strip()
+    completed = subprocess.run(["git.exe", "-C", windows_root, *args], text=True, encoding="utf-8", capture_output=True)
     if completed.returncode:
         raise RuntimeError(f"git_{args[0]}_failed:{completed.stderr.strip()}")
     return completed.stdout.strip()
@@ -447,9 +454,9 @@ def main() -> int:
     scratch = args.scratch.resolve()
     if scratch.exists():
         raise RuntimeError(f"scratch_directory_must_not_exist:{scratch}")
-    scratch.mkdir(parents=True)
     tree = require_clean_execution_tree()
     identities = require_inputs()
+    scratch.mkdir(parents=True)
     c4_identity = run_c4_identity(scratch, args.timeout_seconds)
     c1_rows = read_csv(C1_TRAJECTORY)
     q, times = write_q_only(scratch / "c1_q_only_validation.csv", c1_rows)
