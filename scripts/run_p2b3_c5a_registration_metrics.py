@@ -264,7 +264,7 @@ def run_native_known_answer(scratch: Path, timeout_s: int) -> dict[str, Any]:
     fixture_srdf = ROOT / "tests/fixtures/p2b3_c5a_known_answer.srdf"
     command = " && ".join([
         f"source {shlex.quote(str(scratch / 'install/setup.bash'))}",
-        "ros2 run p2b3_c5a_native p2b3_c5a_fcl_known_answer --",
+        "ros2 run p2b3_c5a_native p2b3_c5a_fcl_known_answer",
         shlex.quote(str(fixture_urdf)), shlex.quote(str(fixture_srdf)),
     ])
     output = bash_logged(command, ROOT, scratch / "fcl_known_answer.log", timeout_s).stdout
@@ -296,7 +296,7 @@ def run_native_cases(scratch: Path, timeout_s: int) -> tuple[list[dict[str, Any]
     native_output = scratch / "native_output"; native_output.mkdir()
     command = " && ".join([
         f"source {shlex.quote(str(scratch / 'install/setup.bash'))}",
-        "ros2 run p2b3_c5a_native p2b3_c5a_native --",
+        "ros2 run p2b3_c5a_native p2b3_c5a_native",
         "--cases", shlex.quote(str(scratch / "cases/case_inputs.csv")),
         "--urdf", shlex.quote(str(URDF)), "--srdf", shlex.quote(str(SRDF)),
         "--output", shlex.quote(str(native_output)), "--group", GROUP, "--tip", TCP_LINK,
