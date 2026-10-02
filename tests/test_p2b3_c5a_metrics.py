@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 import numpy as np
 
 from src.p2b3_c5a_metrics import metric_summary, process_metrics, registration_cases, scene_rows
 from src.physical_uncertainty import registration_transform
+from scripts.run_p2b3_c5a_registration_metrics import ros2_run_command
 
 
 def project(points: np.ndarray, line: np.ndarray, normals: np.ndarray, closed: bool = True):
@@ -95,3 +97,13 @@ def test_metric_summary_rejects_nan_and_scene_transform_keeps_exact_c4_ids():
     assert len(rows) == 181
     assert rows[0]["id"] == "horseshoe_wall_000" and rows[-1]["id"] == "horseshoe_wall_180"
     assert np.isclose(rows[4]["px"], 4.001)
+
+
+def test_native_ros2_arguments_remain_one_command_argv():
+    command = ros2_run_command(
+        Path("/tmp/c5a install"), "p2b3_c5a_native",
+        ["--cases", "/tmp/case inputs.csv", "--tip", "spray_tcp_link"],
+    )
+    assert command.startswith("source '/tmp/c5a install/install/setup.bash' && ros2 run ")
+    assert " && --cases" not in command
+    assert command.endswith("--cases '/tmp/case inputs.csv' --tip spray_tcp_link")

@@ -176,6 +176,12 @@ def bash_logged(command: str, cwd: Path, log: Path, timeout_s: int) -> subproces
     return command_logged(["bash", "-lc", "source /opt/ros/jazzy/setup.bash && " + command], cwd, log, timeout_s)
 
 
+def ros2_run_command(scratch: Path, executable: str, arguments: list[str]) -> str:
+    setup = shlex.quote(str(scratch / "install/setup.bash"))
+    argv = ["ros2", "run", "p2b3_c5a_native", executable, *arguments]
+    return f"source {setup} && {shlex.join(argv)}"
+
+
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
@@ -262,11 +268,7 @@ def build_native(scratch: Path, timeout_s: int) -> None:
 def run_native_known_answer(scratch: Path, timeout_s: int) -> dict[str, Any]:
     fixture_urdf = ROOT / "tests/fixtures/p2b3_c5a_known_answer.urdf"
     fixture_srdf = ROOT / "tests/fixtures/p2b3_c5a_known_answer.srdf"
-    command = " && ".join([
-        f"source {shlex.quote(str(scratch / 'install/setup.bash'))}",
-        "ros2 run p2b3_c5a_native p2b3_c5a_fcl_known_answer",
-        shlex.quote(str(fixture_urdf)), shlex.quote(str(fixture_srdf)),
-    ])
+    command = ros2_run_command(scratch, "p2b3_c5a_fcl_known_answer", [str(fixture_urdf), str(fixture_srdf)])
     output = bash_logged(command, ROOT, scratch / "fcl_known_answer.log", timeout_s).stdout
     record = next((json.loads(line) for line in reversed(output.splitlines()) if line.strip().startswith("{\"status\"")), None)
     if not isinstance(record, dict) or record.get("status") != "PASS":
@@ -294,12 +296,10 @@ def write_case_inputs(scratch: Path, manifest: dict[str, Any], q: np.ndarray, ti
 
 def run_native_cases(scratch: Path, timeout_s: int) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
     native_output = scratch / "native_output"; native_output.mkdir()
-    command = " && ".join([
-        f"source {shlex.quote(str(scratch / 'install/setup.bash'))}",
-        "ros2 run p2b3_c5a_native p2b3_c5a_native",
-        "--cases", shlex.quote(str(scratch / "cases/case_inputs.csv")),
-        "--urdf", shlex.quote(str(URDF)), "--srdf", shlex.quote(str(SRDF)),
-        "--output", shlex.quote(str(native_output)), "--group", GROUP, "--tip", TCP_LINK,
+    command = ros2_run_command(scratch, "p2b3_c5a_native", [
+        "--cases", str(scratch / "cases/case_inputs.csv"),
+        "--urdf", str(URDF), "--srdf", str(SRDF),
+        "--output", str(native_output), "--group", GROUP, "--tip", TCP_LINK,
     ])
     bash_logged(command, ROOT, scratch / "native_measurement.log", timeout_s)
     native = [json.loads(line) for line in (native_output / "p2b3_c5a_native_cases.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
