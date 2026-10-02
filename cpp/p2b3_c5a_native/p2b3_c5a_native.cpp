@@ -196,20 +196,26 @@ collision_detection::CollisionRequest collision_request(const std::string& group
 collision_detection::DistanceRequest distance_request(const std::string& group,
                                                        const moveit::core::RobotModelConstPtr& model,
                                                        const collision_detection::AllowedCollisionMatrix& acm) {
-  collision_detection::DistanceRequest request; request.type = collision_detection::DistanceRequestTypes::GLOBAL;
+  collision_detection::DistanceRequest request; request.type = collision_detection::DistanceRequestTypes::SINGLE;
+  request.max_contacts_per_body = 4096;
   request.group_name = group; request.enable_nearest_points = true; request.enable_signed_distance = true;
   request.acm = &acm; request.enableGroup(model); return request;
 }
-bool finite_distance(const collision_detection::DistanceResult& result) {
+bool update_minimum(Minimum& minimum, const collision_detection::DistanceResult& result, const SampleContext& context) {
   const double sentinel = std::numeric_limits<double>::max() * 0.5;
-  return std::isfinite(result.minimum_distance.distance) && std::abs(result.minimum_distance.distance) < sentinel &&
-         !result.minimum_distance.link_names[0].empty() && !result.minimum_distance.link_names[1].empty() &&
-         result.minimum_distance.nearest_points[0].allFinite() && result.minimum_distance.nearest_points[1].allFinite();
-}
-void update_minimum(Minimum& minimum, const collision_detection::DistanceResult& result, const SampleContext& context) {
-  if (!finite_distance(result) || (minimum.available && result.minimum_distance.distance >= minimum.distance)) return;
-  minimum.available = true; minimum.distance = result.minimum_distance.distance; minimum.context = context;
-  for (int i = 0; i < 2; ++i) { minimum.names[i] = result.minimum_distance.link_names[i]; minimum.points[i] = result.minimum_distance.nearest_points[i]; }
+  bool sample_has_pair = false;
+  const auto consider = [&](const collision_detection::DistanceResultsData& data) {
+    if (!std::isfinite(data.distance) || std::abs(data.distance) >= sentinel || data.link_names[0].empty() ||
+        data.link_names[1].empty() || !data.nearest_points[0].allFinite() || !data.nearest_points[1].allFinite()) return;
+    sample_has_pair = true;
+    if (minimum.available && data.distance >= minimum.distance) return;
+    minimum.available = true; minimum.distance = data.distance; minimum.context = context;
+    for (int i = 0; i < 2; ++i) { minimum.names[i] = data.link_names[i]; minimum.points[i] = data.nearest_points[i]; }
+  };
+  consider(result.minimum_distance);
+  for (const auto& pair : result.distances)
+    for (const auto& value : pair.second) consider(value);
+  return sample_has_pair;
 }
 void set_state(RobotState& state, const moveit::core::JointModelGroup* group, const std::array<double, kDofs>& q) {
   state.setJointGroupPositions(group, std::vector<double>(q.begin(), q.end())); state.update();
@@ -289,9 +295,8 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
     env->checkSelfCollision(creq, self_collision, state, acm);
     collision_detection::DistanceResult world_distance, self_distance;
     world_distance.clear(); self_distance.clear(); distance_env->distanceRobot(dreq, world_distance, state); distance_env->distanceSelf(dreq, self_distance, state);
-    world_distance_valid_count += static_cast<std::size_t>(finite_distance(world_distance));
-    self_distance_valid_count += static_cast<std::size_t>(finite_distance(self_distance));
-    update_minimum(min_world, world_distance, contexts[i]); update_minimum(min_self, self_distance, contexts[i]);
+    world_distance_valid_count += static_cast<std::size_t>(update_minimum(min_world, world_distance, contexts[i]));
+    self_distance_valid_count += static_cast<std::size_t>(update_minimum(min_self, self_distance, contexts[i]));
     if (world_collision.collision) {
       ++world_collision_count;
       if (first_world_collision == "null") { std::ostringstream record; record << "{\"sample_index\":" << i << ",\"waypoint_index\":" << contexts[i].waypoint << ",\"segment_start_waypoint\":" << contexts[i].segment_start << ",\"segment_end_waypoint\":" << contexts[i].segment_end << ",\"segment_fraction\":" << number(contexts[i].fraction) << ",\"time_s\":" << number(contexts[i].time) << ",\"pairs\":" << contact_pairs(world_collision) << '}'; first_world_collision = record.str(); }
@@ -307,7 +312,7 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
   summary << "{\"case_id\":" << json_quote(c.id) << ",\"sample_count\":" << q_samples.size()
           << ",\"collision_method\":\"adaptive_discrete_interpolation\",\"max_joint_step_rad\":" << number(kMaxStep)
           << ",\"collision_backend\":\"MoveIt2 PlanningScene active FCL environment\",\"collision_padding_flags\":{\"environment\":true,\"self\":false}"
-          << ",\"distance_backend\":\"MoveIt2 CollisionEnvFCL getCollisionEnvUnpadded distanceRobot/distanceSelf\",\"distance_padding\":0.0,\"distance_scale\":1.0"
+          << ",\"distance_backend\":\"MoveIt2 CollisionEnvFCL getCollisionEnvUnpadded distanceRobot/distanceSelf\",\"distance_request_type\":\"SINGLE_per_pair_minimum_reduced_to_global_minimum\",\"distance_padding\":0.0,\"distance_scale\":1.0"
           << ",\"robot_world_collision_samples\":" << world_collision_count << ",\"self_collision_samples\":" << self_collision_count
           << ",\"robot_world_distance_valid_samples\":" << world_distance_valid_count
           << ",\"self_distance_valid_samples\":" << self_distance_valid_count
