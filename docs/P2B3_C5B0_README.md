@@ -117,7 +117,9 @@ It covers C5B0 semantics, C5A metrics, C3 uncertainty semantics, and the C4 scen
 - engineering diagnostic boundaries;
 - process metric response surfaces.
 
-It does not mean that a physical registration tolerance, coating-quality limit, hardware-safe bound, continuous collision guarantee, or strict self CCD is available. Those remain `NOT_AVAILABLE`, `UNRESOLVED`, or `NOT_RUN` as recorded in [p2b3_c5b0_result.json](../outputs/p2b3_c5b0_result.json).
+It does not mean that a physical registration tolerance, coating-quality limit, hardware-safe bound, continuous collision guarantee, or strict self CCD is available. Those remain `NOT_AVAILABLE`, `UNRESOLVED`, or `NOT_RUN` as recorded in the Drive-only machine-readable result [`p2b3_c5b0_result.json`](https://drive.google.com/file/d/1LB7S0NRNH-MHUNnlGLJFlFLMgOkxYrEi/view?usp=drivesdk).
+
+The GitHub checkout intentionally keeps only the minimal reproducible surface; the file-level inventory is in [P2B3_C5B0_FILE_MANIFEST.md](P2B3_C5B0_FILE_MANIFEST.md). The complete process archive, drafts, build logs, and prior C5A source snapshot are stored in the linked Drive project folder.
 
 ## Reproduction
 
@@ -137,4 +139,4 @@ cmake --build /mnt/d/c5b0scratch/bullet_build --parallel 2
 
 The authoritative C5A replay remains the remote branch and Drive result cited above. C5B0 convergence shadow builds and logs stay outside Git; no build, install, cache, or duplicated JSONL output is committed.
 
-The complete machine-readable closure is [p2b3_c5b0_result.json](../outputs/p2b3_c5b0_result.json). The required next decision is authorization of a bounded model-based C5B campaign using `BASE_LEFT`; no physical threshold may be inferred from its output.
+The complete machine-readable closure is stored in Drive rather than the local checkout. The required next decision is authorization of a bounded model-based C5B campaign using `BASE_LEFT`; no physical threshold may be inferred from its output.
