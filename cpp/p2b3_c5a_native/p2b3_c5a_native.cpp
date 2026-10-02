@@ -193,10 +193,12 @@ collision_detection::CollisionRequest collision_request(const std::string& group
   request.pad_environment_collisions = true; request.pad_self_collisions = false;
   return request;
 }
-collision_detection::DistanceRequest distance_request(const std::string& group, const collision_detection::AllowedCollisionMatrix& acm) {
+collision_detection::DistanceRequest distance_request(const std::string& group,
+                                                       const moveit::core::RobotModelConstPtr& model,
+                                                       const collision_detection::AllowedCollisionMatrix& acm) {
   collision_detection::DistanceRequest request; request.type = collision_detection::DistanceRequestTypes::GLOBAL;
   request.group_name = group; request.enable_nearest_points = true; request.enable_signed_distance = true;
-  request.acm = &acm; return request;
+  request.acm = &acm; request.enableGroup(model); return request;
 }
 bool finite_distance(const collision_detection::DistanceResult& result) {
   const double sentinel = std::numeric_limits<double>::max() * 0.5;
@@ -274,9 +276,10 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
   const auto& acm = scene->getAllowedCollisionMatrix(); const auto* env = scene->getCollisionEnv().get();
   const auto* distance_env = scene->getCollisionEnvUnpadded().get();
   if (!env || !distance_env) throw std::runtime_error("fcl_environment_unavailable");
-  const auto creq = collision_request(group_name); const auto dreq = distance_request(group_name, acm);
+  const auto creq = collision_request(group_name); const auto dreq = distance_request(group_name, model, acm);
   std::vector<std::array<double, kDofs>> q_samples; const auto contexts = sample_contexts(rows, q_samples);
   int world_collision_count = 0, self_collision_count = 0;
+  std::size_t world_distance_valid_count = 0, self_distance_valid_count = 0;
   Minimum min_world, min_self; std::string first_world_collision = "null", first_self_collision = "null";
   RobotState state(model);
   for (std::size_t i = 0; i < q_samples.size(); ++i) {
@@ -286,6 +289,8 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
     env->checkSelfCollision(creq, self_collision, state, acm);
     collision_detection::DistanceResult world_distance, self_distance;
     world_distance.clear(); self_distance.clear(); distance_env->distanceRobot(dreq, world_distance, state); distance_env->distanceSelf(dreq, self_distance, state);
+    world_distance_valid_count += static_cast<std::size_t>(finite_distance(world_distance));
+    self_distance_valid_count += static_cast<std::size_t>(finite_distance(self_distance));
     update_minimum(min_world, world_distance, contexts[i]); update_minimum(min_self, self_distance, contexts[i]);
     if (world_collision.collision) {
       ++world_collision_count;
@@ -304,6 +309,8 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
           << ",\"collision_backend\":\"MoveIt2 PlanningScene active FCL environment\",\"collision_padding_flags\":{\"environment\":true,\"self\":false}"
           << ",\"distance_backend\":\"MoveIt2 CollisionEnvFCL getCollisionEnvUnpadded distanceRobot/distanceSelf\",\"distance_padding\":0.0,\"distance_scale\":1.0"
           << ",\"robot_world_collision_samples\":" << world_collision_count << ",\"self_collision_samples\":" << self_collision_count
+          << ",\"robot_world_distance_valid_samples\":" << world_distance_valid_count
+          << ",\"self_distance_valid_samples\":" << self_distance_valid_count
           << ",\"first_robot_world_collision\":" << first_world_collision << ",\"first_self_collision\":" << first_self_collision
           << ",\"minimum_robot_world_clearance\":"; write_minimum(summary, min_world);
   summary << ",\"minimum_self_clearance\":"; write_minimum(summary, min_self); summary << "}\n";

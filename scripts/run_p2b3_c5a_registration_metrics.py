@@ -222,13 +222,17 @@ def run_c4_identity(scratch: Path, timeout_s: int) -> dict[str, Any]:
     ])
     bash_logged(command, ROOT, scratch / "c4_identity.log", timeout_s)
     identity = read_json(result_path)
+    validate_c4_identity(identity)
+    return identity
+
+
+def validate_c4_identity(identity: dict[str, Any]) -> None:
     if identity.get("status") != "IDENTITY_GATE_PASS_PHASE_D_PENDING" or identity.get("scene_equivalence", {}).get("status") != "PASS":
         raise RuntimeError("C4_independent_identity_replay_failed")
     if identity.get("zero_transform_equivalence", {}).get("status") != "PASS":
         raise RuntimeError("C4_zero_transform_equivalence_failed")
     if identity.get("scene_manifest_sha256") != "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669":
         raise RuntimeError("C4_identity_replay_scene_sha_mismatch")
-    return identity
 
 
 def build_moveit_runtime(scratch: Path, fairino_source: Path, timeout_s: int) -> None:
@@ -278,7 +282,7 @@ def run_native_known_answer(scratch: Path, timeout_s: int) -> dict[str, Any]:
 
 
 def write_case_inputs(scratch: Path, manifest: dict[str, Any], q: np.ndarray, times: np.ndarray) -> list[dict[str, Any]]:
-    input_dir = scratch / "cases"; input_dir.mkdir(parents=True)
+    input_dir = scratch / "cases"; input_dir.mkdir(parents=True, exist_ok=True)
     q_path = input_dir / "c1_q_only.csv"
     source_q_rows = read_csv(C1_TRAJECTORY)
     q_again, times_again = write_q_only(q_path, source_q_rows)
@@ -296,7 +300,7 @@ def write_case_inputs(scratch: Path, manifest: dict[str, Any], q: np.ndarray, ti
 
 
 def run_native_cases(scratch: Path, timeout_s: int) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
-    native_output = scratch / "native_output"; native_output.mkdir()
+    native_output = scratch / "native_output"; native_output.mkdir(exist_ok=True)
     command = ros2_run_command(scratch, "p2b3_c5a_native", [
         "--cases", str(scratch / "cases/case_inputs.csv"),
         "--urdf", str(URDF), "--srdf", str(SRDF),
@@ -426,6 +430,8 @@ def assemble_cases(
             "scene_object_count": 181, "fresh_fk_regression": fk_regression,
             "robot_world_collision_sample_count": int(raw["robot_world_collision_samples"]),
             "self_collision_sample_count": int(raw["self_collision_samples"]),
+            "robot_world_distance_valid_sample_count": int(raw["robot_world_distance_valid_samples"]),
+            "self_distance_valid_sample_count": int(raw["self_distance_valid_samples"]),
             "first_robot_world_collision": {"status": "AVAILABLE" if raw.get("first_robot_world_collision") else "NO_COLLISION_OBSERVED", "record": raw.get("first_robot_world_collision")},
             "first_self_collision": {"status": "AVAILABLE" if raw.get("first_self_collision") else "NO_COLLISION_OBSERVED", "record": raw.get("first_self_collision")},
             "minimum_robot_world_clearance": clearance_record(raw, "minimum_robot_world_clearance", world_object_ids),
@@ -450,6 +456,8 @@ def assemble_cases(
         "25_frozen_cases": len(result_cases) == 25,
         "all_case_sample_counts_match_c4": all(case["adaptive_discrete_sample_count"] == 858 for case in result_cases),
         "all_robot_world_distances_finite_with_pair_and_points": all_world_available,
+        "robot_world_distance_query_coverage_all_858_samples": all(case["robot_world_distance_valid_sample_count"] == 858 for case in result_cases),
+        "self_distance_query_coverage_all_858_samples": all(case["self_distance_valid_sample_count"] == 858 for case in result_cases),
         "all_robot_world_pair_domains_identified": all(case["minimum_robot_world_clearance"].get("world_object_name", {}).get("status") == "AVAILABLE" and case["minimum_robot_world_clearance"].get("robot_link_name", {}).get("status") == "AVAILABLE" for case in result_cases),
         "all_self_distances_finite_with_pair_and_points": all_self_available,
         "fresh_fk_matches_c1": fk_status == "PASS",
@@ -521,19 +529,30 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scratch", type=Path, required=True, help="New external scratch directory on D:")
     parser.add_argument("--fairino-source", type=Path, required=True, help="Authenticated FAIRINO source checkout")
+    parser.add_argument("--resume-scratch", action="store_true", help="Reuse prior verified C4 identity and generated case inputs in this scratch directory")
     parser.add_argument("--timeout-seconds", type=int, default=5400)
     parser.add_argument("--build-timeout-seconds", type=int, default=1800)
     parser.add_argument("--output-json", type=Path, required=True)
     args = parser.parse_args()
     scratch = args.scratch.resolve()
-    if scratch.exists():
+    if args.resume_scratch and not scratch.is_dir():
+        raise RuntimeError(f"resume_scratch_directory_missing:{scratch}")
+    if not args.resume_scratch and scratch.exists():
         raise RuntimeError(f"scratch_directory_must_not_exist:{scratch}")
     tree = require_clean_execution_tree()
     fairino_identity = verify_fairino_source(args.fairino_source.resolve())
     identities = require_inputs(fairino_identity)
-    scratch.mkdir(parents=True)
-    build_moveit_runtime(scratch, args.fairino_source.resolve(), args.build_timeout_seconds)
-    c4_identity = run_c4_identity(scratch, args.timeout_seconds)
+    if args.resume_scratch:
+        c4_identity_path = scratch / "c4_identity_result.json"
+        cases_path = scratch / "cases/case_inputs.csv"
+        if not c4_identity_path.is_file() or not cases_path.is_file():
+            raise RuntimeError("resume_scratch_missing_verified_c4_identity_or_case_manifest")
+        c4_identity = read_json(c4_identity_path)
+        validate_c4_identity(c4_identity)
+    else:
+        scratch.mkdir(parents=True)
+        build_moveit_runtime(scratch, args.fairino_source.resolve(), args.build_timeout_seconds)
+        c4_identity = run_c4_identity(scratch, args.timeout_seconds)
     c1_rows = read_csv(C1_TRAJECTORY)
     q, times = write_q_only(scratch / "c1_q_only_validation.csv", c1_rows)
     case_specs = write_case_inputs(scratch, read_json(C4_MANIFEST), q, times)
@@ -551,13 +570,15 @@ def main() -> int:
         "robot_world_clearance_all_cases_available": all(case["minimum_robot_world_clearance"]["status"] == "AVAILABLE_SAMPLED_SIGNED_MODEL_DISTANCE" for case in case_results),
     }
     write_json(args.output_json, result)
+    world_minima = [case["minimum_robot_world_clearance"]["signed_distance_m"] for case in case_results
+                    if case["minimum_robot_world_clearance"]["signed_distance_m"] is not None]
     print(json.dumps({
         "P2B3_C5A_STATUS": result["P2B3_C5A_STATUS"],
         "MEASUREMENT_PIPELINE_STATUS": result["MEASUREMENT_PIPELINE_STATUS"],
         "FROZEN_ROBOT_BASELINE_PERFORMANCE_STATUS": result["FROZEN_ROBOT_BASELINE_PERFORMANCE_STATUS"],
         "case_count": result["case_count"],
         "robot_world_collision_samples": result["collision_findings"]["robot_world_collision_sample_total"],
-        "minimum_robot_world_clearance_m": min(case["minimum_robot_world_clearance"]["signed_distance_m"] for case in case_results if case["minimum_robot_world_clearance"]["signed_distance_m"] is not None),
+        "minimum_robot_world_clearance_m": min(world_minima) if world_minima else None,
         "gates": result["measurement_gates"],
     }, sort_keys=True), flush=True)
     return 0 if result["P2B3_C5A_STATUS"] == "PASS" else 2
