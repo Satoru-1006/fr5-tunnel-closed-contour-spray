@@ -80,12 +80,9 @@ def git(*args: str) -> str:
 
 
 def git_at(directory: Path, *args: str) -> str:
-    try:
-        completed = subprocess.run(["git", "-C", str(directory), *args], text=True, encoding="utf-8", capture_output=True)
-        if completed.returncode == 0:
-            return completed.stdout.strip()
-    except OSError:
-        pass
+    # The FAIRINO vendor checkout is Windows-managed. Ask the Windows Git
+    # configuration for status so WSL's different autocrlf view cannot invent
+    # a dirty tree by normalizing the same checked-out text differently.
     windows_root = subprocess.run(["wslpath", "-w", str(directory)], check=True, text=True, encoding="utf-8", capture_output=True).stdout.strip()
     completed = subprocess.run(["git.exe", "-C", windows_root, *args], text=True, encoding="utf-8", capture_output=True)
     if completed.returncode:
