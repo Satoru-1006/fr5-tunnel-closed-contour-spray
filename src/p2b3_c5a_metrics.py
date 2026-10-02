@@ -97,26 +97,40 @@ def process_metrics(
     if np.any(tool_z_lengths <= 1.0e-12):
         raise ValueError("C5A_actual_tcp_positive_z_axis_invalid")
     tool_z = tool_z / tool_z_lengths[:, None]
-    normal_dot = np.clip(np.einsum("ij,ij->i", tool_z, moved_normals), -1.0, 1.0)
-    normal_error_deg = np.degrees(np.arccos(normal_dot))
-
     wall_reference = moved_target[:, :3] + float(stand_off_m) * moved_normals
     projected_wall, projected_normals, projection_distance = project_to_polyline(
         actual_position, wall_reference, moved_normals, False,
     )
+    normal_dot = np.clip(np.einsum("ij,ij->i", tool_z, projected_normals), -1.0, 1.0)
+    normal_error_rad = np.arccos(normal_dot)
+    normal_error_deg = np.degrees(normal_error_rad)
     standoff_error = np.einsum("ij,ij->i", projected_wall - actual_position, projected_normals) - float(stand_off_m)
-    if not all(np.isfinite(array).all() for array in (position_errors, normal_error_deg, standoff_error, projection_distance)):
+    if not all(np.isfinite(array).all() for array in (position_errors, normal_error_rad, normal_error_deg, standoff_error, projection_distance)):
         raise ValueError("C5A_process_metric_result_nonfinite")
     return {
         "tcp_position_error": metric_summary(position_errors, "m"),
         "tcp_positive_z_normal_error": metric_summary(normal_error_deg, "deg"),
+        "tcp_positive_z_normal_error_rad": metric_summary(normal_error_rad, "rad"),
         "projected_standoff_error": metric_summary(standoff_error, "m"),
         "projected_wall_distance": metric_summary(projection_distance, "m"),
+        "position_error_m": position_errors.tolist(),
+        "max_position_error_m": float(np.max(position_errors)),
+        "critical_position_waypoint": int(np.argmax(position_errors)),
+        "target_pose_after_registration_xyz_quat_xyzw": moved_target.tolist(),
+        "surface_normal_after_registration": moved_normals.tolist(),
+        "projected_surface_normal_for_normal_error": projected_normals.tolist(),
+        "normal_error_rad": normal_error_rad.tolist(),
+        "max_normal_error_rad": float(np.max(normal_error_rad)),
+        "critical_normal_waypoint": int(np.argmax(normal_error_rad)),
+        "normal_reference": "C1 _project_to_polyline_with_normals at nearest open-arch projection",
+        "stand_off_error_m": standoff_error.tolist(),
+        "max_abs_stand_off_error_m": float(np.max(np.abs(standoff_error))),
+        "critical_stand_off_waypoint": int(np.argmax(np.abs(standoff_error))),
         "target_pose_transform_max_position_delta_m": float(np.max(np.linalg.norm(moved_target[:, :3] - target[:, :3], axis=1))),
         "surface_normal_transform_max_delta": float(np.max(np.linalg.norm(moved_normals - normals / np.linalg.norm(normals, axis=1)[:, None], axis=1))),
         "stand_off_m": float(stand_off_m),
         "stand_off_source": "C1 authoritative STAND_OFF=0.260 and _project_to_polyline_with_normals(closed=False)",
-        "tcp_axis_convention": "actual FK rotation matrix column +Z compared directly with transformed raw open_arch_tcp_poses_base_link.csv nx,ny,nz",
+        "tcp_axis_convention": "actual FK rotation matrix column +Z compared with C1 _project_to_polyline_with_normals projected surface normal; tcp_points_to_wall=true convention retained",
     }
 
 

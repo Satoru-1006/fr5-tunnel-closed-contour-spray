@@ -25,7 +25,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.p2b3_c5a_metrics import process_metrics, registration_cases, scene_rows
-from src.physical_uncertainty import registration_transform
+from src.physical_uncertainty import registration_transform, transform_pose_array_xyzw, transform_surface_normals
 
 BRANCH = "codex/fr5-p2b3-c5a-registration-metric-closure-20261002"
 PARENT_BRANCH = "codex/fr5-p2b3-c4-authoritative-scene-equivalence-20261002"
@@ -201,6 +201,41 @@ def transform_to_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
+def verify_scene_transform_readback(path: Path, expected_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    actual_rows = read_csv(path)
+    if len(actual_rows) != 181 or len(expected_rows) != 181:
+        raise RuntimeError(f"scene_transform_readback_count_mismatch:{path}")
+    if [row["id"] for row in actual_rows] != [row["id"] for row in expected_rows]:
+        raise RuntimeError(f"scene_transform_readback_object_identity_mismatch:{path}")
+    position_errors: list[float] = []
+    rotation_errors: list[float] = []
+    dimension_errors: list[float] = []
+    for actual, expected in zip(actual_rows, expected_rows):
+        actual_dimensions = np.asarray([float(actual[key]) for key in ("dx", "dy", "dz")])
+        expected_dimensions = np.asarray([expected[key] for key in ("dx", "dy", "dz")], dtype=np.float64)
+        dimension_errors.append(float(np.max(np.abs(actual_dimensions - expected_dimensions))))
+        actual_position = np.asarray([float(actual[key]) for key in ("px", "py", "pz")])
+        expected_position = np.asarray([expected[key] for key in ("px", "py", "pz")], dtype=np.float64)
+        position_errors.append(float(np.linalg.norm(actual_position - expected_position)))
+        actual_quaternion = np.asarray([float(actual[key]) for key in ("qx", "qy", "qz", "qw")])
+        expected_quaternion = np.asarray([expected[key] for key in ("qx", "qy", "qz", "qw")], dtype=np.float64)
+        dot = abs(float(np.dot(actual_quaternion, expected_quaternion))) / (
+            float(np.linalg.norm(actual_quaternion)) * float(np.linalg.norm(expected_quaternion)))
+        rotation_errors.append(2.0 * math.acos(float(np.clip(dot, -1.0, 1.0))))
+    summary = {
+        "status": "PASS" if max(position_errors) <= 1e-12 and max(rotation_errors) <= 1e-12 and max(dimension_errors) == 0.0 else "FAIL",
+        "object_count": len(actual_rows),
+        "object_ids_match_ordered_c4_manifest": True,
+        "dimensions_max_abs_error_m": max(dimension_errors),
+        "translation_max_error_m": max(position_errors),
+        "rotation_max_error_rad": max(rotation_errors),
+        "comparison": "serialized transformed C4 rows read back against the left-composed SE(3) rows before native measurement",
+    }
+    if summary["status"] != "PASS":
+        raise RuntimeError(f"scene_transform_readback_error:{path}:{summary}")
+    return summary
+
+
 def write_q_only(path: Path, rows: list[dict[str, str]]) -> tuple[np.ndarray, np.ndarray]:
     times = np.asarray([float(row["t"]) for row in rows], dtype=np.float64)
     q = np.asarray([[float(row[f"j{i}_q"]) for i in range(1, 7)] for row in rows], dtype=np.float64)
@@ -299,7 +334,9 @@ def write_case_inputs(scratch: Path, manifest: dict[str, Any], q: np.ndarray, ti
         for case in cases:
             delta = registration_transform(case["translation_base_m"], case["rotation_vector_base_rad"])
             scene_path = input_dir / f"{case['case_id']}_scene.csv"
-            transform_to_csv(scene_path, scene_rows(manifest, delta))
+            transformed_rows = scene_rows(manifest, delta)
+            transform_to_csv(scene_path, transformed_rows)
+            case["scene_transform_sanity"] = verify_scene_transform_readback(scene_path, transformed_rows)
             writer.writerow([case["case_id"], str(q_path), str(scene_path)])
     return cases
 
@@ -419,6 +456,7 @@ def c1_polyline_projector():
 def assemble_cases(
     case_specs: list[dict[str, Any]], native_records: list[dict[str, Any]], fk_rows: list[dict[str, str]],
     q: np.ndarray, times: np.ndarray, identity: dict[str, Any], identities: dict[str, Any],
+    native_known_answer: dict[str, Any],
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     project_to_polyline = c1_polyline_projector()
     native_by_id = {record["case_id"]: record for record in native_records}
@@ -432,6 +470,8 @@ def assemble_cases(
     source_fk = read_csv(C1_FK)
     expected_position = np.asarray([[float(row[key]) for key in ("actual_tcp_x", "actual_tcp_y", "actual_tcp_z")] for row in source_fk], dtype=np.float64)
     expected_tool_z = np.asarray([[float(row[key]) for key in ("tool_z_x", "tool_z_y", "tool_z_z")] for row in source_fk], dtype=np.float64)
+    c1_normal_error_deg = np.asarray([float(row["normal_angle_error_deg"]) for row in source_fk], dtype=np.float64)
+    c1_standoff_error_m = np.asarray([float(row["standoff_error_mm"]) / 1000.0 for row in source_fk], dtype=np.float64)
     c1_result = read_json(C1_RESULT)
     stand_off = float(identities["c1_stand_off_m"])
     result_cases: list[dict[str, Any]] = []
@@ -452,6 +492,28 @@ def assemble_cases(
                                   target_pose_xyz_quat_xyzw=target, target_normals=normals,
                                   delta_transform=delta, stand_off_m=stand_off,
                                   project_to_polyline=project_to_polyline)
+        requested_translation = np.asarray(spec["translation_base_m"], dtype=np.float64)
+        expected_delta = registration_transform(spec["translation_base_m"], spec["rotation_vector_base_rad"])
+        delta_error = np.asarray(delta, dtype=np.float64) - expected_delta
+        rotation_delta = expected_delta[:3, :3].T @ np.asarray(delta)[:3, :3]
+        rotation_error_rad = math.acos(float(np.clip((np.trace(rotation_delta) - 1.0) / 2.0, -1.0, 1.0)))
+        expected_transformed_target = transform_pose_array_xyzw(target, expected_delta)
+        expected_transformed_normals = transform_surface_normals(normals, expected_delta)
+        transformed_target_error = float(np.max(np.abs(
+            np.asarray(metrics["target_pose_after_registration_xyz_quat_xyzw"], dtype=np.float64) - expected_transformed_target)))
+        transformed_normal_error = float(np.max(np.abs(
+            np.asarray(metrics["surface_normal_after_registration"], dtype=np.float64) - expected_transformed_normals)))
+        registration_transform_sanity = {
+            "status": "PASS" if np.linalg.norm(np.asarray(delta)[:3, 3] - requested_translation) <= 1e-12
+                and rotation_error_rad <= 1e-12 and float(np.max(np.abs(delta_error))) <= 1e-12
+                and transformed_target_error <= 1e-12 and transformed_normal_error <= 1e-12 else "FAIL",
+            "translation_error_m": float(np.linalg.norm(np.asarray(delta)[:3, 3] - requested_translation)),
+            "rotation_error_rad": rotation_error_rad,
+            "transform_matrix_max_abs_error": float(np.max(np.abs(delta_error))),
+            "target_pose_propagation_max_abs_error": transformed_target_error,
+            "surface_normal_propagation_max_abs_error": transformed_normal_error,
+            "propagation_definition": "C4 frozen left composition DeltaT_base @ T_base_entity_nominal",
+        }
         position_delta = np.linalg.norm(fresh["position"] - expected_position, axis=1)
         tool_z = fresh["rotation"][:, :, 2]
         tool_z_delta = np.linalg.norm(tool_z - expected_tool_z, axis=1)
@@ -467,6 +529,8 @@ def assemble_cases(
             "case_id": spec["case_id"], "family": spec["family"], "magnitude_label": spec["magnitude_label"],
             "translation_base_m": spec["translation_base_m"], "rotation_vector_base_rad": spec["rotation_vector_base_rad"],
             "left_composed_transform_base": delta.tolist(), "joint_states_unchanged": True, "timestamps_unchanged": True,
+            "registration_transform_sanity": registration_transform_sanity,
+            "scene_transform_sanity": spec["scene_transform_sanity"],
             "waypoint_count": 181, "adaptive_discrete_sample_count": int(raw["sample_count"]),
             "scene_object_count": 181, "fresh_fk_regression": fk_regression,
             "robot_world_collision_sample_count": int(raw["robot_world_collision_samples"]),
@@ -483,6 +547,104 @@ def assemble_cases(
         })
     all_world_available = all(case["minimum_robot_world_clearance"]["status"] == "AVAILABLE_SAMPLED_SIGNED_MODEL_DISTANCE" for case in result_cases)
     all_self_available = all(case["minimum_self_clearance"]["status"] == "AVAILABLE_SAMPLED_SIGNED_MODEL_DISTANCE" for case in result_cases)
+    zero_case = next((case for case in result_cases if case["case_id"] == "registration_zero"), {})
+    zero_metrics = zero_case.get("process_metrics", {})
+
+    def valid_vector(case: dict[str, Any], key: str) -> bool:
+        values = np.asarray(case.get("process_metrics", {}).get(key, []), dtype=np.float64)
+        return values.shape == (181,) and bool(np.isfinite(values).all())
+
+    position_vectors_valid = all(valid_vector(case, "position_error_m") for case in result_cases)
+    normal_vectors_valid = all(valid_vector(case, "normal_error_rad") for case in result_cases)
+    standoff_vectors_valid = all(valid_vector(case, "stand_off_error_m") for case in result_cases)
+    position_summaries_consistent = all(
+        case["process_metrics"].get("critical_position_waypoint") == int(np.argmax(case["process_metrics"].get("position_error_m", [math.nan])))
+        and abs(float(case["process_metrics"].get("max_position_error_m", math.nan))
+                - float(np.max(case["process_metrics"].get("position_error_m", [math.nan])))) <= 1e-12
+        for case in result_cases
+    )
+    normal_summaries_consistent = all(
+        case["process_metrics"].get("critical_normal_waypoint") == int(np.argmax(case["process_metrics"].get("normal_error_rad", [math.nan])))
+        and abs(float(case["process_metrics"].get("max_normal_error_rad", math.nan))
+                - float(np.max(case["process_metrics"].get("normal_error_rad", [math.nan])))) <= 1e-12
+        for case in result_cases
+    )
+    standoff_summaries_consistent = all(
+        case["process_metrics"].get("critical_stand_off_waypoint") == int(np.argmax(np.abs(case["process_metrics"].get("stand_off_error_m", [math.nan]))))
+        and abs(float(case["process_metrics"].get("max_abs_stand_off_error_m", math.nan))
+                - float(np.max(np.abs(case["process_metrics"].get("stand_off_error_m", [math.nan]))))) <= 1e-12
+        for case in result_cases
+    )
+
+    c1_position_errors = np.linalg.norm(expected_position - target[:, :3], axis=1)
+    zero_position_matches_c1 = (
+        len(zero_metrics.get("position_error_m", [])) == 181
+        and np.allclose(zero_metrics.get("position_error_m", []), c1_position_errors, rtol=0.0, atol=1e-12)
+        and abs(float(zero_metrics.get("max_position_error_m", math.nan))
+                - float(c1_result.get("c1_measurement", {}).get("max_same_index_error_m", math.nan))) <= 1e-12
+    )
+    zero_normal_matches_c1 = (
+        len(zero_metrics.get("normal_error_rad", [])) == 181 and c1_normal_error_deg.shape == (181,)
+        and np.allclose(np.degrees(zero_metrics.get("normal_error_rad", [])), c1_normal_error_deg, rtol=0.0, atol=1e-8)
+    )
+    zero_standoff_matches_c1 = (
+        len(zero_metrics.get("stand_off_error_m", [])) == 181 and c1_standoff_error_m.shape == (181,)
+        and np.allclose(zero_metrics.get("stand_off_error_m", []), c1_standoff_error_m, rtol=0.0, atol=1e-9)
+    )
+    zero_process_transform_is_identity = (
+        float(zero_metrics.get("target_pose_transform_max_position_delta_m", math.inf)) <= 1e-15
+        and float(zero_metrics.get("surface_normal_transform_max_delta", math.inf)) <= 1e-15
+        and float(zero_metrics.get("max_position_error_m", math.nan)) >= 0.0
+    )
+    zero_process_matches_c1 = all((zero_position_matches_c1, zero_normal_matches_c1,
+                                   zero_standoff_matches_c1, zero_process_transform_is_identity))
+
+    transform_propagation_pass = all(
+        case.get("registration_transform_sanity", {}).get("status") == "PASS"
+        and case.get("scene_transform_sanity", {}).get("status") == "PASS"
+        for case in result_cases
+    )
+    c1_identity_pass = identities.get("c1_post_ruckig_nominal_sha256") == "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3"
+    c4_scene_identity_pass = identities.get("c4_authoritative_scene_manifest_sha256") == "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669"
+    world_clearance_values = np.asarray([
+        float(case["minimum_robot_world_clearance"]["signed_distance_m"])
+        for case in result_cases if case["minimum_robot_world_clearance"].get("signed_distance_m") is not None
+    ], dtype=np.float64)
+    clearance_spread_m = float(np.ptp(world_clearance_values)) if world_clearance_values.size else 0.0
+    zero_normal_values = np.asarray(zero_metrics.get("normal_error_rad", []), dtype=np.float64)
+    nonzero_translation_cases = [case for case in result_cases if case["family"] == "translation"]
+    nonzero_rotation_cases = [case for case in result_cases if case["family"] == "rotation"]
+    position_change_m = max(
+        (abs(float(case["process_metrics"].get("max_position_error_m", 0.0))
+             - float(zero_metrics.get("max_position_error_m", 0.0))) for case in nonzero_translation_cases),
+        default=0.0,
+    )
+    normal_change_rad = max(
+        (float(np.max(np.abs(np.asarray(case["process_metrics"].get("normal_error_rad", []), dtype=np.float64)
+                           - zero_normal_values)))
+         for case in nonzero_rotation_cases if zero_normal_values.shape == (181,)),
+        default=0.0,
+    )
+    world_clearance_informative = clearance_spread_m > 1e-9
+    translation_process_informative = position_change_m > 1e-9
+    rotation_normal_informative = normal_change_rad > 1e-9
+    metric_sanity = {
+        "status": "PASS" if world_clearance_informative and translation_process_informative and rotation_normal_informative else "FAIL",
+        "robot_world_clearance_minimum_spread_m": clearance_spread_m,
+        "translation_max_position_error_change_m": position_change_m,
+        "rotation_max_normal_error_change_rad": normal_change_rad,
+        "numeric_informativity_epsilon": 1e-9,
+        "epsilon_is_physical_acceptance_threshold": False,
+    }
+    known_answer_pass = (
+        native_known_answer.get("status") == "PASS"
+        and abs(float(native_known_answer.get("clear_distance_m", math.nan)) - 0.2) <= 1e-9
+        and abs(float(native_known_answer.get("translated_distance_m", math.nan)) - 0.199) <= 1e-9
+        and abs(float(native_known_answer.get("overlap_distance_m", math.nan)) + 0.05) <= 1e-9
+        and native_known_answer.get("overlap_collision") is True
+        and set(native_known_answer.get("pair", [])) == {"known_answer_obstacle", "base_link"}
+        and np.allclose(native_known_answer.get("clear_nearest_points_x_m", []), [0.3, 0.1], rtol=0.0, atol=1e-9)
+    )
     if not all(case["fresh_fk_regression"]["status"] == "PASS" for case in result_cases):
         fk_status = "FAIL"
     else:
@@ -490,10 +652,21 @@ def assemble_cases(
     c4_zero_collision_count = int(identity.get("zero_baseline", {}).get("full_scene_collision_sample_count", -1))
     c5a_zero = native_by_id.get("registration_zero", {})
     zero_collision_match = int(c5a_zero.get("robot_world_collision_samples", -2)) == c4_zero_collision_count
+    zero_robot_world_collision_count = int(c5a_zero.get("robot_world_collision_samples", -2))
+    zero_self_collision_count = int(c5a_zero.get("self_collision_samples", -2))
+    zero_registration_collision_count = zero_robot_world_collision_count + zero_self_collision_count
+    zero_robot_world_clearance = clearance_record(c5a_zero, "minimum_robot_world_clearance", world_object_ids)
+    self_domains_separated = all(
+        case["minimum_self_clearance"].get("self_link_pair", {}).get("status") == "AVAILABLE"
+        and all(name not in world_object_ids for name in case["minimum_self_clearance"].get("self_link_pair", {}).get("names", []))
+        for case in result_cases
+    )
     gate_checks = {
         "c4_identity_replay": identity.get("status") == "IDENTITY_GATE_PASS_PHASE_D_PENDING",
         "c4_scene_equivalence": identity.get("scene_equivalence", {}).get("status") == "PASS",
         "c4_zero_transform_gate": identity.get("zero_transform_equivalence", {}).get("status") == "PASS",
+        "authoritative_c4_scene_identity_preserved": c4_scene_identity_pass,
+        "c1_nominal_identity": c1_identity_pass,
         "25_frozen_cases": len(result_cases) == 25,
         "all_case_sample_counts_match_c4": all(case["adaptive_discrete_sample_count"] == 858 for case in result_cases),
         "all_robot_world_distances_finite_with_pair_and_points": all_world_available,
@@ -501,9 +674,18 @@ def assemble_cases(
         "self_distance_query_coverage_all_858_samples": all(case["self_distance_valid_sample_count"] == 858 for case in result_cases),
         "all_robot_world_pair_domains_identified": all(case["minimum_robot_world_clearance"].get("world_object_name", {}).get("status") == "AVAILABLE" and case["minimum_robot_world_clearance"].get("robot_link_name", {}).get("status") == "AVAILABLE" for case in result_cases),
         "all_self_distances_finite_with_pair_and_points": all_self_available,
+        "self_clearance_query_separate_from_robot_world": self_domains_separated,
         "fresh_fk_matches_c1": fk_status == "PASS",
         "zero_collision_count_reconciles_to_independent_c4": zero_collision_match,
+        "zero_registration_has_no_sampled_collisions": zero_registration_collision_count == 0,
         "all_q_and_timestamps_unchanged": all(case["joint_states_unchanged"] and case["timestamps_unchanged"] for case in result_cases),
+        "zero_registration_process_geometry_matches_c1": zero_process_matches_c1,
+        "process_position_metric_finite_all_181_waypoints": position_vectors_valid and position_summaries_consistent,
+        "process_normal_metric_finite_all_181_waypoints": normal_vectors_valid and normal_summaries_consistent,
+        "c1_standoff_metric_finite_all_181_waypoints": standoff_vectors_valid and standoff_summaries_consistent,
+        "registration_and_scene_transform_propagation": transform_propagation_pass,
+        "native_fcl_signed_distance_known_answer": known_answer_pass,
+        "robot_world_clearance_and_process_metric_sanity": metric_sanity["status"] == "PASS",
     }
     collision_cases = [case for case in result_cases if case["robot_world_collision_sample_count"] > 0 or case["self_collision_sample_count"] > 0]
     performance = "WEAKNESS_OBSERVED" if collision_cases else "NO_DISCRETE_COLLISIONS_OBSERVED"
@@ -513,6 +695,25 @@ def assemble_cases(
         "P2B3_C5A_STATUS": "PASS" if all(gate_checks.values()) else "BLOCKED",
         "MEASUREMENT_PIPELINE_STATUS": "PASS" if all(gate_checks.values()) else "BLOCKED",
         "FROZEN_ROBOT_BASELINE_PERFORMANCE_STATUS": performance,
+        "CLEARANCE_METRIC_VERIFIED": "YES" if all_world_available else "NO",
+        "PROCESS_POSITION_METRIC": "VERIFIED" if gate_checks["process_position_metric_finite_all_181_waypoints"] else "BLOCKED",
+        "STAND_OFF_METRIC": "VERIFIED_C1_AUTHENTICATED" if gate_checks["c1_standoff_metric_finite_all_181_waypoints"] else "BLOCKED",
+        "PROCESS_NORMAL_METRIC": "VERIFIED_C1_PROJECTED_SURFACE_NORMAL" if gate_checks["process_normal_metric_finite_all_181_waypoints"] else "BLOCKED",
+        "METRIC_SANITY_STATUS": metric_sanity["status"],
+        "KNOWN_ANSWER_CASE_COUNT": len(result_cases),
+        "NATIVE_FCL_KNOWN_ANSWER_FIXTURE_COUNT": 1 if known_answer_pass else 0,
+        "ZERO_REGISTRATION_COLLISION_COUNT": zero_registration_collision_count,
+        "ZERO_REGISTRATION_ROBOT_WORLD_COLLISION_COUNT": zero_robot_world_collision_count,
+        "ZERO_REGISTRATION_SELF_COLLISION_COUNT": zero_self_collision_count,
+        "ZERO_REGISTRATION_MIN_ROBOT_WORLD_CLEARANCE_M": zero_robot_world_clearance["signed_distance_m"],
+        "REGISTRATION_BOUNDARY_CAMPAIGN": "NOT_RUN",
+        "PHYSICAL_REGISTRATION_BOUND": "NOT_AVAILABLE",
+        "PHYSICAL_NORMALIZED_MARGIN": "NOT_AVAILABLE",
+        "STRICT_CONTINUOUS_CCD": "NOT_AVAILABLE",
+        "HARDWARE_VALIDATED": "NOT_RUN",
+        "COATING_QUALITY_CERTIFIED": "NO",
+        "C1_NOMINAL_SHA256": identities["c1_post_ruckig_nominal_sha256"],
+        "AUTHORITATIVE_SCENE_MANIFEST_SHA256": identities["c4_authoritative_scene_manifest_sha256"],
         "PROJECT_SCOPE": "181-point ON-state open-arch only; FAIRINO FR5; frozen C1 post-Ruckig q and timestamps",
         "PARENT_BRANCH": PARENT_BRANCH,
         "PARENT_COMMIT": PARENT,
@@ -536,16 +737,42 @@ def assemble_cases(
             "scene_source": "outputs/p2b3_c4_authoritative_scene_manifest.json ordered 181 BOX objects",
             "acm": {"source": "C4 identity replay and frozen SRDF-derived PlanningScene", "sha256": identities["c4_acm_sha256"], "allowed_pair_count": identities["c4_acm_allowed_pair_count"]},
             "collision_backend": "active MoveIt2 PlanningScene FCL, pad_environment_collisions=true, pad_self_collisions=false",
-            "clearance_backend": "un-padded CollisionEnvFCL distanceRobot/distanceSelf; constructor semantics padding=0.0, scale=1.0",
+            "clearance_backend": "PlanningScene.getCollisionEnvUnpadded() MoveIt2 CollisionEnvFCL distanceRobot/distanceSelf; request GLOBAL, padding=0.0, scale=1.0",
+            "clearance_query_domains": {"robot_world": "distanceRobot only; nearest robot link and world object are reported", "self": "distanceSelf separately; robot link pair only"},
             "clearance_is_signed": True,
             "collision_method": "adaptive_discrete_interpolation",
             "maximum_joint_interpolation_step_deg": 0.5,
+            "process_position_metric": "per-waypoint Euclidean distance from frozen FK TCP position to C1 target TCP position after the same left-composed registration transform",
+            "process_normal_metric": "per-waypoint angle in radians and degrees between frozen FK rotation column +Z and C1 projected open-arch surface normal after registration; exact C1 _project_to_polyline_with_normals function",
+            "process_standoff_metric": "signed projected stand-off error using C1 STAND_OFF=0.260 m and tcp_points_to_wall=true convention",
+            "process_metric_physical_thresholds": "NOT_APPLIED_TO_REGISTRATION_PERTURBATIONS; C1 configured criteria remain C1 provenance only",
             "strict_ccd": "NOT_AVAILABLE",
             "physical_registration_bound": "UNAVAILABLE_NO_MEASURED_FR5_BOUND",
             "hardware": "NOT_RUN",
             "low_clearance_acceptance_threshold": "UNRESOLVED_THRESHOLD_NO_FROZEN_VALUE",
         },
         "measurement_gates": {key: "PASS" if value else "FAIL" for key, value in gate_checks.items()},
+        "metric_sanity": metric_sanity,
+        "native_fcl_known_answer": native_known_answer,
+        "moveitpy_api_introspection": {
+            "runtime": "ROS 2 Jazzy MoveItPy imported from moveit.planning and moveit.core",
+            "planning_scene_public_collision_methods": ["check_collision", "check_collision_unpadded", "check_self_collision", "is_state_colliding", "is_state_valid"],
+            "collision_result_public_distance_fields": ["collision", "distance"],
+            "robot_world_distance_method": "NOT_AVAILABLE_IN_PYTHON_PLANNINGSCENE_BINDING",
+            "nearest_robot_world_pair": "NOT_AVAILABLE_IN_PYTHON_COLLISIONRESULT_BINDING",
+            "nearest_points": "NOT_AVAILABLE_IN_PYTHON_COLLISIONRESULT_BINDING",
+            "measurement_route": "native MoveIt2 C++ CollisionEnvFCL; no Python CollisionResult.distance relabeling",
+        },
+        "c2_clearance_evaluator_audit": {
+            "source": "cpp/stage3_h13_d41/stage3_h13_d41_native.cpp; run_p2b3_c2_robustness.py routes through src/p2a_axiswise_robustness._D41BatchEvaluator",
+            "robot_world_query": "DistanceRequest::GLOBAL via CollisionEnv::distanceRobot; separate distanceSelf query, so environment clearance excludes self pairs",
+            "acm": "ACM pointer supplied to both distance queries",
+            "signed_semantics": "enable_signed_distance=true; MoveIt DistanceResultsData defines <=0 as collision",
+            "padding_semantics": "uses getCollisionEnv() from a separately constructed scene; no explicit getCollisionEnvUnpadded() call, so an unpadded guarantee is not established by the C2 implementation",
+            "nearest_pair": "link pair string retained",
+            "nearest_points": "not retained in the C2 Distance record or result rows",
+            "c4_authority_transfer": "C2 rebuilds its scene from pose rows; direct use of the C4 authoritative manifest is not established there. C5A instead loads the frozen C4 181-object manifest directly.",
+        },
         "collision_findings": {
             "affected_case_ids": [case["case_id"] for case in collision_cases],
             "robot_world_collision_sample_total": sum(case["robot_world_collision_sample_count"] for case in result_cases),
@@ -556,6 +783,9 @@ def assemble_cases(
         "case_count": len(result_cases), "case_results": result_cases,
         "claim_boundaries": {
             "CLEARANCE_METRIC_VERIFIED": "YES" if all_world_available else "NO",
+            "REGISTRATION_BOUNDARY_CAMPAIGN": "NOT_RUN",
+            "PHYSICAL_REGISTRATION_BOUND": "NOT_AVAILABLE",
+            "PHYSICAL_NORMALIZED_MARGIN": "NOT_AVAILABLE",
             "STRICT_CONTINUOUS_COLLISION_DETECTION": "NOT_AVAILABLE",
             "HARDWARE_VALIDATED": "NO",
             "HARDWARE_SAFETY_CERTIFIED": "NO",
@@ -600,7 +830,9 @@ def main() -> int:
     build_native(scratch, args.build_timeout_seconds)
     known_answer = run_native_known_answer(scratch, args.timeout_seconds)
     native_records, fk_rows = run_native_cases(scratch, args.timeout_seconds)
-    case_results, result = assemble_cases(case_specs, native_records, fk_rows, q, times, c4_identity, identities)
+    case_results, result = assemble_cases(
+        case_specs, native_records, fk_rows, q, times, c4_identity, identities, known_answer,
+    )
     result["execution_tree_identity"] = tree
     result["native_fcl_known_answer"] = known_answer
     result["native_evaluator"] = {
