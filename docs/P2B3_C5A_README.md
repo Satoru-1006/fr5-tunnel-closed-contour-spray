@@ -42,7 +42,7 @@ These are geometric diagnostics. No coating deposition model or new acceptance t
 
 ## Validation and results
 
-- All **24/24 measurement gates passed**. The exact gate ledger is in `outputs/p2b3_c5a_result.json`.
+- All **24/24 measurement gates passed**. The completed exact gate ledger is archived as `p2b3_c5a_result.json` in the Google Drive `P2-B3-C5A/CORE` folder. Generated result JSON is not committed to the GitHub branch.
 - Fresh native C5A measurements completed 25 cases: **858 samples per case, 4,525 fresh FK rows**. Each native shard confirmed all seven expected FR5 collision-geometry links were loaded.
 - A native synthetic FCL known-answer fixture passed: clear distance `0.200 m`, translated distance `0.199 m`, and overlap distance `-0.050 m` with collision reported and pair/nearest-point checks passing.
 - Zero registration: zero robot–world and self-collision samples; minimum sampled robot–world distance `0.08004969620976321 m`; minimum sampled self distance `0.016622079818704765 m`. The C1 zero-registration position, projected-normal, and stand-off arrays reconcile to the frozen C1 measurements.
@@ -70,23 +70,37 @@ No registration tolerance, coating-quality threshold, or hardware conclusion is 
 
 ## Reproduction
 
-From the execution branch, run the focused tests:
+The GitHub branch keeps the minimal C5A source, fixtures, tests, and this reproduction guide. The C1/C4 frozen inputs listed above remain in the repository because the runner validates and consumes them. No generated C5A result or build output is required in the checkout.
+
+Use a WSL2 Ubuntu 24.04 environment with ROS 2 Jazzy, MoveIt 2/FCL, `colcon`, Git, Python 3, NumPy, SciPy, and pytest. The external FAIRINO source must match the verified remote and exact commit below. Example setup from PowerShell:
 
 ```powershell
-python -m pytest -q tests/test_p2b3_c5a_metrics.py tests/test_p2b3_c3_physical_uncertainty.py tests/test_p2b3_c4_scene_contract.py
+git clone --single-branch --branch codex/fr5-p2b3-c5a-registration-metric-closure-20261002 `
+  https://github.com/Satoru-1006/fr5-tunnel-closed-contour-spray.git `
+  D:\fr5-p2b3-c5a-source
+git clone https://github.com/FAIR-INNOVATION/frcobot_ros2.git `
+  D:\fr5-p2b3-c5a-deps\frcobot_ros2
+git -C D:\fr5-p2b3-c5a-deps\frcobot_ros2 checkout --detach 60755d44d521a5ad6bee8494cc19522f8801aa20
 ```
 
-Run the native replay under WSL using the authenticated FAIRINO source checkout and a dedicated scratch directory:
+The FAIRINO checkout is external to the project checkout so it does not make the clean-tree identity check fail. Run the focused tests from WSL:
 
 ```bash
-python3 /mnt/d/fr5-p2b3-c5a-registration-metric-closure-20261002/scripts/run_p2b3_c5a_registration_metrics.py \
-  --scratch /mnt/d/fr5-p2b3-c5a-run6-20261002 \
-  --fairino-source /mnt/d/robotfucker/external/frcobot_ros2 \
-  --resume-scratch --timeout-seconds 900 --build-timeout-seconds 1200 \
-  --output-json /mnt/d/fr5-p2b3-c5a-registration-metric-closure-20261002/outputs/p2b3_c5a_result.json
+cd /mnt/d/fr5-p2b3-c5a-source
+python3 -m pytest -q tests/test_p2b3_c5a_metrics.py tests/test_p2b3_c3_physical_uncertainty.py tests/test_p2b3_c4_scene_contract.py
 ```
 
-The completed replay reported `P2B3_C5A_STATUS=PASS`. C4's previously verified identity artifact was validated and reused via `--resume-scratch`; the C5A native evaluator rebuilt and freshly measured all 25 cases. Scratch logs and intermediate CSV/JSONL files are not part of the release artifacts.
+Run the native replay under WSL using a new scratch directory and an output path outside the repository. The scratch path must not already exist; the script creates it. For example:
+
+```bash
+python3 /mnt/d/fr5-p2b3-c5a-source/scripts/run_p2b3_c5a_registration_metrics.py \
+  --scratch /mnt/d/fr5-p2b3-c5a-scratch \
+  --fairino-source /mnt/d/fr5-p2b3-c5a-deps/frcobot_ros2 \
+  --timeout-seconds 900 --build-timeout-seconds 1200 \
+  --output-json /mnt/d/fr5-p2b3-c5a-output/p2b3_c5a_result.json
+```
+
+The completed replay reported `P2B3_C5A_STATUS=PASS`. A fresh run rebuilds the required runtime and native evaluator and measures all 25 cases. Scratch logs and intermediate CSV/JSONL files are generated only in the external scratch directory. The result JSON is written only to the external path selected by the caller; it is not stored in the Git checkout. The already-completed authoritative result is archived separately in the Drive `CORE` folder.
 
 ## Git and delivery provenance
 

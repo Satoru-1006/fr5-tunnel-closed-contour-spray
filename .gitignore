@@ -21,6 +21,7 @@ outputs/*
 !outputs/*.png
 !outputs/*.gif
 !outputs/*.json
+outputs/p2b3_c5a_result.json
 !outputs/tcp_poses.csv
 !outputs/tcp_poses_base_link.csv
 !outputs/quality_report.csv
