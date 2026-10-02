@@ -7,7 +7,7 @@ import numpy as np
 
 from src.p2b3_c5a_metrics import metric_summary, process_metrics, registration_cases, scene_rows
 from src.physical_uncertainty import registration_transform
-from scripts.run_p2b3_c5a_registration_metrics import ros2_run_command
+from scripts.run_p2b3_c5a_registration_metrics import c1_polyline_projector, ros2_run_command
 
 
 def project(points: np.ndarray, line: np.ndarray, normals: np.ndarray, closed: bool = True):
@@ -107,3 +107,12 @@ def test_native_ros2_arguments_remain_one_command_argv():
     assert command.startswith("source '/tmp/c5a install/install/setup.bash' && ros2 run ")
     assert " && --cases" not in command
     assert command.endswith("--cases '/tmp/case inputs.csv' --tip spray_tcp_link")
+
+
+def test_extracted_c1_projection_matches_independent_synthetic_projection():
+    points = np.asarray([[0.4, 0.1, 0.0], [1.8, -0.2, 0.05]])
+    line = np.asarray([[0, 0, 0], [1, 0, 0], [2, 0, 0]], dtype=float)
+    normals = np.repeat([[0, 0, 1]], 3, axis=0)
+    actual = c1_polyline_projector()(points, line, normals, False)
+    expected = project(points, line, normals, False)
+    assert all(np.allclose(a, b, atol=0.0, rtol=0.0) for a, b in zip(actual, expected))

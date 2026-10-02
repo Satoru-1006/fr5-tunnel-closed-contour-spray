@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import csv
 import hashlib
 import json
@@ -353,12 +354,28 @@ def clearance_record(native: dict[str, Any], key: str, world_object_ids: set[str
     return record
 
 
+def c1_polyline_projector():
+    """Compile only C1's frozen polyline projection function from its source AST."""
+    source_path = ROOT / "ros2_moveit_bridge/plan_closed_contour_moveit.py"
+    source = source_path.read_text(encoding="utf-8")
+    tree = ast.parse(source, filename=str(source_path))
+    definitions = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "_project_to_polyline_with_normals"]
+    if len(definitions) != 1:
+        raise RuntimeError("C1_project_to_polyline_with_normals_source_not_unique")
+    isolated = ast.Module(body=definitions, type_ignores=[])
+    namespace: dict[str, Any] = {"np": np}
+    exec(compile(isolated, str(source_path), "exec"), namespace)
+    projector = namespace.get("_project_to_polyline_with_normals")
+    if not callable(projector):
+        raise RuntimeError("C1_polyline_projector_extraction_failed")
+    return projector
+
+
 def assemble_cases(
     case_specs: list[dict[str, Any]], native_records: list[dict[str, Any]], fk_rows: list[dict[str, str]],
     q: np.ndarray, times: np.ndarray, identity: dict[str, Any], identities: dict[str, Any],
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    from ros2_moveit_bridge.plan_closed_contour_moveit import _project_to_polyline_with_normals
-
+    project_to_polyline = c1_polyline_projector()
     native_by_id = {record["case_id"]: record for record in native_records}
     fk_by_id = grouped_fk(fk_rows)
     if set(native_by_id) != {case["case_id"] for case in case_specs} or set(fk_by_id) != set(native_by_id):
@@ -389,7 +406,7 @@ def assemble_cases(
         metrics = process_metrics(actual_position_xyz=fresh["position"], actual_rotation_matrices=fresh["rotation"],
                                   target_pose_xyz_quat_xyzw=target, target_normals=normals,
                                   delta_transform=delta, stand_off_m=stand_off,
-                                  project_to_polyline=_project_to_polyline_with_normals)
+                                  project_to_polyline=project_to_polyline)
         position_delta = np.linalg.norm(fresh["position"] - expected_position, axis=1)
         tool_z = fresh["rotation"][:, :, 2]
         tool_z_delta = np.linalg.norm(tool_z - expected_tool_z, axis=1)
