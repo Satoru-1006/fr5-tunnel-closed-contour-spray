@@ -7,6 +7,7 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -37,6 +38,7 @@ struct Args {
   std::string cases, urdf, srdf, output;
   std::string group{"fairino5_v6_group"};
   std::string tip{"spray_tcp_link"};
+  bool probe_first_sample_only{false};
 };
 
 struct JointRow { double time{0.0}; std::array<double, kDofs> q{}; };
@@ -109,6 +111,10 @@ Args parse_args(int argc, char** argv) {
     else if (key == "--output") args.output = value;
     else if (key == "--group") args.group = value;
     else if (key == "--tip") args.tip = value;
+    else if (key == "--probe-first-sample-only") {
+      if (value != "true" && value != "false") throw std::runtime_error("invalid_boolean:" + key);
+      args.probe_first_sample_only = value == "true";
+    }
     else throw std::runtime_error("unknown_argument:" + key);
   }
   if (args.cases.empty() || args.urdf.empty() || args.srdf.empty() || args.output.empty())
@@ -217,6 +223,37 @@ bool update_minimum(Minimum& minimum, const collision_detection::DistanceResult&
     for (const auto& value : pair.second) consider(value);
   return sample_has_pair;
 }
+std::string distance_result_diagnostic_json(const collision_detection::DistanceResult& result) {
+  const double sentinel = std::numeric_limits<double>::max() * 0.5;
+  std::size_t value_count = 0, named_finite_value_count = 0;
+  const collision_detection::DistanceResultsData* map_minimum = nullptr;
+  for (const auto& pair : result.distances) {
+    for (const auto& value : pair.second) {
+      ++value_count;
+      if (std::isfinite(value.distance) && std::abs(value.distance) < sentinel &&
+          !value.link_names[0].empty() && !value.link_names[1].empty()) {
+        ++named_finite_value_count;
+        if (!map_minimum || value.distance < map_minimum->distance) map_minimum = &value;
+      }
+    }
+  }
+  std::ostringstream out;
+  out << "{\"distance_map_pair_count\":" << result.distances.size()
+      << ",\"distance_map_value_count\":" << value_count
+      << ",\"distance_map_named_finite_value_count\":" << named_finite_value_count
+      << ",\"minimum_distance_raw_m\":" << number(result.minimum_distance.distance)
+      << ",\"minimum_distance_pair\":[" << json_quote(result.minimum_distance.link_names[0]) << ','
+      << json_quote(result.minimum_distance.link_names[1]) << ']'
+      << ",\"minimum_distance_points_finite\":"
+      << (result.minimum_distance.nearest_points[0].allFinite() && result.minimum_distance.nearest_points[1].allFinite() ? "true" : "false")
+      << ",\"map_minimum\":";
+  if (!map_minimum) out << "null";
+  else out << "{\"distance_m\":" << number(map_minimum->distance)
+           << ",\"pair\":[" << json_quote(map_minimum->link_names[0]) << ',' << json_quote(map_minimum->link_names[1]) << ']'
+           << ",\"nearest_points\":[" << vector_json(map_minimum->nearest_points[0]) << ',' << vector_json(map_minimum->nearest_points[1]) << ']'
+           << ",\"points_finite\":" << (map_minimum->nearest_points[0].allFinite() && map_minimum->nearest_points[1].allFinite() ? "true" : "false") << '}';
+  out << '}'; return out.str();
+}
 void set_state(RobotState& state, const moveit::core::JointModelGroup* group, const std::array<double, kDofs>& q) {
   state.setJointGroupPositions(group, std::vector<double>(q.begin(), q.end())); state.update();
 }
@@ -272,7 +309,8 @@ void write_fk(const fs::path& path, const std::string& case_id, const std::vecto
   }
 }
 void run_case(const Case& c, const fs::path& output, const moveit::core::RobotModelConstPtr& model,
-              const std::string& group_name, const std::string& tip_name, bool first_fk) {
+              const std::string& group_name, const std::string& tip_name, bool first_fk,
+              bool probe_first_sample_only, std::size_t collision_geometry_link_count) {
   const auto rows = read_joint_csv(c.q_path); auto scene = make_scene(model, c.scene_path);
   const auto* group = model->getJointModelGroup(group_name); const auto* tip = model->getLinkModel(tip_name);
   if (!group || !tip) throw std::runtime_error("group_or_tip_missing");
@@ -286,9 +324,12 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
   std::vector<std::array<double, kDofs>> q_samples; const auto contexts = sample_contexts(rows, q_samples);
   int world_collision_count = 0, self_collision_count = 0;
   std::size_t world_distance_valid_count = 0, self_distance_valid_count = 0;
+  std::string first_query_diagnostic = "null";
   Minimum min_world, min_self; std::string first_world_collision = "null", first_self_collision = "null";
+  std::size_t samples_evaluated = 0;
   RobotState state(model);
   for (std::size_t i = 0; i < q_samples.size(); ++i) {
+    samples_evaluated = i + 1;
     set_state(state, group, q_samples[i]);
     collision_detection::CollisionResult world_collision, self_collision;
     env->checkRobotCollision(creq, world_collision, state, acm);
@@ -297,6 +338,27 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
     world_distance.clear(); self_distance.clear(); distance_env->distanceRobot(dreq, world_distance, state); distance_env->distanceSelf(dreq, self_distance, state);
     world_distance_valid_count += static_cast<std::size_t>(update_minimum(min_world, world_distance, contexts[i]));
     self_distance_valid_count += static_cast<std::size_t>(update_minimum(min_self, self_distance, contexts[i]));
+    if (i == 0) {
+      auto active_world = dreq; collision_detection::DistanceResult active_world_result;
+      active_world_result.clear(); env->distanceRobot(active_world, active_world_result, state);
+      auto all_world = dreq; all_world.group_name.clear(); all_world.active_components_only = nullptr;
+      collision_detection::DistanceResult all_world_result; all_world_result.clear(); distance_env->distanceRobot(all_world, all_world_result, state);
+      auto no_acm_world = dreq; no_acm_world.acm = nullptr;
+      collision_detection::DistanceResult no_acm_world_result; no_acm_world_result.clear(); distance_env->distanceRobot(no_acm_world, no_acm_world_result, state);
+      auto global_world = dreq; global_world.type = collision_detection::DistanceRequestTypes::GLOBAL;
+      collision_detection::DistanceResult global_world_result; global_world_result.clear(); distance_env->distanceRobot(global_world, global_world_result, state);
+      auto all_self = dreq; all_self.group_name.clear(); all_self.active_components_only = nullptr;
+      collision_detection::DistanceResult all_self_result; all_self_result.clear(); distance_env->distanceSelf(all_self, all_self_result, state);
+      std::ostringstream diagnostic;
+      diagnostic << "{\"configured_unpadded_group_acm\":" << distance_result_diagnostic_json(world_distance)
+                 << ",\"active_group_acm\":" << distance_result_diagnostic_json(active_world_result)
+                 << ",\"unpadded_all_links_acm\":" << distance_result_diagnostic_json(all_world_result)
+                 << ",\"unpadded_group_no_acm\":" << distance_result_diagnostic_json(no_acm_world_result)
+                 << ",\"unpadded_group_global_acm\":" << distance_result_diagnostic_json(global_world_result)
+                 << ",\"unpadded_all_self_links_acm\":" << distance_result_diagnostic_json(all_self_result)
+                 << ",\"configured_self_query\":" << distance_result_diagnostic_json(self_distance) << '}';
+      first_query_diagnostic = diagnostic.str();
+    }
     if (world_collision.collision) {
       ++world_collision_count;
       if (first_world_collision == "null") { std::ostringstream record; record << "{\"sample_index\":" << i << ",\"waypoint_index\":" << contexts[i].waypoint << ",\"segment_start_waypoint\":" << contexts[i].segment_start << ",\"segment_end_waypoint\":" << contexts[i].segment_end << ",\"segment_fraction\":" << number(contexts[i].fraction) << ",\"time_s\":" << number(contexts[i].time) << ",\"pairs\":" << contact_pairs(world_collision) << '}'; first_world_collision = record.str(); }
@@ -305,17 +367,22 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
       ++self_collision_count;
       if (first_self_collision == "null") { std::ostringstream record; record << "{\"sample_index\":" << i << ",\"waypoint_index\":" << contexts[i].waypoint << ",\"segment_start_waypoint\":" << contexts[i].segment_start << ",\"segment_end_waypoint\":" << contexts[i].segment_end << ",\"segment_fraction\":" << number(contexts[i].fraction) << ",\"time_s\":" << number(contexts[i].time) << ",\"pairs\":" << contact_pairs(self_collision) << '}'; first_self_collision = record.str(); }
     }
+    if (probe_first_sample_only) break;
   }
   write_fk(output / "p2b3_c5a_fresh_fk.csv", c.id, rows, model, group, tip, first_fk);
   std::ofstream summary(output / "p2b3_c5a_native_cases.jsonl", first_fk ? std::ios::trunc : std::ios::app);
   if (!summary) throw std::runtime_error("cannot_write_native_case_summary");
   summary << "{\"case_id\":" << json_quote(c.id) << ",\"sample_count\":" << q_samples.size()
+          << ",\"samples_evaluated\":" << samples_evaluated
+          << ",\"diagnostic_first_sample_only\":" << (probe_first_sample_only ? "true" : "false")
           << ",\"collision_method\":\"adaptive_discrete_interpolation\",\"max_joint_step_rad\":" << number(kMaxStep)
+          << ",\"robot_collision_geometry_link_count\":" << collision_geometry_link_count
           << ",\"collision_backend\":\"MoveIt2 PlanningScene active FCL environment\",\"collision_padding_flags\":{\"environment\":true,\"self\":false}"
           << ",\"distance_backend\":\"MoveIt2 CollisionEnvFCL getCollisionEnvUnpadded distanceRobot/distanceSelf\",\"distance_request_type\":\"SINGLE_per_pair_minimum_reduced_to_global_minimum\",\"distance_padding\":0.0,\"distance_scale\":1.0"
           << ",\"robot_world_collision_samples\":" << world_collision_count << ",\"self_collision_samples\":" << self_collision_count
           << ",\"robot_world_distance_valid_samples\":" << world_distance_valid_count
           << ",\"self_distance_valid_samples\":" << self_distance_valid_count
+          << ",\"first_sample_distance_query_diagnostic\":" << first_query_diagnostic
           << ",\"first_robot_world_collision\":" << first_world_collision << ",\"first_self_collision\":" << first_self_collision
           << ",\"minimum_robot_world_clearance\":"; write_minimum(summary, min_world);
   summary << ",\"minimum_self_clearance\":"; write_minimum(summary, min_self); summary << "}\n";
@@ -330,9 +397,17 @@ int main(int argc, char** argv) {
     auto srdf = std::make_shared<srdf::Model>(); if (!srdf->initFile(*urdf, args.srdf)) throw std::runtime_error("SRDF_parse_failed");
     auto model = std::make_shared<moveit::core::RobotModel>(urdf, srdf);
     if (!model->hasJointModelGroup(args.group)) throw std::runtime_error("robot_group_missing:" + args.group);
+    const std::set<std::string> expected_collision_links{
+      "base_link", "shoulder_link", "upperarm_link", "forearm_link", "wrist1_link", "wrist2_link", "wrist3_link"};
+    std::set<std::string> actual_collision_links;
+    for (const auto* link : model->getLinkModelsWithCollisionGeometry()) actual_collision_links.insert(link->getName());
+    if (actual_collision_links != expected_collision_links)
+      throw std::runtime_error("collision_geometry_link_set_mismatch:expected=7:actual=" + std::to_string(actual_collision_links.size()));
+    std::cout << "validated_robot_collision_geometry_links=" << actual_collision_links.size() << '\n' << std::flush;
     const auto cases = read_cases(args.cases);
     for (std::size_t i = 0; i < cases.size(); ++i) {
-      run_case(cases[i], args.output, model, args.group, args.tip, i == 0);
+      run_case(cases[i], args.output, model, args.group, args.tip, i == 0,
+               args.probe_first_sample_only, actual_collision_links.size());
       std::cout << "completed_case=" << cases[i].id << " (" << (i + 1) << '/' << cases.size() << ")\n" << std::flush;
     }
     rclcpp::shutdown(); return 0;

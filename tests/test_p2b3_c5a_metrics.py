@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import numpy as np
 
@@ -101,10 +101,14 @@ def test_metric_summary_rejects_nan_and_scene_transform_keeps_exact_c4_ids():
 
 def test_native_ros2_arguments_remain_one_command_argv():
     command = ros2_run_command(
-        Path("/tmp/c5a install"), "p2b3_c5a_native",
+        PurePosixPath("/tmp/c5a install"), "p2b3_c5a_native",
         ["--cases", "/tmp/case inputs.csv", "--tip", "spray_tcp_link"],
     )
-    assert command.startswith("source '/tmp/c5a install/install/setup.bash' && ros2 run ")
+    assert command.startswith(
+        "source '/tmp/c5a install/fairino_install/setup.bash' && "
+        "source '/tmp/c5a install/bridge_install/setup.bash' && "
+        "source '/tmp/c5a install/install/setup.bash' && ros2 run "
+    )
     assert " && --cases" not in command
     assert command.endswith("--cases '/tmp/case inputs.csv' --tip spray_tcp_link")
 

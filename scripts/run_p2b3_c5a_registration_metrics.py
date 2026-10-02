@@ -178,9 +178,13 @@ def bash_logged(command: str, cwd: Path, log: Path, timeout_s: int) -> subproces
 
 
 def ros2_run_command(scratch: Path, executable: str, arguments: list[str]) -> str:
-    setup = shlex.quote(str(scratch / "install/setup.bash"))
+    setup_chain = [
+        scratch / "fairino_install/setup.bash",
+        scratch / "bridge_install/setup.bash",
+        scratch / "install/setup.bash",
+    ]
     argv = ["ros2", "run", "p2b3_c5a_native", executable, *arguments]
-    return f"source {setup} && {shlex.join(argv)}"
+    return " && ".join([*(f"source {shlex.quote(str(path))}" for path in setup_chain), shlex.join(argv)])
 
 
 def write_json(path: Path, value: Any) -> None:
