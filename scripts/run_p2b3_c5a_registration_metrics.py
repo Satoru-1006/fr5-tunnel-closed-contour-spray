@@ -78,10 +78,10 @@ def git(*args: str) -> str:
 
 def require_clean_execution_tree() -> dict[str, str]:
     branch, head = git("branch", "--show-current"), git("rev-parse", "HEAD")
-    parent, dirty = git("rev-parse", "HEAD^"), git("status", "--porcelain")
-    if branch != BRANCH or parent != PARENT or dirty:
-        raise RuntimeError(f"execution_tree_identity_mismatch:branch={branch}:head={head}:parent={parent}:dirty={bool(dirty)}")
-    return {"branch": branch, "execution_code_commit": head, "parent_commit": parent, "clean_at_start": True}
+    ancestry_base, dirty = git("merge-base", PARENT, "HEAD"), git("status", "--porcelain")
+    if branch != BRANCH or ancestry_base != PARENT or dirty:
+        raise RuntimeError(f"execution_tree_identity_mismatch:branch={branch}:head={head}:base={ancestry_base}:dirty={bool(dirty)}")
+    return {"branch": branch, "execution_code_commit": head, "parent_commit": ancestry_base, "clean_at_start": True}
 
 
 def require_inputs() -> dict[str, Any]:
