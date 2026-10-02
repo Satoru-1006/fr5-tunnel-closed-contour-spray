@@ -92,5 +92,6 @@ The completed replay reported `P2B3_C5A_STATUS=PASS`. C4's previously verified i
 
 - Parent C4 final commit: `f1b3840db3573142050695cb5e29702f4fd7a7de`.
 - Execution code commit: `14ff903b806878005c6ff307a09fc2e69e3b0665`.
-- Artifact publish commit and final delivery SHA are recorded in the Drive `PROJECT_INDEX.md` receipt after remote readback. A commit cannot contain its own Git SHA; the index and final delivery report identify the final branch tip.
-- `GITHUB_CI` is reported separately from replay and will be labeled `NOT_AVAILABLE_NO_WORKFLOW_RUNS_OR_STATUS_CHECKS` if the repository/ref has no configured workflow or status checks.
+- Artifact publish commit: `6fff346aa8c859a6edd1c690c1707d935ae1bfd4`.
+- The final delivery SHA is recorded in the Drive `PROJECT_INDEX.md` receipt after exact remote readback. A commit cannot contain its own Git SHA; the index and final delivery report identify the final branch tip.
+- `GITHUB_CI=NOT_AVAILABLE_NO_WORKFLOW_RUNS_OR_STATUS_CHECKS`: the repository exposes zero GitHub Actions workflows, and the inspected C4 reference has zero status entries and check runs. The final C5A SHA is checked after push.
