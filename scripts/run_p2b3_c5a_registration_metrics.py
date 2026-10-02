@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import ast
 import csv
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import math
@@ -304,15 +305,51 @@ def write_case_inputs(scratch: Path, manifest: dict[str, Any], q: np.ndarray, ti
 
 
 def run_native_cases(scratch: Path, timeout_s: int) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    case_rows = read_csv(scratch / "cases/case_inputs.csv")
+    if len(case_rows) != 25:
+        raise RuntimeError(f"native_case_manifest_count_mismatch:{len(case_rows)}")
+    worker_count = min(4, os.cpu_count() or 1, len(case_rows))
+    shards = [case_rows[index::worker_count] for index in range(worker_count)]
+
+    def run_shard(index: int, rows: list[dict[str, str]]) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+        shard_root = scratch / "native_shards" / f"shard_{index:02d}"
+        shard_root.mkdir(parents=True, exist_ok=True)
+        manifest_path = shard_root / "case_inputs.csv"
+        with manifest_path.open("w", encoding="utf-8", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=("case_id", "q_csv", "scene_csv"), lineterminator="\n")
+            writer.writeheader(); writer.writerows(rows)
+        output = shard_root / "native_output"; output.mkdir(exist_ok=True)
+        command = ros2_run_command(scratch, "p2b3_c5a_native", [
+            "--cases", str(manifest_path), "--urdf", str(URDF), "--srdf", str(SRDF),
+            "--output", str(output), "--group", GROUP, "--tip", TCP_LINK,
+        ])
+        bash_logged(command, ROOT, shard_root / "native_measurement.log", timeout_s)
+        native = [json.loads(line) for line in (output / "p2b3_c5a_native_cases.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+        fk = read_csv(output / "p2b3_c5a_fresh_fk.csv")
+        if len(native) != len(rows) or len(fk) != len(rows) * 181:
+            raise RuntimeError(f"native_shard_output_count_mismatch:shard={index}:cases={len(native)}:fk_rows={len(fk)}")
+        return native, fk
+
+    with ThreadPoolExecutor(max_workers=worker_count) as pool:
+        futures = [pool.submit(run_shard, index, rows) for index, rows in enumerate(shards)]
+        shard_results = [future.result() for future in futures]
+
+    native_by_case = {record["case_id"]: record for native, _ in shard_results for record in native}
+    fk_by_case: dict[str, list[dict[str, str]]] = {}
+    for _, shard_fk in shard_results:
+        for row in shard_fk:
+            fk_by_case.setdefault(row["case_id"], []).append(row)
+    expected_ids = [row["case_id"] for row in case_rows]
+    if set(native_by_case) != set(expected_ids) or set(fk_by_case) != set(expected_ids):
+        raise RuntimeError("native_shard_case_identity_mismatch")
+    native = [native_by_case[case_id] for case_id in expected_ids]
+    fk = [row for case_id in expected_ids for row in fk_by_case[case_id]]
     native_output = scratch / "native_output"; native_output.mkdir(exist_ok=True)
-    command = ros2_run_command(scratch, "p2b3_c5a_native", [
-        "--cases", str(scratch / "cases/case_inputs.csv"),
-        "--urdf", str(URDF), "--srdf", str(SRDF),
-        "--output", str(native_output), "--group", GROUP, "--tip", TCP_LINK,
-    ])
-    bash_logged(command, ROOT, scratch / "native_measurement.log", timeout_s)
-    native = [json.loads(line) for line in (native_output / "p2b3_c5a_native_cases.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
-    fk = read_csv(native_output / "p2b3_c5a_fresh_fk.csv")
+    (native_output / "p2b3_c5a_native_cases.jsonl").write_text(
+        "".join(json.dumps(record, sort_keys=True, allow_nan=False) + "\n" for record in native), encoding="utf-8")
+    with (native_output / "p2b3_c5a_fresh_fk.csv").open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(fk[0]), lineterminator="\n")
+        writer.writeheader(); writer.writerows(fk)
     if len(native) != 25 or len(fk) != 25 * 181:
         raise RuntimeError(f"native_output_count_mismatch:cases={len(native)}:fk_rows={len(fk)}")
     return native, fk

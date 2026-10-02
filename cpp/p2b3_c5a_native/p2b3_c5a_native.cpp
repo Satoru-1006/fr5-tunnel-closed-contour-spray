@@ -202,7 +202,7 @@ collision_detection::CollisionRequest collision_request(const std::string& group
 collision_detection::DistanceRequest distance_request(const std::string& group,
                                                        const moveit::core::RobotModelConstPtr& model,
                                                        const collision_detection::AllowedCollisionMatrix& acm) {
-  collision_detection::DistanceRequest request; request.type = collision_detection::DistanceRequestTypes::SINGLE;
+  collision_detection::DistanceRequest request; request.type = collision_detection::DistanceRequestTypes::GLOBAL;
   request.max_contacts_per_body = 4096;
   request.group_name = group; request.enable_nearest_points = true; request.enable_signed_distance = true;
   request.acm = &acm; request.enableGroup(model); return request;
@@ -338,7 +338,7 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
     world_distance.clear(); self_distance.clear(); distance_env->distanceRobot(dreq, world_distance, state); distance_env->distanceSelf(dreq, self_distance, state);
     world_distance_valid_count += static_cast<std::size_t>(update_minimum(min_world, world_distance, contexts[i]));
     self_distance_valid_count += static_cast<std::size_t>(update_minimum(min_self, self_distance, contexts[i]));
-    if (i == 0) {
+    if (i == 0 && probe_first_sample_only) {
       auto active_world = dreq; collision_detection::DistanceResult active_world_result;
       active_world_result.clear(); env->distanceRobot(active_world, active_world_result, state);
       auto all_world = dreq; all_world.group_name.clear(); all_world.active_components_only = nullptr;
@@ -378,7 +378,7 @@ void run_case(const Case& c, const fs::path& output, const moveit::core::RobotMo
           << ",\"collision_method\":\"adaptive_discrete_interpolation\",\"max_joint_step_rad\":" << number(kMaxStep)
           << ",\"robot_collision_geometry_link_count\":" << collision_geometry_link_count
           << ",\"collision_backend\":\"MoveIt2 PlanningScene active FCL environment\",\"collision_padding_flags\":{\"environment\":true,\"self\":false}"
-          << ",\"distance_backend\":\"MoveIt2 CollisionEnvFCL getCollisionEnvUnpadded distanceRobot/distanceSelf\",\"distance_request_type\":\"SINGLE_per_pair_minimum_reduced_to_global_minimum\",\"distance_padding\":0.0,\"distance_scale\":1.0"
+          << ",\"distance_backend\":\"MoveIt2 CollisionEnvFCL getCollisionEnvUnpadded distanceRobot/distanceSelf\",\"distance_request_type\":\"GLOBAL_native_global_minimum\",\"distance_padding\":0.0,\"distance_scale\":1.0"
           << ",\"robot_world_collision_samples\":" << world_collision_count << ",\"self_collision_samples\":" << self_collision_count
           << ",\"robot_world_distance_valid_samples\":" << world_distance_valid_count
           << ",\"self_distance_valid_samples\":" << self_distance_valid_count
