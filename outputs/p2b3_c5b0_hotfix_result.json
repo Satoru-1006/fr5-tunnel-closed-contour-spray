@@ -1,0 +1,303 @@
+{
+  "schema": "p2b3-c5b0-hotfix-result-v1",
+  "task": "FR5_P2-B3-C5B0-HOTFIX",
+  "date": "2026-10-08",
+  "scope": {
+    "robot": "FAIRINO_FR5",
+    "ier8_in_scope": false,
+    "c5b1_started": false,
+    "stage3_mutated": false,
+    "c4_mutated": false,
+    "c1_mutated": false
+  },
+  "status": {
+    "measurement_pipeline": "PASS",
+    "frozen_baseline": "MEASURED_NOT_OPTIMIZED",
+    "historical_convergence": "INSUFFICIENT_EVIDENCE",
+    "strict_self_ccd": "NOT_AVAILABLE",
+    "clearance": "NOT_AVAILABLE",
+    "hardware_validation": "NOT_AVAILABLE"
+  },
+  "git": {
+    "branch": "codex/p2b3-c5b0-hotfix",
+    "execution_commit": "9100577f8bf2a6c8ba32be268c9bf477a4ab56a3",
+    "artifact_publish_commit": null
+  },
+  "identity": {
+    "c4_manifest_path": "outputs/p2b3_c4_authoritative_scene_manifest.json",
+    "c4_manifest_canonical_sha256": "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669",
+    "c4_object_count": 181,
+    "c4_object_ids_unique": true,
+    "c4_dimensions_finite_positive": true,
+    "c1_trajectory_path": "outputs/p2b3_c2_c1_nominal_post_ruckig.csv",
+    "c1_trajectory_sha256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+    "c1_waypoint_count": 181,
+    "c1_timestamps_strictly_increasing": true
+  },
+  "convergence_repair": {
+    "evaluator": "src/p2b3_c5b0_registration_spec.py::discrete_convergence_summary",
+    "accepted_statuses": [
+      "CONVERGED",
+      "NOT_CONVERGED",
+      "INSUFFICIENT_EVIDENCE"
+    ],
+    "default_without_declared_tolerance": "INSUFFICIENT_EVIDENCE",
+    "historical_rows": [
+      {
+        "case_id": "registration_zero",
+        "sample_count": {
+          "0.5deg": 858,
+          "0.25deg": 1653,
+          "0.1deg": 3983
+        },
+        "min_distance_m": {
+          "0.5deg": 0.08004969620976321,
+          "0.25deg": 0.08004804691553469,
+          "0.1deg": 0.08004767537031543
+        },
+        "pair": [
+          "upperarm_link",
+          "horseshoe_wall_026"
+        ],
+        "segment": "85->86",
+        "collision_samples": {
+          "0.5deg": 0,
+          "0.25deg": 0,
+          "0.1deg": 0
+        }
+      },
+      {
+        "case_id": "translation_5mm_x_minus",
+        "sample_count": {
+          "0.5deg": 858,
+          "0.25deg": 1653,
+          "0.1deg": 3983
+        },
+        "min_distance_m": {
+          "0.5deg": 0.0750496962097632,
+          "0.25deg": 0.07504804691553468,
+          "0.1deg": 0.07504767537031543
+        },
+        "pair": [
+          "upperarm_link",
+          "horseshoe_wall_026"
+        ],
+        "segment": "85->86",
+        "collision_samples": {
+          "0.5deg": 0,
+          "0.25deg": 0,
+          "0.1deg": 0
+        }
+      },
+      {
+        "case_id": "translation_5mm_x_plus",
+        "sample_count": {
+          "0.5deg": 858,
+          "0.25deg": 1653,
+          "0.1deg": 3983
+        },
+        "min_distance_m": {
+          "0.5deg": 0.08504969620976321,
+          "0.25deg": 0.08504804691553469,
+          "0.1deg": 0.08504767537031543
+        },
+        "pair": [
+          "upperarm_link",
+          "horseshoe_wall_026"
+        ],
+        "segment": "85->86",
+        "collision_samples": {
+          "0.5deg": 0,
+          "0.25deg": 0,
+          "0.1deg": 0
+        }
+      },
+      {
+        "case_id": "translation_5mm_z_minus",
+        "sample_count": {
+          "0.5deg": 858,
+          "0.25deg": 1653,
+          "0.1deg": 3983
+        },
+        "min_distance_m": {
+          "0.5deg": 0.08005012017513419,
+          "0.25deg": 0.08004804691553469,
+          "0.1deg": 0.0800477371422925
+        },
+        "pair": [
+          "upperarm_link",
+          "horseshoe_wall_026"
+        ],
+        "segment": "85->86",
+        "collision_samples": {
+          "0.5deg": 0,
+          "0.25deg": 0,
+          "0.1deg": 0
+        }
+      },
+      {
+        "case_id": "rotation_0p5deg_x_minus",
+        "sample_count": {
+          "0.5deg": 858,
+          "0.25deg": 1653,
+          "0.1deg": 3983
+        },
+        "min_distance_m": {
+          "0.5deg": 0.08004969620976321,
+          "0.25deg": 0.08004804691553469,
+          "0.1deg": 0.08004767537031543
+        },
+        "pair": [
+          "upperarm_link",
+          "horseshoe_wall_026"
+        ],
+        "segment": "85->86",
+        "collision_samples": {
+          "0.5deg": 0,
+          "0.25deg": 0,
+          "0.1deg": 0
+        }
+      }
+    ],
+    "historical_reclassification": "INSUFFICIENT_EVIDENCE",
+    "historical_max_abs_change_from_0p5deg_m": 0.00000238303284169,
+    "historical_pair_stable": true,
+    "historical_segment_stable": true,
+    "historical_collision_status_stable": true,
+    "declared_distance_tolerance_m": null,
+    "adversarial_cases": {
+      "material_distance_change": "NOT_CONVERGED",
+      "coarse_free_fine_collision": "NOT_CONVERGED",
+      "pair_switch_only": "diagnostic_visible",
+      "segment_switch_only": "diagnostic_visible",
+      "missing_tolerance": "INSUFFICIENT_EVIDENCE",
+      "incomplete_record": "INSUFFICIENT_EVIDENCE"
+    }
+  },
+  "registration_repair": {
+    "identity_shortcut_validates_before_return": true,
+    "external_transform_validation": [
+      "finite",
+      "4x4",
+      "homogeneous_last_row",
+      "orthogonal_rotation",
+      "positive_unit_determinant"
+    ],
+    "invalid_cases_rejected": [
+      "scale",
+      "mirror",
+      "shear",
+      "invalid_last_row",
+      "nan",
+      "unknown_convention",
+      "missing_workpiece_frame"
+    ],
+    "invalid_transform_projection": false
+  },
+  "fcl_padding_audit": {
+    "boolean_collision_backend": "MoveIt2 CollisionEnvFCL active environment",
+    "distance_backend": "MoveIt2 CollisionEnvFCL getCollisionEnvUnpadded distanceRobot/distanceSelf",
+    "collision_request": {
+      "pad_environment_collisions": true,
+      "pad_self_collisions": false
+    },
+    "distance_padding_m": 0.0,
+    "distance_scale": 1.0,
+    "known_answer": {
+      "status": "PASS",
+      "clear_distance_m": 0.2,
+      "near_distance_m": 0.199,
+      "overlap_signed_distance_m": -0.05,
+      "overlap_collision": true,
+      "padded_unpadded_collision_predicates_equal": true,
+      "padded_unpadded_signed_distances_equal": true
+    },
+    "real_c4_first_sample_probe": {
+      "status": "PASS",
+      "scene_object_count": 181,
+      "sample_count_declared": 858,
+      "samples_evaluated": 1,
+      "configured_group_distance_m": 0.19572822952162827,
+      "configured_group_pair": [
+        "upperarm_link",
+        "horseshoe_wall_066"
+      ],
+      "configured_self_distance_m": 0.0168364497732324,
+      "configured_self_pair": [
+        "wrist2_link",
+        "forearm_link"
+      ],
+      "acm_and_global_cross_checks_equal": true
+    }
+  },
+  "bullet_probe": {
+    "status": "AVAILABLE",
+    "backend": "MoveIt2 CollisionEnvBullet",
+    "api": "CollisionEnvBullet::checkRobotCollision(req,res,state1,state2,acm)",
+    "scene_identity": {
+      "source": "outputs/p2b3_c4_authoritative_scene_manifest.json",
+      "canonical_sha256": "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669",
+      "object_count": 181
+    },
+    "segment": {
+      "start_waypoint": 85,
+      "end_waypoint": 86,
+      "time_start_s": 240.69927324299999,
+      "time_end_s": 243.68350353700001,
+      "q_start": [
+        0.42119323443328083,
+        -2.8968513915075773,
+        2.3052120874925901,
+        -1.1055500173664039,
+        1.5144831778982286,
+        0.24260076695433058
+      ],
+      "q_end": [
+        0.27631621358752401,
+        -2.919055068170223,
+        2.2913506389060068,
+        -1.0510063769866218,
+        1.5404618370789502,
+        0.24260076695433058
+      ]
+    },
+    "collision_request": {
+      "pad_environment_collisions": true,
+      "pad_self_collisions": false,
+      "acm_applied": true
+    },
+    "endpoint_a_collision": false,
+    "endpoint_b_collision": false,
+    "adaptive_discrete_interpolation": {
+      "steps": 17,
+      "sample_count": 18,
+      "collision_sample_count": 0,
+      "intermediate_collision_sample_count": 0,
+      "label": "adaptive_discrete_interpolation"
+    },
+    "robot_world_ccd_collision": false,
+    "robot_world_ccd_pairs": [],
+    "strict_self_ccd": null,
+    "strict_self_ccd_status": "NOT_AVAILABLE",
+    "clearance_m": null,
+    "hardware_validation": null,
+    "hardware_validation_status": "NOT_AVAILABLE"
+  },
+  "regression": {
+    "python_command": "python -m pytest -q tests/test_p2b3_c5b0_registration_spec.py tests/test_p2b3_c5a_metrics.py tests/test_p2b3_c3_physical_uncertainty.py tests/test_p2b3_c4_scene_contract.py",
+    "python_result": "80 passed",
+    "cpp_build": "p2b3_c5b0_ccd Release colcon build passed",
+    "synthetic_bullet_result": "PASS",
+    "historical_c5a_raw_values_changed": false,
+    "historical_c5a_full_replay": "NOT_RUN",
+    "historical_c5b0_interpretation_changed": true
+  },
+  "delivery": {
+    "previous_drive_result_id": "1LB7S0NRNH-MHUNnlGLJFlFLMgOkxYrEi",
+    "previous_drive_result_overwritten": false,
+    "new_drive_files": [
+      "docs/P2B3_C5B0_HOTFIX_REPORT.md",
+      "outputs/p2b3_c5b0_hotfix_result.json"
+    ]
+  }
+}
