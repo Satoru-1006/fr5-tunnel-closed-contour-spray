@@ -32,13 +32,14 @@ moveit_msgs::msg::CollisionObject make_box(double center_x) {
   return object;
 }
 
-Observation observe(const moveit::core::RobotModelConstPtr& model, double center_x) {
+Observation observe(const moveit::core::RobotModelConstPtr& model, double center_x, bool padded) {
   planning_scene::PlanningScene scene(model); scene.processCollisionObjectMsg(make_box(center_x));
   scene.allocateCollisionDetector(collision_detection::CollisionDetectorAllocatorFCL::create());
-  const auto& acm = scene.getAllowedCollisionMatrix(); const auto* env = scene.getCollisionEnvUnpadded().get();
+  const auto& acm = scene.getAllowedCollisionMatrix();
+  const auto* env = (padded ? scene.getCollisionEnv() : scene.getCollisionEnvUnpadded()).get();
   moveit::core::RobotState state(model); state.update();
   collision_detection::CollisionRequest collision_request; collision_request.contacts = true; collision_request.max_contacts = 8;
-  collision_request.pad_environment_collisions = false; collision_request.pad_self_collisions = false;
+  collision_request.pad_environment_collisions = padded; collision_request.pad_self_collisions = false;
   collision_detection::CollisionResult collision; env->checkRobotCollision(collision_request, collision, state, acm);
   collision_detection::DistanceRequest distance_request; distance_request.type = collision_detection::DistanceRequestTypes::GLOBAL;
   distance_request.enable_signed_distance = true; distance_request.enable_nearest_points = true; distance_request.acm = &acm;
@@ -58,9 +59,12 @@ int main(int argc, char** argv) {
     auto urdf = std::make_shared<urdf::Model>(); if (!urdf->initFile(argv[1])) throw std::runtime_error("fixture_urdf_parse_failed");
     auto srdf = std::make_shared<srdf::Model>(); if (!srdf->initFile(*urdf, argv[2])) throw std::runtime_error("fixture_srdf_parse_failed");
     auto model = std::make_shared<moveit::core::RobotModel>(urdf, srdf);
-    const auto clear = observe(model, 0.4);  // [-0.1,0.1] and [0.3,0.5]: exact 0.2 m gap.
-    const auto nearer = observe(model, 0.399);  // exact 0.199 m gap.
-    const auto overlap = observe(model, 0.15);  // overlap depth is 0.05 m.
+    const auto clear = observe(model, 0.4, false);  // [-0.1,0.1] and [0.3,0.5]: exact 0.2 m gap.
+    const auto nearer = observe(model, 0.399, false);  // exact 0.199 m gap.
+    const auto overlap = observe(model, 0.15, false);  // overlap depth is 0.05 m.
+    const auto clear_padded = observe(model, 0.4, true);
+    const auto nearer_padded = observe(model, 0.399, true);
+    const auto overlap_padded = observe(model, 0.15, true);
     check(!clear.collision && std::abs(clear.distance - 0.2) < 1e-8, "positive_known_answer_distance_or_free_state_failed");
     const bool points_match = (std::abs(clear.a.x() - 0.1) < 1e-8 && std::abs(clear.b.x() - 0.3) < 1e-8) ||
                               (std::abs(clear.b.x() - 0.1) < 1e-8 && std::abs(clear.a.x() - 0.3) < 1e-8);
@@ -69,12 +73,20 @@ int main(int argc, char** argv) {
     check(!nearer.collision && std::abs(nearer.distance - 0.199) < 1e-8 && nearer.distance < clear.distance,
           "known_translation_did_not_monotonically_change_distance");
     check(overlap.collision && overlap.distance <= 0.0, "forced_overlap_collision_or_signed_distance_failed");
+    check(clear.collision == clear_padded.collision && nearer.collision == nearer_padded.collision &&
+              overlap.collision == overlap_padded.collision,
+          "padded_unpadded_collision_predicate_mismatch");
+    check(std::abs(clear.distance - clear_padded.distance) < 1e-12 &&
+              std::abs(nearer.distance - nearer_padded.distance) < 1e-12 &&
+              std::abs(overlap.distance - overlap_padded.distance) < 1e-12,
+          "padded_unpadded_signed_distance_mismatch");
     std::cout << "{\"status\":\"PASS\",\"clear_distance_m\":" << clear.distance
               << ",\"clear_nearest_points_x_m\":[" << clear.a.x() << ',' << clear.b.x()
               << "],\"pair\":[\"" << clear.names[0] << "\",\"" << clear.names[1] << "\"]"
               << ",\"translated_distance_m\":" << nearer.distance
               << ",\"overlap_distance_m\":" << overlap.distance
-              << ",\"overlap_collision\":true}\n";
+              << ",\"overlap_collision\":true,\"padded_unpadded_collision_predicates_equal\":true"
+              << ",\"padded_unpadded_signed_distances_equal\":true}\n";
     rclcpp::shutdown(); return 0;
   } catch (const std::exception& e) {
     std::cerr << "p2b3_c5a_fcl_known_answer: " << e.what() << '\n'; if (rclcpp::ok()) rclcpp::shutdown(); return 2;

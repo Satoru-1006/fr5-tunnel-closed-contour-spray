@@ -46,7 +46,8 @@ int main() {
             << "\"endpoint_a_collision\":false,\"endpoint_b_collision\":false,"
             << "\"bullet_sweep_crossing_collision\":" << (crossing ? "true" : "false") << ","
             << "\"bullet_sweep_clear_transition_collision\":" << (clear ? "true" : "false") << ","
-            << "\"strict_self_ccd\":\"NOT_AVAILABLE\","
+              << "\"strict_self_ccd\":null,"
+              << "\"strict_self_ccd_status\":\"NOT_AVAILABLE\","
             << "\"status\":\"" << (pass ? "PASS" : "FAIL") << "\"}\n";
   return pass ? EXIT_SUCCESS : EXIT_FAILURE;
 }

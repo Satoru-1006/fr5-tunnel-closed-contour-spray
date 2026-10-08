@@ -9,6 +9,7 @@ physical process claims.
 from __future__ import annotations
 
 from copy import deepcopy
+import re
 from typing import Any, Mapping, Sequence
 
 import numpy as np
@@ -22,6 +23,13 @@ PRIMARY_PARAMETERIZATION = BASE_LEFT
 WORKPIECE_ORIGIN_STATUS = "NOT_AVAILABLE"
 WORKPIECE_REFERENCE_STATUS = "ENGINEERING_REFERENCE_ONLY"
 
+# One validation policy is used at every public homogeneous-transform entry
+# point.  These are numerical representation tolerances, not physical safety
+# margins and must not be used to project an invalid matrix onto SE(3).
+SE3_ORTHOGONAL_TOL = 1.0e-9
+SE3_DETERMINANT_TOL = 1.0e-9
+SE3_HOMOGENEOUS_ROW_TOL = 1.0e-12
+
 
 def _vector(value: Sequence[float], size: int, name: str) -> np.ndarray:
     result = np.asarray(value, dtype=np.float64)
@@ -33,6 +41,28 @@ def _vector(value: Sequence[float], size: int, name: str) -> np.ndarray:
 def skew(value: Sequence[float]) -> np.ndarray:
     x, y, z = _vector(value, 3, "skew_input")
     return np.array([[0.0, -z, y], [z, 0.0, -x], [-y, x, 0.0]], dtype=np.float64)
+
+
+def _validate_se3(transform: Sequence[Sequence[float]], name: str) -> np.ndarray:
+    """Validate, but never repair, a finite proper rigid transform."""
+    result = np.asarray(transform, dtype=np.float64)
+    if result.shape != (4, 4) or not np.isfinite(result).all():
+        raise ValueError(f"{name}_must_be_finite_4x4")
+    if not np.allclose(
+        result[3, :], np.asarray([0.0, 0.0, 0.0, 1.0]),
+        atol=SE3_HOMOGENEOUS_ROW_TOL, rtol=0.0,
+    ):
+        raise ValueError(f"{name}_invalid_homogeneous_row")
+    rotation = result[:3, :3]
+    if not np.allclose(
+        rotation.T @ rotation, np.eye(3),
+        atol=SE3_ORTHOGONAL_TOL, rtol=0.0,
+    ):
+        raise ValueError(f"{name}_rotation_not_orthogonal")
+    determinant = float(np.linalg.det(rotation))
+    if not np.isclose(determinant, 1.0, atol=SE3_DETERMINANT_TOL, rtol=0.0):
+        raise ValueError(f"{name}_rotation_determinant_not_positive_one")
+    return result
 
 
 def so3_exp(rotation_vector_rad: Sequence[float]) -> np.ndarray:
@@ -70,9 +100,7 @@ def se3_exp(twist: Sequence[float]) -> np.ndarray:
 
 
 def se3_adjoint(transform: Sequence[Sequence[float]]) -> np.ndarray:
-    transform_array = np.asarray(transform, dtype=np.float64)
-    if transform_array.shape != (4, 4) or not np.isfinite(transform_array).all():
-        raise ValueError("transform_must_be_finite_4x4")
+    transform_array = _validate_se3(transform, "transform")
     rotation = transform_array[:3, :3]
     translation = transform_array[:3, 3]
     result = np.zeros((6, 6), dtype=np.float64)
@@ -83,9 +111,7 @@ def se3_adjoint(transform: Sequence[Sequence[float]]) -> np.ndarray:
 
 
 def se3_inverse(transform: Sequence[Sequence[float]]) -> np.ndarray:
-    transform_array = np.asarray(transform, dtype=np.float64)
-    if transform_array.shape != (4, 4) or not np.isfinite(transform_array).all():
-        raise ValueError("transform_must_be_finite_4x4")
+    transform_array = _validate_se3(transform, "transform")
     rotation = transform_array[:3, :3]
     result = np.eye(4)
     result[:3, :3] = rotation.T
@@ -107,19 +133,18 @@ def induced_delta(
     convention: str,
     workpiece_transform_base: Sequence[Sequence[float]] | None = None,
 ) -> np.ndarray:
-    delta_array = np.asarray(delta, dtype=np.float64)
-    if delta_array.shape != (4, 4) or not np.isfinite(delta_array).all():
-        raise ValueError("delta_must_be_finite_4x4")
+    delta_array = _validate_se3(delta, "delta")
     if convention == BASE_LEFT:
         return delta_array
     if convention != WORKPIECE_LOCAL:
         raise ValueError(f"unknown_registration_convention:{convention}")
     if workpiece_transform_base is None:
         raise ValueError("WORKPIECE_LOCAL_requires_workpiece_transform")
+    workpiece = _validate_se3(workpiece_transform_base, "workpiece_transform_base")
     return (
-        np.asarray(workpiece_transform_base, dtype=np.float64)
+        workpiece
         @ delta_array
-        @ se3_inverse(workpiece_transform_base)
+        @ se3_inverse(workpiece)
     )
 
 
@@ -130,13 +155,14 @@ def apply_registration(
     workpiece_transform_base: Sequence[Sequence[float]] | None = None,
 ) -> np.ndarray:
     """Propagate one rigid transform without changing q or timestamps."""
-    entity = np.asarray(entity_transform_base, dtype=np.float64)
-    if entity.shape != (4, 4) or not np.isfinite(entity).all():
-        raise ValueError("entity_transform_must_be_finite_4x4")
-    delta_array = np.asarray(delta, dtype=np.float64)
-    if delta_array.shape == (4, 4) and np.array_equal(delta_array, np.eye(4)):
+    entity = _validate_se3(entity_transform_base, "entity_transform")
+    delta_array = _validate_se3(delta, "delta")
+    # Validate convention and the optional frame even for identity.  The
+    # identity shortcut is numerical only; it is not an input-validation path.
+    induced = induced_delta(delta_array, convention, workpiece_transform_base)
+    if np.array_equal(delta_array, np.eye(4)):
         return entity.copy()
-    return induced_delta(delta, convention, workpiece_transform_base) @ entity
+    return induced @ entity
 
 
 def transform_points(
@@ -314,27 +340,163 @@ def margin_taxonomy() -> dict[str, dict[str, Any]]:
     }
 
 
-def discrete_convergence_summary(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
-    """Summarize sampled-resolution bookkeeping without calling it CCD."""
-    if not records:
-        raise ValueError("convergence_records_empty")
-    distances = [float(record["min_robot_world_signed_distance_m"]) for record in records]
-    if not np.isfinite(distances).all():
-        raise ValueError("convergence_distance_nonfinite")
-    pairs = [tuple(record["pair"]) for record in records]
-    segments = [str(record["segment"]) for record in records]
-    return {
-        "status": "PASS",
-        "method": "adaptive_discrete_interpolation",
-        "resolutions": [str(record["resolution"]) for record in records],
-        "sample_counts": [int(record["sample_count"]) for record in records],
-        "min_distance_m": distances,
-        "max_abs_change_from_first_m": float(np.max(np.abs(np.asarray(distances) - distances[0]))),
-        "nearest_pair_stable": len(set(pairs)) == 1,
-        "critical_segment_stable": len(set(segments)) == 1,
-        "collision_counts": [int(record["collision_samples"]) for record in records],
-        "strict_continuous_collision_detection": "NOT_AVAILABLE",
+def _resolution_step_rad(value: Any) -> float:
+    """Parse an explicitly unit-labelled angular sampling resolution."""
+    if isinstance(value, bool):
+        raise ValueError("resolution_must_be_positive")
+    if isinstance(value, (int, float, np.integer, np.floating)):
+        step = float(value)
+    elif isinstance(value, str):
+        match = re.fullmatch(
+            r"\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(deg|rad)\s*",
+            value,
+        )
+        if match is None:
+            raise ValueError("resolution_must_have_numeric_value_and_unit")
+        step = float(match.group(1))
+        if match.group(2) == "deg":
+            step = float(np.deg2rad(step))
+    else:
+        raise ValueError("resolution_must_have_numeric_value_and_unit")
+    if not np.isfinite(step) or step <= 0.0:
+        raise ValueError("resolution_must_be_positive")
+    return step
+
+
+def _convergence_observation(record: Mapping[str, Any], index: int) -> dict[str, Any]:
+    required = {
+        "resolution", "sample_count", "min_robot_world_signed_distance_m",
+        "pair", "segment", "collision_samples",
     }
+    missing = sorted(required.difference(record))
+    if missing:
+        raise ValueError(f"record_{index}_missing_fields:{','.join(missing)}")
+    sample_count = record["sample_count"]
+    collision_samples = record["collision_samples"]
+    if isinstance(sample_count, bool) or not isinstance(sample_count, (int, np.integer)) or sample_count <= 0:
+        raise ValueError(f"record_{index}_sample_count_must_be_positive_integer")
+    if isinstance(collision_samples, bool) or not isinstance(collision_samples, (int, np.integer)):
+        raise ValueError(f"record_{index}_collision_samples_must_be_integer")
+    if collision_samples < 0 or collision_samples > sample_count:
+        raise ValueError(f"record_{index}_collision_samples_out_of_range")
+    distance = float(record["min_robot_world_signed_distance_m"])
+    if not np.isfinite(distance):
+        raise ValueError(f"record_{index}_distance_must_be_finite")
+    pair = record["pair"]
+    if isinstance(pair, (str, bytes)) or not isinstance(pair, Sequence) or len(pair) != 2 or not all(str(item) for item in pair):
+        raise ValueError(f"record_{index}_pair_must_be_two_nonempty_names")
+    segment = record["segment"]
+    if not isinstance(segment, str) or not segment.strip():
+        raise ValueError(f"record_{index}_segment_must_be_nonempty_string")
+    return {
+        "resolution": str(record["resolution"]),
+        "resolution_step_rad": _resolution_step_rad(record["resolution"]),
+        "sample_count": int(sample_count),
+        "min_robot_world_signed_distance_m": distance,
+        "pair": [str(pair[0]), str(pair[1])],
+        "segment": segment,
+        "collision_samples": int(collision_samples),
+    }
+
+
+def discrete_convergence_summary(
+    records: Sequence[Mapping[str, Any]],
+    *,
+    distance_tolerance_m: float | None = None,
+) -> dict[str, Any]:
+    """Summarize sampled-resolution evidence without calling it CCD.
+
+    A convergence claim requires three coarse-to-fine records, strictly
+    increasing sample counts, and a caller-declared numerical tolerance.  No
+    tolerance is inferred from the observed values, because doing so would
+    make the acceptance criterion self-fulfilling.  Pair and segment changes
+    are retained as independent diagnostics rather than being conflated with
+    the scalar distance criterion.
+    """
+    result: dict[str, Any] = {
+        "status": "INSUFFICIENT_EVIDENCE",
+        "method": "adaptive_discrete_interpolation",
+        "resolutions": [],
+        "resolution_steps_rad": [],
+        "sample_counts": [],
+        "min_distance_m": [],
+        "raw_observations": [],
+        "distance_changes_m": [],
+        "max_abs_change_from_first_m": None,
+        "max_abs_change_between_adjacent_m": None,
+        "distance_tolerance_m": None,
+        "distance_converged": None,
+        "nearest_pair_stable": None,
+        "critical_segment_stable": None,
+        "collision_counts": [],
+        "collision_status_stable": None,
+        "strict_continuous_collision_detection": "NOT_AVAILABLE",
+        "validation_errors": [],
+    }
+    if not isinstance(records, Sequence) or isinstance(records, (str, bytes)) or not records:
+        result["validation_errors"].append("convergence_records_empty")
+        return result
+
+    observations: list[dict[str, Any]] = []
+    for index, record in enumerate(records):
+        if not isinstance(record, Mapping):
+            result["validation_errors"].append(f"record_{index}_must_be_mapping")
+            continue
+        try:
+            observation = _convergence_observation(record, index)
+        except (TypeError, ValueError, OverflowError) as error:
+            result["validation_errors"].append(str(error))
+            continue
+        observations.append(observation)
+    result["raw_observations"] = observations
+    result["resolutions"] = [item["resolution"] for item in observations]
+    result["resolution_steps_rad"] = [item["resolution_step_rad"] for item in observations]
+    result["sample_counts"] = [item["sample_count"] for item in observations]
+    result["min_distance_m"] = [item["min_robot_world_signed_distance_m"] for item in observations]
+    result["collision_counts"] = [item["collision_samples"] for item in observations]
+
+    if len(observations) < 3:
+        result["validation_errors"].append("at_least_three_refinements_required")
+    if distance_tolerance_m is None:
+        result["validation_errors"].append("distance_tolerance_not_declared")
+    else:
+        try:
+            tolerance = float(distance_tolerance_m)
+        except (TypeError, ValueError, OverflowError):
+            tolerance = float("nan")
+        if not np.isfinite(tolerance) or tolerance <= 0.0:
+            result["validation_errors"].append("distance_tolerance_must_be_positive_and_finite")
+        else:
+            result["distance_tolerance_m"] = tolerance
+
+    if observations:
+        steps = np.asarray(result["resolution_steps_rad"], dtype=np.float64)
+        counts = np.asarray(result["sample_counts"], dtype=np.int64)
+        if len(observations) > 1 and not np.all(np.diff(steps) < 0.0):
+            result["validation_errors"].append("resolutions_must_be_strictly_coarse_to_fine")
+        if len(observations) > 1 and not np.all(np.diff(counts) > 0):
+            result["validation_errors"].append("sample_counts_must_increase_with_refinement")
+        distances = np.asarray(result["min_distance_m"], dtype=np.float64)
+        pairs = [tuple(item["pair"]) for item in observations]
+        segments = [item["segment"] for item in observations]
+        collision_status = [item["collision_samples"] > 0 for item in observations]
+        result["nearest_pair_stable"] = len(set(pairs)) == 1
+        result["critical_segment_stable"] = len(set(segments)) == 1
+        result["collision_status_stable"] = len(set(collision_status)) == 1
+        if len(distances) > 1:
+            changes = np.abs(np.diff(distances))
+            result["distance_changes_m"] = changes.tolist()
+            result["max_abs_change_between_adjacent_m"] = float(np.max(changes))
+            result["max_abs_change_from_first_m"] = float(np.max(np.abs(distances - distances[0])))
+            if result["distance_tolerance_m"] is not None:
+                result["distance_converged"] = bool(np.all(changes <= result["distance_tolerance_m"]))
+
+    if not result["validation_errors"]:
+        if result["distance_converged"] and result["collision_status_stable"]:
+            result["status"] = "CONVERGED"
+        else:
+            result["status"] = "NOT_CONVERGED"
+    return result
 
 
 def specification_summary() -> dict[str, Any]:

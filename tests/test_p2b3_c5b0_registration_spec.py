@@ -4,6 +4,7 @@ import math
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from src.p2b3_c5b0_registration_spec import (
     BASE_LEFT,
@@ -15,10 +16,24 @@ from src.p2b3_c5b0_registration_spec import (
     failure_predicate_taxonomy,
     se3_adjoint,
     se3_exp,
+    se3_inverse,
     transform_c4_scene_manifest,
     transform_normals,
     transform_points,
 )
+
+
+def _convergence_record(**overrides):
+    record = {
+        "resolution": "0.5deg",
+        "sample_count": 858,
+        "min_robot_world_signed_distance_m": 0.08004969620976321,
+        "pair": ["upperarm_link", "horseshoe_wall_026"],
+        "segment": "85->86",
+        "collision_samples": 0,
+    }
+    record.update(overrides)
+    return record
 
 
 def test_base_left_identity_and_workpiece_local_identity_are_exact():
@@ -97,7 +112,84 @@ def test_discrete_resolution_convergence_bookkeeping_is_not_ccd():
         {"resolution": "0.25deg", "sample_count": 1653, "min_robot_world_signed_distance_m": 0.08004804691553469, "pair": ["upperarm_link", "horseshoe_wall_026"], "segment": "85->86", "collision_samples": 0},
         {"resolution": "0.1deg", "sample_count": 3983, "min_robot_world_signed_distance_m": 0.08004767537031543, "pair": ["upperarm_link", "horseshoe_wall_026"], "segment": "85->86", "collision_samples": 0},
     ])
-    assert summary["status"] == "PASS"
+    # The archived C5A rows preserve the expected numerical trend, but the
+    # old closure did not declare an acceptance tolerance.  The hotfix must
+    # therefore keep the evidence and refuse to promote it implicitly.
+    assert summary["status"] == "INSUFFICIENT_EVIDENCE"
     assert summary["nearest_pair_stable"] and summary["critical_segment_stable"]
     assert summary["strict_continuous_collision_detection"] == "NOT_AVAILABLE"
     assert summary["max_abs_change_from_first_m"] < 3.0e-6
+
+
+def test_convergence_rejects_material_distance_change():
+    summary = discrete_convergence_summary([
+        _convergence_record(resolution="0.5deg", sample_count=100),
+        _convergence_record(resolution="0.25deg", sample_count=200, min_robot_world_signed_distance_m=0.079),
+        _convergence_record(resolution="0.1deg", sample_count=400, min_robot_world_signed_distance_m=0.078),
+    ], distance_tolerance_m=1.0e-4)
+    assert summary["status"] == "NOT_CONVERGED"
+    assert summary["distance_converged"] is False
+
+
+def test_convergence_rejects_coarse_free_fine_collision():
+    summary = discrete_convergence_summary([
+        _convergence_record(resolution="0.5deg", sample_count=100),
+        _convergence_record(resolution="0.25deg", sample_count=200, collision_samples=1),
+        _convergence_record(resolution="0.1deg", sample_count=400, collision_samples=1),
+    ], distance_tolerance_m=0.1)
+    assert summary["status"] == "NOT_CONVERGED"
+    assert summary["collision_status_stable"] is False
+
+
+def test_convergence_reports_pair_and_segment_switches_independently():
+    summary = discrete_convergence_summary([
+        _convergence_record(resolution="0.5deg", sample_count=100),
+        _convergence_record(resolution="0.25deg", sample_count=200, pair=["link_a", "object_a"]),
+        _convergence_record(resolution="0.1deg", sample_count=400, segment="12->13"),
+    ], distance_tolerance_m=0.1)
+    assert summary["status"] == "CONVERGED"
+    assert summary["nearest_pair_stable"] is False
+    assert summary["critical_segment_stable"] is False
+
+
+def test_convergence_is_insufficient_without_declared_tolerance_or_evidence():
+    summary = discrete_convergence_summary([_convergence_record()])
+    assert summary["status"] == "INSUFFICIENT_EVIDENCE"
+    assert any(error.startswith("at_least_three_refinements") for error in summary["validation_errors"])
+    assert "distance_tolerance_not_declared" in summary["validation_errors"]
+
+
+def test_convergence_is_insufficient_for_incomplete_record():
+    summary = discrete_convergence_summary([
+        _convergence_record(resolution="0.5deg", sample_count=100),
+        {"resolution": "0.25deg", "sample_count": 200},
+        _convergence_record(resolution="0.1deg", sample_count=400),
+    ], distance_tolerance_m=0.1)
+    assert summary["status"] == "INSUFFICIENT_EVIDENCE"
+    assert any("missing_fields" in error for error in summary["validation_errors"])
+
+
+def test_identity_does_not_bypass_registration_validation():
+    with pytest.raises(ValueError, match="unknown_registration_convention"):
+        apply_registration(np.eye(4), np.eye(4), "UNKNOWN")
+    with pytest.raises(ValueError, match="WORKPIECE_LOCAL_requires_workpiece_transform"):
+        apply_registration(np.eye(4), np.eye(4), WORKPIECE_LOCAL)
+
+
+@pytest.mark.parametrize(
+    "bad_transform",
+    [
+        np.diag([2.0, 1.0, 1.0, 1.0]),
+        np.diag([-1.0, 1.0, 1.0, 1.0]),
+        np.array([[1.0, 0.1, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]),
+        np.array([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.1, 1.0]]),
+        np.array([[np.nan, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]),
+    ],
+)
+def test_se3_entry_points_reject_non_rigid_transforms(bad_transform):
+    with pytest.raises(ValueError):
+        se3_adjoint(bad_transform)
+    with pytest.raises(ValueError):
+        se3_inverse(bad_transform)
+    with pytest.raises(ValueError):
+        apply_registration(np.eye(4), bad_transform, BASE_LEFT)
