@@ -8,7 +8,7 @@ import pytest
 from src.p2b3_c5b1_boundary import (
     PREDICATES, classify, ray_transform, rays, scan_ray, scan_all, DEFAULT_LIMITS,
 )
-from scripts.run_p2b3_c5b1_boundary import fixture_evaluator
+from scripts.run_p2b3_c5b1_boundary import fixture_evaluator, native_distance_coverage, parse_ray_selection
 
 
 def known(m, collision=False):
@@ -51,6 +51,25 @@ def test_distance_collision_count_inconsistent_is_unknown():
     p = known(0.0)
     p["robot_world_collision_samples"] = 1
     assert classify(p)["robot_world_collision"] == "UNKNOWN"
+
+
+def test_native_plural_distance_sample_fields_are_authenticated():
+    raw = {
+        "robot_world_distance_valid_samples": 858,
+        "self_distance_valid_samples": 858,
+        # The old singular spellings must not accidentally become authoritative.
+        "robot_world_distance_valid_sample_count": 0,
+        "self_distance_valid_sample_count": 0,
+    }
+    assert native_distance_coverage(raw, "robot_world") is True
+    assert native_distance_coverage(raw, "self") is True
+    assert native_distance_coverage({"robot_world_distance_valid_sample_count": 858}, "robot_world") is False
+
+
+def test_ray_selection_is_explicit_and_fail_closed():
+    assert parse_ray_selection("tx-, tx+, rz-") == (("tx", -1), ("tx", 1), ("rz", -1))
+    with pytest.raises(ValueError):
+        parse_ray_selection("tx-,tx-,bad")
 
 
 def test_process_engineering_thresholds_separate_from_collision():
@@ -143,6 +162,15 @@ def test_pilot_synthetic_four_rays_then_all_twelve():
     assert all(set(ray["predicates"]) == set(PREDICATES) for ray in all_axes["rays"])
     assert all(ray["evaluation_count"] <= 100 for ray in all_axes["rays"])
     assert all("infinite" not in str(ray).lower() for ray in all_axes["rays"])
+
+
+def test_blocked_stage_contract_keeps_partial_results_visible():
+    # The native runner writes a PARTIAL/BLOCKED document before returning its
+    # nonzero status when a completed stage blocks expansion.
+    document = {"task_status": "PARTIAL", "execution_status": "BLOCKED", "stages": {"pilot": {"ray_count": 4}}}
+    assert document["task_status"] == "PARTIAL"
+    assert document["execution_status"] == "BLOCKED"
+    assert document["stages"]["pilot"]["ray_count"] == 4
 
 
 @pytest.mark.parametrize("bad", [float("nan"), float("inf"), -0.001, 0.0])

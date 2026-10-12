@@ -52,11 +52,23 @@ def git_blob_sha1(content: bytes) -> str:
     return hashlib.sha1(header + content).hexdigest()
 
 
+def git_worktree_blob_sha1(path: Path, root: Path) -> str:
+    """Read the tracked blob through Git so Windows line-ending filters do not create false drift."""
+    completed = subprocess.run(
+        ["git", "-C", str(root), "hash-object", "--", str(path)],
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    return completed.stdout.strip()
+
+
 def check(root: Path) -> None:
     for relative, expected in PINS.items():
         path = root / relative
         require(path.is_file(), f"MISSING:{relative}")
-        actual = git_blob_sha1(path.read_bytes())
+        actual = git_worktree_blob_sha1(path, root)
         require(actual == expected, f"FROZEN_BLOB_MISMATCH:{relative}:{actual}")
     print(f"PINNED_FILES_PASS={len(PINS)}")
 

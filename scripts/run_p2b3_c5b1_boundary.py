@@ -25,6 +25,29 @@ from src.p2b3_c5b1_boundary import DEFAULT_LIMITS, scan_all, ray_transform
 from scripts.verify_p2b3_c5b1_frozen_baseline import check as check_frozen
 
 PILOT = (("tx", -1), ("tx", 1), ("rx", -1), ("rx", 1))
+RAY_LABELS = {f"{axis}{'+' if sign > 0 else '-'}": (axis, sign) for axis, sign in (
+    (axis, sign) for axis in ("tx", "ty", "tz", "rx", "ry", "rz") for sign in (-1, 1)
+)}
+
+
+def native_distance_coverage(raw: Mapping[str, Any], domain: str, expected_samples: int = 858) -> bool:
+    """Return coverage from the native C++ evaluator's plural sample-count fields."""
+    field = {
+        "robot_world": "robot_world_distance_valid_samples",
+        "self": "self_distance_valid_samples",
+    }.get(domain)
+    if field is None:
+        raise ValueError(f"unsupported_native_distance_domain:{domain}")
+    return raw.get(field) == expected_samples
+
+
+def parse_ray_selection(value: str | None) -> tuple[tuple[str, int], ...] | None:
+    if value is None:
+        return None
+    labels = [item.strip().lower() for item in value.split(",") if item.strip()]
+    if not labels or len(set(labels)) != len(labels) or any(item not in RAY_LABELS for item in labels):
+        raise ValueError("invalid_ray_selection")
+    return tuple(RAY_LABELS[item] for item in labels)
 
 
 def fixture_evaluator(axis: str, sign: int, magnitude: float) -> dict[str, Any]:
@@ -147,8 +170,8 @@ class NativeEvaluator:
         world = raw.get("minimum_robot_world_clearance") or {}
         return {
             "backend_status": "REAL_FR5_C5A_NATIVE_FCL_SAMPLED",
-            "robot_world_collision_coverage": raw.get("robot_world_distance_valid_sample_count") == 858,
-            "self_collision_coverage": raw.get("self_distance_valid_sample_count") == 858,
+            "robot_world_collision_coverage": native_distance_coverage(raw, "robot_world"),
+            "self_collision_coverage": native_distance_coverage(raw, "self"),
             "robot_world_distance_m": distance("minimum_robot_world_clearance"),
             "self_distance_m": distance("minimum_self_clearance"),
             "robot_world_collision_samples": raw.get("robot_world_collision_samples"),
@@ -185,13 +208,16 @@ def main() -> int:
     ap.add_argument("--coarse-steps", type=int, default=8)
     ap.add_argument("--max-evaluations-per-ray", type=int, default=80)
     ap.add_argument("--native-timeout", type=int, default=300)
+    ap.add_argument("--rays", help="comma-separated signed ray labels for bounded parallel shards, e.g. tx-,tx+,rx-,rx+")
     args = ap.parse_args()
     if args.output_json.resolve().is_relative_to(ROOT):
         ap.error("--output-json must be outside repository")
     if args.output_json.exists():
         ap.error("--output-json must not overwrite prior results")
     # Never proceed with an identity violation, including in fixture mode.
+    stages = {}
     try:
+        selection = parse_ray_selection(args.rays)
         check_frozen(ROOT)
         if args.backend == "native":
             if args.scratch is None or args.native_binary is None:
@@ -199,7 +225,6 @@ def main() -> int:
             backend = NativeEvaluator(args.scratch.resolve(), args.native_binary.resolve(), args.native_timeout)
         else:
             backend = fixture_evaluator
-        stages = {}
         if args.mode in ("pilot", "staged"):
             pilot = scan_all(backend, limits=DEFAULT_LIMITS["pilot"],
                              coarse_steps=args.coarse_steps,
@@ -216,15 +241,19 @@ def main() -> int:
         if args.mode in ("all", "staged"):
             stages["all"] = scan_all(backend, limits=DEFAULT_LIMITS["all"],
                                       coarse_steps=args.coarse_steps,
-                                      max_evaluations_per_ray=args.max_evaluations_per_ray)
+                                      max_evaluations_per_ray=args.max_evaluations_per_ray,
+                                      selection=selection)
         result = {
             "schema": "p2b3-c5b1-signed-boundary-v1",
             "project": "FAIRINO_FR5", "backend": args.backend,
             "measurement_type": "SYNTHETIC_TEST_NOT_FR5" if args.backend == "fixture" else "NATIVE_FR5_FCL_SAMPLED",
+            "task_status": "COMPLETE",
+            "execution_status": "COMPLETE",
             "source_hotfix_commit": "ad842009562351c8b4a587fd9cd42dbfb3d03cb0",
             "c1_nominal_semantic_sha256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
             "c4_manifest_semantic_sha256": "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669",
             "registration": "BASE_LEFT", "q_and_timestamps_mutated": False,
+            "selected_rays": args.rays,
             "stages": stages, "strict_self_ccd": "NOT_AVAILABLE",
             "physical_registration_bound": "NOT_AVAILABLE",
             "coating_quality_failure_predicate": "NOT_AVAILABLE",
@@ -237,6 +266,27 @@ def main() -> int:
                           "result_json": str(args.output_json)}))
         return 0
     except Exception as exc:
+        if stages and not args.output_json.exists():
+            partial = {
+                "schema": "p2b3-c5b1-signed-boundary-v1",
+                "project": "FAIRINO_FR5", "backend": args.backend,
+                "measurement_type": "SYNTHETIC_TEST_NOT_FR5" if args.backend == "fixture" else "NATIVE_FR5_FCL_SAMPLED",
+                "task_status": "PARTIAL",
+                "execution_status": "BLOCKED",
+                "error": f"{type(exc).__name__}: {exc}"[:800],
+                "source_hotfix_commit": "ad842009562351c8b4a587fd9cd42dbfb3d03cb0",
+                "c1_nominal_semantic_sha256": "be697bcb976cb69d349ee6c549364ba39041d9f0bda1b57d7f215129f8d5cbb3",
+                "c4_manifest_semantic_sha256": "f2a73cfe736d8379d9b5149bbd69fc98cfba09004f519c1975e2084e80eb0669",
+                "registration": "BASE_LEFT", "q_and_timestamps_mutated": False,
+                "selected_rays": args.rays,
+                "stages": stages, "strict_self_ccd": "NOT_AVAILABLE",
+                "physical_registration_bound": "NOT_AVAILABLE",
+                "coating_quality_failure_predicate": "NOT_AVAILABLE",
+                "global_minimum_failure_proven": False,
+            }
+            args.output_json.parent.mkdir(parents=True, exist_ok=True)
+            args.output_json.write_text(json.dumps(partial, indent=2, allow_nan=False, sort_keys=True) + "\n")
+            print(f"PARTIAL_RESULT_JSON={args.output_json}")
         print(f"C5B1_SCAN_BLOCKED:{type(exc).__name__}:{exc}", file=sys.stderr)
         return 2
 
