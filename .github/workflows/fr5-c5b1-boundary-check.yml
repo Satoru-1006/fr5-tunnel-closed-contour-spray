@@ -21,3 +21,9 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python -m pytest -q -p no:cacheprovider tests/test_p2b3_c5b1_boundary.py
+      - name: Execute staged synthetic pilot then all twelve rays
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python scripts/run_p2b3_c5b1_boundary.py --backend fixture --mode staged --output-json "${{ runner.temp }}/c5b1_synthetic.json"
+          python -c 'import json,sys; v=json.load(open(sys.argv[1])); assert v["measurement_type"] == "SYNTHETIC_TEST_NOT_FR5"; assert v["stages"]["pilot"]["ray_count"] == 4 and v["stages"]["all"]["ray_count"] == 12; print("SYNTHETIC_STAGED_4_AND_12_RAYS=PASS_NOT_FR5")' "${{ runner.temp }}/c5b1_synthetic.json"
