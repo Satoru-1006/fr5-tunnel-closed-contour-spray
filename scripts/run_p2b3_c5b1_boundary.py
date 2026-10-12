@@ -164,7 +164,7 @@ class NativeEvaluator:
                     "sample": world.get("critical_sample", {}).get("sample_index"),
                 },
                 "self_collision": {
-                    "waypoint": (raw.get("minimum_self_clearance") or {}).get("waypoint_index"),
+                    "waypoint": (raw.get("minimum_self_clearance") or {}).get("critical_sample", {}).get("waypoint_index"),
                     "segment": (raw.get("minimum_self_clearance") or {}).get("critical_sample", {}).get("segment"),
                     "sample": (raw.get("minimum_self_clearance") or {}).get("critical_sample", {}).get("sample_index"),
                 },
