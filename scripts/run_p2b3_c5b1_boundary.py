@@ -156,7 +156,21 @@ class NativeEvaluator:
             "max_position_error_m": metrics["max_position_error_m"],
             "max_normal_error_deg": math.degrees(metrics["max_normal_error_rad"]),
             "critical_waypoint": metrics["critical_position_waypoint"],
-            "critical_segment": world.get("segment"),
+            "critical_segment": world.get("critical_sample", {}).get("segment"),
+            "critical_locations": {
+                "robot_world_collision": {
+                    "waypoint": world.get("critical_sample", {}).get("waypoint_index"),
+                    "segment": world.get("critical_sample", {}).get("segment"),
+                    "sample": world.get("critical_sample", {}).get("sample_index"),
+                },
+                "self_collision": {
+                    "waypoint": (raw.get("minimum_self_clearance") or {}).get("waypoint_index"),
+                    "segment": (raw.get("minimum_self_clearance") or {}).get("critical_sample", {}).get("segment"),
+                    "sample": (raw.get("minimum_self_clearance") or {}).get("critical_sample", {}).get("sample_index"),
+                },
+                "position_diagnostic": {"waypoint": metrics["critical_position_waypoint"], "segment": None},
+                "normal_diagnostic": {"waypoint": metrics["critical_normal_waypoint"], "segment": None},
+            },
             "failure_mode": "MODEL_COLLISION_OR_ENGINEERING_GEOMETRY_GATE",
         }
 
