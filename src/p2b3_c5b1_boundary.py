@@ -98,6 +98,7 @@ def _observation(
             "statuses": states,
             "critical_waypoint": raw.get("critical_waypoint"),
             "critical_segment": raw.get("critical_segment"),
+            "critical_locations": raw.get("critical_locations", {}),
             "failure_mode": raw.get("failure_mode"),
             "metrics": {k: raw.get(k) for k in (
                 "robot_world_distance_m", "self_distance_m",
@@ -112,6 +113,7 @@ def _observation(
             "statuses": {name: "UNKNOWN" for name in PREDICATES},
             "critical_waypoint": None,
             "critical_segment": None,
+            "critical_locations": {},
             "failure_mode": None,
             "metrics": {},
             "backend_status": "ERROR",
@@ -182,12 +184,15 @@ def scan_ray(
                 else:
                     b = middle["magnitude"]
             else:
+                evidence = cache[round(b if high_status == "FAIL" else a, 15)]
+                location = evidence["critical_locations"].get(predicate, {})
                 transitions.append({
                     "from": low_status, "to": high_status,
                     "a": a, "b": b, "width": b-a,
-                    "critical_waypoint": cache[round(b if high_status == "FAIL" else a, 15)]["critical_waypoint"],
-                    "critical_segment": cache[round(b if high_status == "FAIL" else a, 15)]["critical_segment"],
-                    "failure_mode": cache[round(b if high_status == "FAIL" else a, 15)]["failure_mode"],
+                    "critical_waypoint": location.get("waypoint", evidence["critical_waypoint"]),
+                    "critical_segment": location.get("segment", evidence["critical_segment"]),
+                    "failure_mode": predicate,
+                    "critical_sample": location.get("sample"),
                 })
                 continue
             # Do not promote an unfinished bracket to a measured boundary.
