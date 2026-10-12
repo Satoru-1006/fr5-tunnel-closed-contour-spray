@@ -1,0 +1,23 @@
+name: FR5 C5B1 bounded search kernel (no ROS)
+on:
+  push:
+    branches:
+      - codex/fr5-p2b3-c5b1-boundary-search-20261012
+  workflow_dispatch:
+jobs:
+  freeze-and-kernel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen C1/C4 blob and baseline identity check
+        run: python scripts/verify_p2b3_c5b1_frozen_baseline.py
+      - name: Install lightweight test dependency
+        run: python -m pip install pytest
+      - name: C5B1 signed search adversarial tests
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -m pytest -q -p no:cacheprovider tests/test_p2b3_c5b1_boundary.py
