@@ -18,7 +18,7 @@ Canonical identities: C1 trajectory semantic SHA-256 `be697bcb976cb69d349ee6c549
 - No transition within sampled domain is labeled `NO_FAILURE_OBSERVED_WITHIN_DOMAIN` only if no FAIL/UNKNOWN was observed; this is *not* proof of absence in unsampled interior. `first_observed_entry` is the smallest resolved *observed* PASS→FAIL bracket, never a globally certified minimum.
 - `scripts/run_p2b3_c5b1_boundary.py` orchestrates four-ray pilot followed by all twelve rays. Default is `--backend native`: accepts a prebuilt, authenticated C5A C++ FCL evaluator, checks the frozen baseline, creates new external scratch, writes frozen q-only rows and transformed authoritative C4 scene CSV per amplitude, calls the native executable for each sample, reads native C5A sample distances/collision counts and fresh FK rows, then applies C5A process metrics and C1 frozen projector.
 - A deliberate `--backend fixture` option supports synthetic known-answer testing only and is labeled `SYNTHETIC_TEST_NOT_FR5`. It must never appear as a measured FR5 margin.
-- `tests/test_p2b3_c5b1_boundary.py` contains tests for 12 signed rays, multiple non-monotonic boundaries, bracketing refinement, UNKNOWN at coarse/midpoint, baseline FAIL, no-failure finite-domain semantics, budget exhaustion, and pilot→12-ray fixture layout.
+- `tests/test_p2b3_c5b1_boundary.py` contains tests for 12 signed rays, multiple non-monotonic boundaries, bracketing refinement, UNKNOWN at coarse/midpoint, baseline FAIL, no-failure finite-domain semantics, budget exhaustion, and pilot→12-ray fixture layout. GitHub Actions run 38212910487 completed successfully: **17 passed in 0.06s**; the read-only freeze gate also passed 8 pinned file identities.
 
 ### Frozen protocol defaults (engineering search domains, not measured error bounds)
 
@@ -50,9 +50,9 @@ All twelve signed rays have the old two nonzero-amplitude endpoint observations.
 
 | Gate | Evidence | Status |
 |---|---|---|
-| Frozen authority remains unchanged | New isolated branch, input hashes/byte identities pinned by prior freeze; inspect Git compare | STRUCTURALLY_GUARDED; new branch compare to be read back |
+| Frozen authority remains unchanged | Git compare against Step 1 and GitHub Actions frozen input checker (8 pins) | PASS; no frozen input files changed |
 | Search and native adapter | Source files written to GitHub | IMPLEMENTED; fresh ROS/MoveIt runtime replay NOT_RUN |
-| Adversarial tests | Test module committed | ADDED_NOT_EXECUTED in this session |
+| Adversarial tests | GitHub Actions 38212910487, full job log and test summary | CI_PASS: 17 passed, 0 failed; no ROS/native in CI |
 | Pilot historical four-ray reference | C5A Drive source read | ARCHIVAL_DATA_VERIFIED, not fresh pilot |
 | 12-axis historical discrete endpoint reference | C5A Drive source read | ARCHIVAL_DATA_VERIFIED, not fresh 12-ray campaign |
 | Native C5B1 pilot and full 12-ray campaign | Requires existing WSL2 Jazzy/MoveIt native build and sourced runtime | NOT_RUN |
@@ -63,7 +63,7 @@ Native FCL `distanceRobot()` and `distanceSelf()` are distinct; configured colli
 
 ## Reproduction (from frozen C5B1 branch, outputs outside repo)
 
-First run the pure tests in the proper environment (not executed here):
+The following pure Python tests were executed successfully by GitHub Actions (17 passed). Independently rerun them in the FR5 runtime if needed:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/test_p2b3_c5b1_boundary.py
@@ -81,4 +81,6 @@ python3 scripts/run_p2b3_c5b1_boundary.py \
 
 A fresh scratch path and a new result path are required; no historical result is overwritten. `staged` performs a 4-ray bounded pilot, blocks further native expansion on an UNKNOWN pilot, and then attempts all 12 signed directions. For fixture-only contract inspection, run `--backend fixture --mode staged` with an external `--output-json`; its output must be labeled synthetic, never FR5 measurements.
 
-**Required before claiming STEP2_NATIVE_COMPLETE:** independent local pytest PASS receipt, frozen baseline gate PASS, real native 4-ray pilot PASS/FAIL/UNKNOWN ledger, real 12-ray observations and brackets, clean source tree/recorded exact Git SHA, and result JSON uploaded and read back in Drive. Do not claim full C5B1 research completion on the basis of this code-only delivery.
+**CI evidence:** https://github.com/Satoru-1006/fr5-tunnel-closed-contour-spray/actions/runs/38212910487 — freeze check 8/8 pinned blobs PASS and C5B1 pure pytest 17 passed. 
+
+**Required before claiming STEP2_NATIVE_COMPLETE:** native FR5 environment validation, real native 4-ray pilot PASS/FAIL/UNKNOWN ledger, real 12-ray observations and brackets, clean source tree/recorded exact Git SHA, and result JSON uploaded and read back in Drive. Do not claim full C5B1 research completion on the basis of this code-only delivery.
