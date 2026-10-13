@@ -1,0 +1,674 @@
+{
+  "ccd": "NOT_ASSESSED",
+  "coating_quality": "NOT_ASSESSED",
+  "input_identity_status": "FROZEN_HASH_VERIFIED",
+  "input_sha256": {
+    "C1_FK": "ed8cffa87dae845df0dcc3cf50f88225e3f72b1fa425acce6def08e7ee60acee",
+    "C1_TARGET": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7",
+    "C5B1_NATIVE_RESULT": "20dd1df5a2c4a1239f3a8079d70cb0932c80b9b57b70c94064d3614ea14ee31a"
+  },
+  "measured_surface": "NOT_AVAILABLE",
+  "numerical_tolerances": {
+    "edge_parameter": 1e-09,
+    "equivalent_normal_deg": 1e-06,
+    "hit_group_m": 1e-09,
+    "parallel_cos": 1e-12,
+    "plane_m": 1e-10
+  },
+  "project": "FAIRINO_FR5",
+  "rays": [
+    {
+      "archive_normal_10deg_bracket_m": [
+        0.014599609375,
+        0.014609375
+      ],
+      "probes": [
+        {
+          "amplitude_m": 0.0,
+          "measurement": {
+            "continuous_collision": "NOT_ASSESSED",
+            "coplanar_uncertain_waypoints": [],
+            "extrema_on_confirmed_hits_only": {
+              "axial_standoff_delta_m": {
+                "abs_value_m": 2.4659716225339245e-05,
+                "waypoint": 90
+              },
+              "landing_offset_material_reference_m": {
+                "abs_value_m": 0.003626323643770214,
+                "waypoint": 90
+              },
+              "normal_geometric_angle_interval_deg": {
+                "upper_deg": 1.371493954191462,
+                "waypoint": 14
+              },
+              "normal_interpolated_angle_interval_deg": {
+                "upper_deg": 0.7990500294533369,
+                "waypoint": 90
+              }
+            },
+            "first_critical_hit": {
+              "axial_standoff_delta_m": 2.4659716225339245e-05,
+              "distance_m": 0.26002465971622535,
+              "facet_normal_separation_deg": 0.0,
+              "landing_offset_material_reference_m": 0.003626323643770214,
+              "member_hit_count": 1,
+              "normal_geometric_angle_interval_deg": [
+                1.0878001343708985,
+                1.0878001343708985
+              ],
+              "normal_geometric_candidate_vectors_base": [
+                [
+                  -0.005467558400631716,
+                  -0.0,
+                  0.9999850527908584
+                ]
+              ],
+              "normal_interpolated_angle_interval_deg": [
+                0.7990500294533369,
+                0.7990500294533369
+              ],
+              "normal_interpolated_candidate_vectors_base": [
+                [
+                  0.007521269354373867,
+                  9.210594240175765e-19,
+                  0.9999717148536249
+                ]
+              ],
+              "participating_segment_ids": [
+                90
+              ],
+              "point_base_xyz_m": [
+                0.004395533757921989,
+                -0.09637399608765647,
+                0.899966618743268
+              ]
+            },
+            "multiple_distinct_hits_waypoints": [],
+            "no_forward_hit_waypoints": [
+              0
+            ],
+            "normal_certainty": "PARTIAL_OR_AMBIGUOUS",
+            "normal_nonunique_or_unavailable_waypoints": [
+              0
+            ],
+            "physical_coating_quality": "NOT_ASSESSED",
+            "point_hit_waypoints": 180,
+            "position_certainty": "PARTIAL_OR_INDETERMINATE",
+            "position_indeterminate_waypoints": [
+              0
+            ],
+            "scope": "FINITE_C1_DESIGN_POLYGONAL_STRIP_NOT_MEASURED_TUNNEL",
+            "shared_edge_multiple_normal_waypoints": [],
+            "waypoint_count": 181
+          },
+          "signed_base_tz_m": -0.0
+        },
+        {
+          "amplitude_m": 0.014599609375,
+          "measurement": {
+            "continuous_collision": "NOT_ASSESSED",
+            "coplanar_uncertain_waypoints": [],
+            "extrema_on_confirmed_hits_only": {
+              "axial_standoff_delta_m": {
+                "abs_value_m": 0.014580690785819223,
+                "waypoint": 89
+              },
+              "landing_offset_material_reference_m": {
+                "abs_value_m": 0.014616929280436983,
+                "waypoint": 25
+              },
+              "normal_geometric_angle_interval_deg": {
+                "upper_deg": 1.3702715607237776,
+                "waypoint": 14
+              },
+              "normal_interpolated_angle_interval_deg": {
+                "upper_deg": 2.391861806445993,
+                "waypoint": 14
+              }
+            },
+            "first_critical_hit": {
+              "axial_standoff_delta_m": -0.014580690785819223,
+              "distance_m": 0.2454193092141808,
+              "facet_normal_separation_deg": 0.0,
+              "landing_offset_material_reference_m": 0.0031734510798580072,
+              "member_hit_count": 1,
+              "normal_geometric_angle_interval_deg": [
+                1.007915958260447,
+                1.007915958260447
+              ],
+              "normal_geometric_candidate_vectors_base": [
+                [
+                  0.02066110885905365,
+                  -0.0,
+                  0.9997865365070258
+                ]
+              ],
+              "normal_interpolated_angle_interval_deg": [
+                0.7234489142466811,
+                0.7234489142466811
+              ],
+              "normal_interpolated_candidate_vectors_base": [
+                [
+                  0.03257318860362876,
+                  3.988933372825843e-18,
+                  0.9994693528989232
+                ]
+              ],
+              "participating_segment_ids": [
+                89
+              ],
+              "point_base_xyz_m": [
+                0.01951873031111561,
+                -0.09690246874575877,
+                0.8850557390390068
+              ]
+            },
+            "multiple_distinct_hits_waypoints": [],
+            "no_forward_hit_waypoints": [],
+            "normal_certainty": "COMPLETE",
+            "normal_nonunique_or_unavailable_waypoints": [],
+            "physical_coating_quality": "NOT_ASSESSED",
+            "point_hit_waypoints": 181,
+            "position_certainty": "COMPLETE",
+            "position_indeterminate_waypoints": [],
+            "scope": "FINITE_C1_DESIGN_POLYGONAL_STRIP_NOT_MEASURED_TUNNEL",
+            "shared_edge_multiple_normal_waypoints": [],
+            "waypoint_count": 181
+          },
+          "signed_base_tz_m": -0.014599609375
+        },
+        {
+          "amplitude_m": 0.014609375,
+          "measurement": {
+            "continuous_collision": "NOT_ASSESSED",
+            "coplanar_uncertain_waypoints": [],
+            "extrema_on_confirmed_hits_only": {
+              "axial_standoff_delta_m": {
+                "abs_value_m": 0.014590455837118238,
+                "waypoint": 89
+              },
+              "landing_offset_material_reference_m": {
+                "abs_value_m": 0.014626694814321776,
+                "waypoint": 25
+              },
+              "normal_geometric_angle_interval_deg": {
+                "upper_deg": 1.3702715607237776,
+                "waypoint": 14
+              },
+              "normal_interpolated_angle_interval_deg": {
+                "upper_deg": 2.393460669870623,
+                "waypoint": 14
+              }
+            },
+            "first_critical_hit": {
+              "axial_standoff_delta_m": -0.014590455837118238,
+              "distance_m": 0.24540954416288177,
+              "facet_normal_separation_deg": 0.0,
+              "landing_offset_material_reference_m": 0.0031734006788411984,
+              "member_hit_count": 1,
+              "normal_geometric_angle_interval_deg": [
+                1.007915958260447,
+                1.007915958260447
+              ],
+              "normal_geometric_candidate_vectors_base": [
+                [
+                  0.02066110885905365,
+                  -0.0,
+                  0.9997865365070258
+                ]
+              ],
+              "normal_interpolated_angle_interval_deg": [
+                0.7234497295279951,
+                0.7234497295279951
+              ],
+              "normal_interpolated_candidate_vectors_base": [
+                [
+                  0.03257265649929677,
+                  3.988868210991258e-18,
+                  0.9994693702403187
+                ]
+              ],
+              "participating_segment_ids": [
+                89
+              ],
+              "point_base_xyz_m": [
+                0.019518408966575047,
+                -0.09690259199756555,
+                0.8850459800547589
+              ]
+            },
+            "multiple_distinct_hits_waypoints": [],
+            "no_forward_hit_waypoints": [],
+            "normal_certainty": "COMPLETE",
+            "normal_nonunique_or_unavailable_waypoints": [],
+            "physical_coating_quality": "NOT_ASSESSED",
+            "point_hit_waypoints": 181,
+            "position_certainty": "COMPLETE",
+            "position_indeterminate_waypoints": [],
+            "scope": "FINITE_C1_DESIGN_POLYGONAL_STRIP_NOT_MEASURED_TUNNEL",
+            "shared_edge_multiple_normal_waypoints": [],
+            "waypoint_count": 181
+          },
+          "signed_base_tz_m": -0.014609375
+        },
+        {
+          "amplitude_m": 0.02,
+          "measurement": {
+            "continuous_collision": "NOT_ASSESSED",
+            "coplanar_uncertain_waypoints": [],
+            "extrema_on_confirmed_hits_only": {
+              "axial_standoff_delta_m": {
+                "abs_value_m": 0.019980977686417045,
+                "waypoint": 91
+              },
+              "landing_offset_material_reference_m": {
+                "abs_value_m": 0.02001781698600086,
+                "waypoint": 25
+              },
+              "normal_geometric_angle_interval_deg": {
+                "upper_deg": 4.111734600815129,
+                "waypoint": 13
+              },
+              "normal_interpolated_angle_interval_deg": {
+                "upper_deg": 3.253717210980519,
+                "waypoint": 13
+              }
+            },
+            "first_critical_hit": {
+              "axial_standoff_delta_m": -0.019980977686417045,
+              "distance_m": 0.24001902231358296,
+              "facet_normal_separation_deg": 0.0,
+              "landing_offset_material_reference_m": 0.0032853234672238565,
+              "member_hit_count": 1,
+              "normal_geometric_angle_interval_deg": [
+                1.0583137171382047,
+                1.0583137171382047
+              ],
+              "normal_geometric_candidate_vectors_base": [
+                [
+                  -0.005467558400631716,
+                  -0.0,
+                  0.9999850527908584
+                ]
+              ],
+              "normal_interpolated_angle_interval_deg": [
+                0.7756670300717652,
+                0.7756670300717652
+              ],
+              "normal_interpolated_candidate_vectors_base": [
+                [
+                  -0.017725414401648657,
+                  -2.1706655100393615e-18,
+                  0.9998428925007619
+                ]
+              ],
+              "participating_segment_ids": [
+                90
+              ],
+              "point_base_xyz_m": [
+                -0.01083260517190633,
+                -0.09675168551287604,
+                0.8798833567598019
+              ]
+            },
+            "multiple_distinct_hits_waypoints": [],
+            "no_forward_hit_waypoints": [],
+            "normal_certainty": "COMPLETE",
+            "normal_nonunique_or_unavailable_waypoints": [],
+            "physical_coating_quality": "NOT_ASSESSED",
+            "point_hit_waypoints": 181,
+            "position_certainty": "COMPLETE",
+            "position_indeterminate_waypoints": [],
+            "scope": "FINITE_C1_DESIGN_POLYGONAL_STRIP_NOT_MEASURED_TUNNEL",
+            "shared_edge_multiple_normal_waypoints": [],
+            "waypoint_count": 181
+          },
+          "signed_base_tz_m": -0.02
+        }
+      ],
+      "ray": "tz-"
+    },
+    {
+      "archive_normal_10deg_bracket_m": [
+        0.015595703125,
+        0.01560546875
+      ],
+      "probes": [
+        {
+          "amplitude_m": 0.0,
+          "measurement": {
+            "continuous_collision": "NOT_ASSESSED",
+            "coplanar_uncertain_waypoints": [],
+            "extrema_on_confirmed_hits_only": {
+              "axial_standoff_delta_m": {
+                "abs_value_m": 2.4659716225339245e-05,
+                "waypoint": 90
+              },
+              "landing_offset_material_reference_m": {
+                "abs_value_m": 0.003626323643770214,
+                "waypoint": 90
+              },
+              "normal_geometric_angle_interval_deg": {
+                "upper_deg": 1.371493954191462,
+                "waypoint": 14
+              },
+              "normal_interpolated_angle_interval_deg": {
+                "upper_deg": 0.7990500294533369,
+                "waypoint": 90
+              }
+            },
+            "first_critical_hit": {
+              "axial_standoff_delta_m": 2.4659716225339245e-05,
+              "distance_m": 0.26002465971622535,
+              "facet_normal_separation_deg": 0.0,
+              "landing_offset_material_reference_m": 0.003626323643770214,
+              "member_hit_count": 1,
+              "normal_geometric_angle_interval_deg": [
+                1.0878001343708985,
+                1.0878001343708985
+              ],
+              "normal_geometric_candidate_vectors_base": [
+                [
+                  -0.005467558400631716,
+                  -0.0,
+                  0.9999850527908584
+                ]
+              ],
+              "normal_interpolated_angle_interval_deg": [
+                0.7990500294533369,
+                0.7990500294533369
+              ],
+              "normal_interpolated_candidate_vectors_base": [
+                [
+                  0.007521269354373867,
+                  9.210594240175765e-19,
+                  0.9999717148536249
+                ]
+              ],
+              "participating_segment_ids": [
+                90
+              ],
+              "point_base_xyz_m": [
+                0.004395533757921989,
+                -0.09637399608765647,
+                0.899966618743268
+              ]
+            },
+            "multiple_distinct_hits_waypoints": [],
+            "no_forward_hit_waypoints": [
+              0
+            ],
+            "normal_certainty": "PARTIAL_OR_AMBIGUOUS",
+            "normal_nonunique_or_unavailable_waypoints": [
+              0
+            ],
+            "physical_coating_quality": "NOT_ASSESSED",
+            "point_hit_waypoints": 180,
+            "position_certainty": "PARTIAL_OR_INDETERMINATE",
+            "position_indeterminate_waypoints": [
+              0
+            ],
+            "scope": "FINITE_C1_DESIGN_POLYGONAL_STRIP_NOT_MEASURED_TUNNEL",
+            "shared_edge_multiple_normal_waypoints": [],
+            "waypoint_count": 181
+          },
+          "signed_base_tz_m": 0.0
+        },
+        {
+          "amplitude_m": 0.015595703125,
+          "measurement": {
+            "continuous_collision": "NOT_ASSESSED",
+            "coplanar_uncertain_waypoints": [],
+            "extrema_on_confirmed_hits_only": {
+              "axial_standoff_delta_m": {
+                "abs_value_m": 0.015621176672777293,
+                "waypoint": 90
+              },
+              "landing_offset_material_reference_m": {
+                "abs_value_m": 0.015620815667014806,
+                "waypoint": 157
+              },
+              "normal_geometric_angle_interval_deg": {
+                "upper_deg": 1.371493954191462,
+                "waypoint": 14
+              },
+              "normal_interpolated_angle_interval_deg": {
+                "upper_deg": 2.5883940888478367,
+                "waypoint": 15
+              }
+            },
+            "first_critical_hit": {
+              "axial_standoff_delta_m": 0.015621176672777293,
+              "distance_m": 0.2756211766727773,
+              "facet_normal_separation_deg": 0.0,
+              "landing_offset_material_reference_m": 0.003844093411157047,
+              "member_hit_count": 1,
+              "normal_geometric_angle_interval_deg": [
+                1.102020806842009,
+                1.102020806842009
+              ],
+              "normal_geometric_candidate_vectors_base": [
+                [
+                  0.02066110885905365,
+                  -0.0,
+                  0.9997865365070258
+                ]
+              ],
+              "normal_interpolated_angle_interval_deg": [
+                0.7992084195405414,
+                0.7992084195405414
+              ],
+              "normal_interpolated_candidate_vectors_base": [
+                [
+                  0.007712914487253742,
+                  9.445284087579596e-19,
+                  0.9999702550326748
+                ]
+              ],
+              "participating_segment_ids": [
+                89
+              ],
+              "point_base_xyz_m": [
+                0.004511184759969077,
+                -0.0961564994795634,
+                0.9155611902746441
+              ]
+            },
+            "multiple_distinct_hits_waypoints": [],
+            "no_forward_hit_waypoints": [
+              0,
+              180
+            ],
+            "normal_certainty": "PARTIAL_OR_AMBIGUOUS",
+            "normal_nonunique_or_unavailable_waypoints": [
+              0,
+              180
+            ],
+            "physical_coating_quality": "NOT_ASSESSED",
+            "point_hit_waypoints": 179,
+            "position_certainty": "PARTIAL_OR_INDETERMINATE",
+            "position_indeterminate_waypoints": [
+              0,
+              180
+            ],
+            "scope": "FINITE_C1_DESIGN_POLYGONAL_STRIP_NOT_MEASURED_TUNNEL",
+            "shared_edge_multiple_normal_waypoints": [],
+            "waypoint_count": 181
+          },
+          "signed_base_tz_m": 0.015595703125
+        },
+        {
+          "amplitude_m": 0.01560546875,
+          "measurement": {
+            "continuous_collision": "NOT_ASSESSED",
+            "coplanar_uncertain_waypoints": [],
+            "extrema_on_confirmed_hits_only": {
+              "axial_standoff_delta_m": {
+                "abs_value_m": 0.015630942019425942,
+                "waypoint": 90
+              },
+              "landing_offset_material_reference_m": {
+                "abs_value_m": 0.015630580327388413,
+                "waypoint": 157
+              },
+              "normal_geometric_angle_interval_deg": {
+                "upper_deg": 1.371493954191462,
+                "waypoint": 14
+              },
+              "normal_interpolated_angle_interval_deg": {
+                "upper_deg": 2.590015234110086,
+                "waypoint": 15
+              }
+            },
+            "first_critical_hit": {
+              "axial_standoff_delta_m": 0.015630942019425942,
+              "distance_m": 0.27563094201942595,
+              "facet_normal_separation_deg": 0.0,
+              "landing_offset_material_reference_m": 0.0038442308425514975,
+              "member_hit_count": 1,
+              "normal_geometric_angle_interval_deg": [
+                1.102020806842009,
+                1.102020806842009
+              ],
+              "normal_geometric_candidate_vectors_base": [
+                [
+                  0.02066110885905365,
+                  -0.0,
+                  0.9997865365070258
+                ]
+              ],
+              "normal_interpolated_angle_interval_deg": [
+                0.7992085659220126,
+                0.7992085659220126
+              ],
+              "normal_interpolated_candidate_vectors_base": [
+                [
+                  0.007713034448721333,
+                  9.44543099315502e-19,
+                  0.9999702541073874
+                ]
+              ],
+              "participating_segment_ids": [
+                89
+              ],
+              "point_base_xyz_m": [
+                0.004511257171785663,
+                -0.09615636329981385,
+                0.9155709544032162
+              ]
+            },
+            "multiple_distinct_hits_waypoints": [],
+            "no_forward_hit_waypoints": [
+              0,
+              180
+            ],
+            "normal_certainty": "PARTIAL_OR_AMBIGUOUS",
+            "normal_nonunique_or_unavailable_waypoints": [
+              0,
+              180
+            ],
+            "physical_coating_quality": "NOT_ASSESSED",
+            "point_hit_waypoints": 179,
+            "position_certainty": "PARTIAL_OR_INDETERMINATE",
+            "position_indeterminate_waypoints": [
+              0,
+              180
+            ],
+            "scope": "FINITE_C1_DESIGN_POLYGONAL_STRIP_NOT_MEASURED_TUNNEL",
+            "shared_edge_multiple_normal_waypoints": [],
+            "waypoint_count": 181
+          },
+          "signed_base_tz_m": 0.01560546875
+        },
+        {
+          "amplitude_m": 0.02,
+          "measurement": {
+            "continuous_collision": "NOT_ASSESSED",
+            "coplanar_uncertain_waypoints": [],
+            "extrema_on_confirmed_hits_only": {
+              "axial_standoff_delta_m": {
+                "abs_value_m": 0.020025348011327437,
+                "waypoint": 90
+              },
+              "landing_offset_material_reference_m": {
+                "abs_value_m": 0.020024668962180265,
+                "waypoint": 157
+              },
+              "normal_geometric_angle_interval_deg": {
+                "upper_deg": 4.08827290899652,
+                "waypoint": 14
+              },
+              "normal_interpolated_angle_interval_deg": {
+                "upper_deg": 3.3280027014159708,
+                "waypoint": 15
+              }
+            },
+            "first_critical_hit": {
+              "axial_standoff_delta_m": 0.020025348011327437,
+              "distance_m": 0.28002534801132745,
+              "facet_normal_separation_deg": 0.0,
+              "landing_offset_material_reference_m": 0.0039062023482608105,
+              "member_hit_count": 1,
+              "normal_geometric_angle_interval_deg": [
+                1.102020806842009,
+                1.102020806842009
+              ],
+              "normal_geometric_candidate_vectors_base": [
+                [
+                  0.02066110885905365,
+                  -0.0,
+                  0.9997865365070258
+                ]
+              ],
+              "normal_interpolated_angle_interval_deg": [
+                0.7992804326197753,
+                0.7992804326197753
+              ],
+              "normal_interpolated_candidate_vectors_base": [
+                [
+                  0.007767017135615669,
+                  9.511538534522228e-19,
+                  0.9999698362674823
+                ]
+              ],
+              "participating_segment_ids": [
+                89
+              ],
+              "point_base_xyz_m": [
+                0.004543842489249871,
+                -0.09609508241251799,
+                0.9199648122606803
+              ]
+            },
+            "multiple_distinct_hits_waypoints": [],
+            "no_forward_hit_waypoints": [
+              0,
+              180
+            ],
+            "normal_certainty": "PARTIAL_OR_AMBIGUOUS",
+            "normal_nonunique_or_unavailable_waypoints": [
+              0,
+              180
+            ],
+            "physical_coating_quality": "NOT_ASSESSED",
+            "point_hit_waypoints": 179,
+            "position_certainty": "PARTIAL_OR_INDETERMINATE",
+            "position_indeterminate_waypoints": [
+              0,
+              180
+            ],
+            "scope": "FINITE_C1_DESIGN_POLYGONAL_STRIP_NOT_MEASURED_TUNNEL",
+            "shared_edge_multiple_normal_waypoints": [],
+            "waypoint_count": 181
+          },
+          "signed_base_tz_m": 0.02
+        }
+      ],
+      "ray": "tz+"
+    }
+  ],
+  "schema": "FR5_C5B1_R3_R2_FINITE_RAYCAST_V1",
+  "semantic_change": "SPLIT_POSITION_AND_NORMAL_CERTAINTY; FINITE_COPLANAR_INTERVALS; ADJACENT_DUPLICATE_ONLY",
+  "source": "C1_181_POINT_OPEN_RULLED_STRIP_Y_1.10M",
+  "status": "OFFLINE_FINITE_REFERENCE_SURFACE_REPLAY_NOT_PHYSICAL_CERTIFICATE"
+}
