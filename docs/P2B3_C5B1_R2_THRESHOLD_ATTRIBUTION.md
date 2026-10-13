@@ -70,3 +70,15 @@ Test: python -m unittest discover -s tests -p test_p2b3_c5b1_r2_attribution.py
 4. Treat strict continuous collision checking and physical clearance as separate safety evidence.
 
 Context: Chen et al., Journal of Manufacturing Processes 131 (2024), DOI 10.1016/j.jmapro.2024.09.081; Autonomous Trajectory Planning for Spray Painting on Complex Surfaces Based on a Point Cloud Model, PMC10747898. Published process models do not define an FR5-specific acceptance tolerance.
+
+## E. Distribution receipt and code-version caveat (2026-10-13)
+
+- Google Drive offline patch: https://drive.google.com/file/d/1KdC3TbDGRI_o7VqMsJwjTXBLFB4MTypX/view?usp=drivesdk
+- Package name: `FR5_C5B1_R2_threshold_attribution_patch.zip`; length: 6064 bytes.
+- SHA-256 of locally retained ZIP and Drive raw-file byte readback: `aef7cbfe52817251cc9c11f473c6c27aca50d3f43456aa981301772eb993a03a` (MATCH).
+- Verified GitHub branch source blob SHA: `8b17ebdeab99fe1af4f11c05201fea593ea1a44f` (`src/p2b3_c5b1_r2_attribution.py`).
+- Verified GitHub branch test blob SHA: `c28b473d49d2b2ec423434fbe90e74695596b675` (`tests/test_p2b3_c5b1_r2_attribution.py`).
+- Distribution caveat: the ZIP contains an independently packaged implementation and tests; their file blobs differ from the GitHub branch. This is **not a byte-identical GitHub source snapshot**. For a single source of truth, use the versioned GitHub branch and its documentation; use the ZIP as an independently tested offline patch, not as proof of source-byte parity.
+- In-session ZIP-source targeted tests: 5 passed; the GitHub source was inspected, not independently executed in ROS 2 / MoveIt2 here. Do not infer native replay, physical coating validation, CCD, or laboratory acceptance from this receipt.
+
+The historical C5B1 source inputs and original Google Drive native JSON/CSV/report remain unchanged.
