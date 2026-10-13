@@ -58,9 +58,9 @@ Run from the GitHub repository root, with Python 3.10 or newer:
       --c1-target outputs/internal_wiper_moveit_inputs/open_arch_tcp_poses_base_link.csv \
       --output-json /external/dir/P2B3_C5B1_R2_ATTRIBUTION.json
 
-The script checks the pinned C1 CSV hashes, checks the 12-ray native scan structure, prevents overwrites and labels its physical-claim scope. The --allow-hash-mismatch option is exploratory and must never be reported as verified evidence. The authoritative C5B1 JSON remains a separate Drive input, not a generated file in this branch.
+The script checks both pinned C1 CSV hashes and the published C5B1 JSON SHA256 (20dd1df5a2c4a1239f3a8079d70cb0932c80b9b57b70c94064d3614ea14ee31a), checks the 12-ray native scan structure, prevents overwrites and labels its physical-claim scope. The --allow-hash-mismatch option is exploratory and must never be reported as verified evidence. The authoritative C5B1 JSON remains a separate Drive input, not a generated file in this branch.
 
-Test: python -m unittest tests.test_p2b3_c5b1_r2_attribution
+Test: python -m unittest discover -s tests -p test_p2b3_c5b1_r2_attribution.py
 
 ## Next physical research requirements
 
