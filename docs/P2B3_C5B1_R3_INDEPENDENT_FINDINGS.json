@@ -1,0 +1,72 @@
+{
+  "C5B1_native_JSON_SHA256": "20dd1df5a2c4a1239f3a8079d70cb0932c80b9b57b70c94064d3614ea14ee31a",
+  "date": "2026-10-13",
+  "evidence_source": "GitHub frozen C1 FK and C1 target CSV, read via GitHub connector and recomputed independently using JS in current session",
+  "frozen_waypoint_count": 181,
+  "limitations": {
+    "continuous_collision": "NOT_ASSESSED",
+    "mesh_numerical_accuracy": "NO_MEASURED_GEOMETRY_VALIDATION",
+    "physical_surface": "NOT_AVAILABLE",
+    "process_quality": "NOT_ASSESSED"
+  },
+  "measurement_type": "RECONSTRUCTED_FINITE_PIECEWISE_PLANAR_REFERENCE_SURFACE_NOT_PHYSICAL_SCAN",
+  "probes": [
+    {
+      "hit": 180,
+      "magnitude_m": 0,
+      "max_abs_axial_standoff_error_mm": 0.02466,
+      "max_intersection_normal_deg": 0.79905,
+      "max_landing_offset_mm": 3.626324,
+      "multi_hit": 0,
+      "no_hit": 1,
+      "ray": "zero"
+    },
+    {
+      "hit": 181,
+      "magnitude_m": 0.014599609375,
+      "max_abs_axial_standoff_error_mm": 14.580691,
+      "max_intersection_normal_deg": 2.391862,
+      "max_landing_offset_mm": 14.616929,
+      "multi_hit": 0,
+      "no_hit": 0,
+      "ray": "tz-"
+    },
+    {
+      "hit": 181,
+      "magnitude_m": 0.014609375,
+      "max_abs_axial_standoff_error_mm": 14.590456,
+      "max_intersection_normal_deg": 2.393461,
+      "max_landing_offset_mm": 14.626695,
+      "multi_hit": 0,
+      "no_hit": 0,
+      "ray": "tz-"
+    },
+    {
+      "hit": 179,
+      "magnitude_m": 0.015595703125,
+      "max_abs_axial_standoff_error_mm": 15.621177,
+      "max_intersection_normal_deg": 2.588394,
+      "max_landing_offset_mm": 15.620816,
+      "multi_hit": 0,
+      "no_hit": 2,
+      "ray": "tz+"
+    },
+    {
+      "hit": 179,
+      "magnitude_m": 0.01560546875,
+      "max_abs_axial_standoff_error_mm": 15.630942,
+      "max_intersection_normal_deg": 2.590015,
+      "max_landing_offset_mm": 15.63058,
+      "multi_hit": 0,
+      "no_hit": 2,
+      "ray": "tz+"
+    }
+  ],
+  "project": "FAIRINO_FR5",
+  "python_runner_canonical_output": "NOT_EXECUTED_ON_FROZEN_INPUTS_IN_THIS_SESSION",
+  "reference_C1_FK_SHA256": "ed8cffa87dae845df0dcc3cf50f88225e3f72b1fa425acce6def08e7ee60acee",
+  "reference_C1_target_SHA256": "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7",
+  "schema": "P2B3_C5B1_R3_INDEPENDENT_REFERENCE_SURFACE_FINDINGS_V1",
+  "surface": "C1 181 frozen wall points connected as open 180-segment polyline and extruded 1.10 m along base Y",
+  "targeted_unit_tests": "8_PASS_SYNTHETIC_FIXTURES"
+}
