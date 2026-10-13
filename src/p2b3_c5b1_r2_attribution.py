@@ -18,6 +18,7 @@ THRESHOLDS_M = (0.003, 0.006, 0.010)
 AXES = ("tx", "ty", "tz", "rx", "ry", "rz")
 C1_TARGET_HASH = "8a7d4a22c9e701bf840da255e1619e81b4a29bac4183528ad76fc918e16fbde7"
 C1_FK_HASH = "ed8cffa87dae845df0dcc3cf50f88225e3f72b1fa425acce6def08e7ee60acee"
+C5B1_SCAN_HASH = "20dd1df5a2c4a1239f3a8079d70cb0932c80b9b57b70c94064d3614ea14ee31a"
 
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8-sig") as stream:
@@ -193,8 +194,9 @@ def main():
     args=ap.parse_args()
     if args.output_json.exists():ap.error("output_json_already_exists")
     if not args.allow_hash_mismatch:
-        if sha(args.c1_fk)!=C1_FK_HASH or sha(args.c1_target)!=C1_TARGET_HASH:
-            ap.error("frozen_C1_input_sha256_mismatch")
+        if (sha(args.c1_fk)!=C1_FK_HASH or sha(args.c1_target)!=C1_TARGET_HASH
+            or sha(args.scan_json)!=C5B1_SCAN_HASH):
+            ap.error("frozen_C1_or_authoritative_C5B1_sha256_mismatch")
     scan=json.loads(args.scan_json.read_text(encoding="utf-8-sig"))
     rows=samples(read_csv(args.c1_fk),read_csv(args.c1_target))
     result=analyze(scan,rows)
